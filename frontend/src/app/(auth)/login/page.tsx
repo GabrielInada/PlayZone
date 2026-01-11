@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Input } from '../../components/Input'; // Se o @ continuar vermelho, use '../../components/Input'
+import { Input } from '@/components/Input'; // Se o @ continuar vermelho, use '../../components/Input'
 
 // 1. Definição dinâmica dos campos para evitar HTML repetido
 type LoginField = {

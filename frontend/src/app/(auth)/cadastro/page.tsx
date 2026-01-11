@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Image from 'next/image';
-import { Input } from '../../components/Input';
+import { Input } from '@/components/Input';
 import Link from 'next/link';
 
 // Tipagem rigorosa para os campos do formulário
