@@ -1,12 +1,16 @@
 'use client';
-import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Input } from '@/components/Input'; // Se o @ continuar vermelho, use '../../components/Input'
+import Image from "next/image";
+import Link from "next/link";
+import { useState } from "react";
+import { Input } from "@/components/Input";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema } from "@/lib/validations";
 
-// 1. Definição dinâmica dos campos para evitar HTML repetido
+// 1. Ajuste nomes para 'email' e 'password' para bater com o Zod
 type LoginField = {
-  name: 'email' | 'senha';
+  name: 'email' | 'password';
   label: string;
   type: string;
   placeholder: string;
@@ -14,38 +18,42 @@ type LoginField = {
 
 const LOGIN_FIELDS: LoginField[] = [
   { name: 'email', label: 'Email:', type: 'email', placeholder: 'Digite seu email' },
-  { name: 'senha', label: 'Senha:', type: 'password', placeholder: 'Digite sua senha' },
+  { name: 'password', label: 'Senha:', type: 'password', placeholder: 'Digite sua senha' },
 ];
 
 export default function LoginPage() {
-  // 2. Estado dinâmico para capturar os dados
-  const [formData, setFormData] = useState({ email: '', senha: '' });
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+  // 2. Configuração do Hook Form
+  const { 
+    register, 
+    handleSubmit, 
+    formState: { errors } 
+  } = useForm({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: '',
+      password: '' // Mudado de 'senha' para 'password'
+    }
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: any) => {
     setIsLoading(true);
-
-    // Simulação de autenticação profissional
-    console.log("Enviando para o Backend:", formData);
+    console.log("Dados Validados:", data);
     
     setTimeout(() => {
       setIsLoading(false);
-      alert("Login realizado com sucesso (Simulação)");
+      // Redireciona para /home (verifique se a pasta existe em src/app/home)
+      router.push('/home'); 
     }, 1500);
   };
 
   return (
     <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
       <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-300 w-full max-w-md">
-        {/* Centralização da logo com Tailwind */}
         <Image 
-          src="/file.svg" 
+          src="/logo_ufraPlayZone.png" 
           alt="Logo UFRA PlayZone" 
           width={150} 
           height={150} 
@@ -57,19 +65,22 @@ export default function LoginPage() {
           Entre com suas credenciais para acessar o sistema
         </p>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Mapeamento dinâmico dos inputs */}
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {LOGIN_FIELDS.map((field) => (
-            <Input
-              key={field.name}
-              name={field.name}
-              label={field.label}
-              type={field.type}
-              placeholder={field.placeholder}
-              value={formData[field.name]}
-              onChange={handleChange}
-              required
-            />
+            <div key={field.name} className="flex flex-col">
+              <Input
+                {...register(field.name)} // Conecta ao Zod
+                label={field.label}
+                type={field.type}
+                placeholder={field.placeholder}
+              />
+              {/* Exibição das mensagens de erro do Zod */}
+              {errors[field.name] && (
+                <span className="text-red-600 text-xs mt-1 font-bold uppercase">
+                  {errors[field.name]?.message as string}
+                </span>
+              )}
+            </div>
           ))}
           
           <button 
@@ -89,7 +100,6 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Footer fixo com o verde oficial da UFRA */}
       <footer className="w-full h-10 bg-[#004a1b] fixed bottom-0 left-0" />
     </main>
   );

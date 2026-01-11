@@ -1,83 +1,102 @@
 'use client';
-import { useState } from 'react';
-import Image from 'next/image';
-import { Input } from '@/components/Input';
-import Link from 'next/link';
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signupSchema } from "@/lib/validations";
+import { Input } from "@/components/Input";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 
-// Tipagem rigorosa para os campos do formulário
-type FormField = {
-  name: 'nome' | 'email' | 'senha' | 'confirmarSenha';
-  label: string;
-  type: string;
-  placeholder: string;
-};
+const SIGNUP_FIELDS = [
+  { name: 'name', label: 'Nome Completo:', type: 'text', placeholder: 'Seu nome' },
+  { name: 'email', label: 'Email:', type: 'email', placeholder: 'seu@email.com' },
+  { name: 'password', label: 'Senha:', type: 'password', placeholder: 'Crie uma senha' },
+  { name: 'confirmPassword', label: 'Confirmar Senha:', type: 'password', placeholder: 'Repita a senha' },
+] as const;
 
-const REGISTER_FIELDS: FormField[] = [
-  { name: 'nome', label: 'Nome Completo:', type: 'text', placeholder: 'Digite seu nome' },
-  { name: 'email', label: 'Email:', type: 'email', placeholder: 'Digite seu email' },
-  { name: 'senha', label: 'Senha:', type: 'password', placeholder: 'Digite sua senha' },
-  { name: 'confirmarSenha', label: 'Confirmar Senha:', type: 'password', placeholder: 'Confirme sua senha' },
-];
+export default function SignupPage() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [perfilSelecionado, setPerfilSelecionado] = useState(""); // Estado para controlar a cor
 
-export default function RegisterPage() {
-  const [formData, setFormData] = useState<Record<string, string>>({
-    nome: '', email: '', senha: '', confirmarSenha: '', perfil: 'delegado'
+  const { register, handleSubmit, formState: { errors } } = useForm({
+    resolver: zodResolver(signupSchema)
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const onSubmit = async (data: any) => {
+    setIsLoading(true);
+    
+    setTimeout(() => {
+      setIsLoading(false);
+      
+      alert("Conta criada com sucesso! Redirecionando para o login..."); 
+      
+      router.push('/login'); 
+    }, 1500);
   };
 
   return (
     <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
       <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-300 w-full max-w-md">
-        <Image src="/file.svg" alt="Logo" width={150} height={150} className="mx-auto mb-6" />
+        <Image src="/logo_ufraPlayZone.png" alt="Logo UFRA" width={120} height={120} className="mx-auto mb-4" />
+        <h2 className="text-xl font-bold text-[#004a1b] mb-6 text-center">Cadastro de Usuário</h2>
         
-        <p className="text-sm text-gray-600 mb-6 text-center">
-          Faça seu cadastro para acessar o sistema
-        </p>
-        
-        <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
-          {/* Mapeamento dinâmico: Menos HTML, mais lógica React */}
-          {REGISTER_FIELDS.map((field) => (
-            <Input
-              key={field.name}
-              name={field.name}
-              label={field.label}
-              type={field.type}
-              placeholder={field.placeholder}
-              value={formData[field.name]}
-              onChange={handleChange}
-              required
-            />
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
+          {/* 1. Inputs de Texto normais */}
+          {SIGNUP_FIELDS.map((field) => (
+            <div key={field.name}>
+              <Input
+                {...register(field.name)}
+                label={field.label}
+                type={field.type}
+                placeholder={field.placeholder}
+              />
+              {errors[field.name] && (
+                <span className="text-red-600 text-[10px] font-bold uppercase mt-1">
+                  {errors[field.name]?.message as string}
+                </span>
+              )}
+            </div>
           ))}
 
-          <div className="flex flex-col gap-1">
+          {/* 2. Seleção de Perfil EM ÚLTIMO */}
+          <div className="flex flex-col gap-1 w-full">
             <label className="text-sm font-bold text-gray-700">Selecione Seu Perfil:</label>
             <select 
-              name="perfil"
-              onChange={handleChange}
-              className="p-2 border border-gray-300 rounded-md bg-gray-200 outline-none cursor-pointer"
-            >
-              <option value="delegado">Delegado da partida</option>
-              <option value="jogador">Jogador</option>
-              <option value="jogador">Administrador</option>
-            </select>
+            {...register("perfil", { 
+              onChange: (e) => setPerfilSelecionado(e.target.value)
+            })}
+            className={`p-2 border border-[#004a1b] rounded-md bg-[#E8E8E8] outline-none focus:ring-2 focus:ring-green-600 transition-all ${
+              perfilSelecionado === "" ? "text-gray-500" : "text-black"
+            }`}
+          >
+            <option value="">Escolha uma opção</option>
+            <option value="jogador">Jogador</option>
+            <option value="delegado">Delegado da partida</option>
+            <option value="admin">Administrador</option>
+          </select>
+            {errors.perfil && (
+              <span className="text-red-600 text-[10px] font-bold uppercase mt-1">
+                {errors.perfil.message as string}
+              </span>
+            )}
           </div>
-
-          <button type="submit" className="w-full bg-green-700 text-white py-2 rounded-md font-bold hover:bg-green-800 transition-all">
-            Solicitar Acesso
+          
+          <button 
+            type="submit" 
+            disabled={isLoading}
+            className="w-full bg-[#004a1b] text-white py-2 rounded-md font-bold mt-4 hover:bg-green-800 disabled:bg-gray-400"
+          >
+            {isLoading ? "Processando..." : "Finalizar Cadastro"}
           </button>
         </form>
-        <p className="mt-4 text-sm text-gray-600 text-center italic">
-          Já tem uma conta?{" "}
-          <Link href="/login" className="text-blue-600 font-semibold hover:underline transition-all">
-            Entrar
-          </Link>
+
+        <p className="mt-4 text-xs text-center text-gray-600">
+          Já tem uma conta? <Link href="/login" className="text-blue-600 font-bold hover:underline">Entre aqui</Link>
         </p>
       </div>
-      <footer className="w-full h-10 bg-green-900 fixed bottom-0" />
+      <footer className="w-full h-10 bg-[#004a1b] fixed bottom-0 left-0" />
     </main>
   );
 }
