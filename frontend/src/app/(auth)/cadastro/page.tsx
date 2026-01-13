@@ -40,7 +40,10 @@ export default function SignupPage() {
     <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
       <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-300 w-full max-w-md">
         <Image src="/logo_ufraPlayZone.png" alt="Logo UFRA" width={120} height={120} className="mx-auto mb-4" />
-        <h2 className="text-xl font-bold text-[#004a1b] mb-6 text-center">Cadastro de Usuário</h2>
+        
+        <p className="text-sm text-gray-600 mb-6 text-center">
+          Cadastre suas credenciais para acessar o sistema
+        </p>
         
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
           {/* 1. Inputs de Texto normais */}
@@ -92,8 +95,8 @@ export default function SignupPage() {
           </button>
         </form>
 
-        <p className="mt-4 text-xs text-center text-gray-600">
-          Já tem uma conta? <Link href="/login" className="text-blue-600 font-bold hover:underline">Entre aqui</Link>
+        <p className="mt-6 text-sm text-gray-600 text-center italic">
+          Já tem uma conta? <Link href="/login" className="text-blue-600 font-semibold hover:underline">Entre aqui</Link>
         </p>
       </div>
       <footer className="w-full h-10 bg-[#004a1b] fixed bottom-0 left-0" />

@@ -34,7 +34,7 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
-      password: '' // Mudado de 'senha' para 'password'
+      password: ''
     }
   });
 
