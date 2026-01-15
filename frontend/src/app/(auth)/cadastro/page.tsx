@@ -25,16 +25,24 @@ export default function SignupPage() {
   });
 
   const onSubmit = async (data: any) => {
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      setIsLoading(false);
-      
-      alert("Conta criada com sucesso! Redirecionando para o login..."); 
-      
+  setIsLoading(true);
+  
+  // 1. Simulação Dados Mockados
+  console.log("Dados recebidos do formulário:", data);
+
+  // 2. Simulação de processamento (delay de rede)
+  setTimeout(() => {
+    setIsLoading(false);
+
+    // 3. Teste de Lógica: Sucesso apenas se o nome for "Teste"
+    if (data.name === "Teste") {
+      alert("Usuário validado com sucesso!");
       router.push('/login'); 
-    }, 1500);
-  };
+    } else {
+      alert("Erro simulado! Tente usar o nome 'Teste' para passar.");
+    }
+  }, 1500);
+};
 
   return (
     <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">

@@ -39,15 +39,22 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: any) => {
-    setIsLoading(true);
-    console.log("Dados Validados:", data);
+  setIsLoading(true);
+  
+  // Log para verificar se o Zod capturou os dados corretamente
+  console.log("Tentativa de Login com:", data);
+
+  // Simulação de autenticação no backend
+  setTimeout(() => {
+    setIsLoading(false);
+
+    //Sucesso se os dados passarem pela validação do Zod
+    // No futuro, aqui você verificará se a resposta do fetch foi 'ok'
+    alert("Login realizado com sucesso! Bem-vindo ao UFRA PlayZone.");
     
-    setTimeout(() => {
-      setIsLoading(false);
-      // Redireciona para /home (verifique se a pasta existe em src/app/home)
-      router.push('/home'); 
-    }, 1500);
-  };
+    router.push('/home'); 
+  }, 1500);
+};
 
   return (
     <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
