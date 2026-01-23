@@ -1,10 +1,8 @@
-type ContainerHeaderProps = {
-    children: React.ReactNode;
-}
+type ContainerHeaderProps = { children: React.ReactNode };
 
 export function ContainerHeader({ children }: ContainerHeaderProps) {
     return (
-        <div className="mx-auto max-w-[98rem] px-4 sm:px-6 lg:px-8 py-4">
+        <div className="mx-auto max-w-[98rem] px-6 sm:px-8 lg:px-14 py-4">
             {children}
         </div>
     );
