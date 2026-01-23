@@ -39,3 +39,27 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# cache
+.npm/
+.cache/
+.eslintcache
+*.log
+
+# Dependências
+node_modules/
+
+# Build e Cache do Next.js 
+.next/
+out/
+
+# Logs de erro
+npm-debug.log*
+yarn-debug.log*
+
+# Ignora node_modules em qualquer nível do projeto
+node_modules/
+
+package-lock.jason
+package.json
+
