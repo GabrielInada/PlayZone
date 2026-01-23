@@ -13,11 +13,23 @@ export function Header() {
     return (
         <ContainerHeader>
             <header className="bg-white">
-                <nav className="relative flex items-center my-8 gap-6 md:gap-10 lg:justify-end bg-white">
-                    {/* Logo centralizada no mobile/tablet e menor */}
-                    <div className="absolute left-1/2 -translate-x-1/2 lg:static lg:translate-x-0 lg:mr-auto shrink-0">
-                        <Logo  />
+                {/* MOBILE/TABLET: coluna (logo em cima, botão embaixo)
+            DESKTOP (lg+): linha (layout normal) */}
+                <nav className="relative flex flex-col items-center gap-3 py-2 lg:flex-row lg:gap-10 lg:justify-end">
+                    {/* Logo (no mobile não precisa ser absolute) */}
+                    <div className="shrink-0 lg:mr-auto">
+                        <Logo />
                     </div>
+
+                    {/* Botão hambúrguer centralizado (mobile/tablet) */}
+                    <button
+                        type="button"
+                        className="inline-flex lg:hidden items-center justify-center rounded-lg border border-black/10 p-2"
+                        aria-label={open ? "Fechar menu" : "Abrir menu"}
+                        onClick={() => setOpen((v) => !v)}
+                    >
+                        {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                    </button>
 
                     {/* Links desktop/tablet */}
                     <div className="hidden lg:flex items-center gap-10">
@@ -29,7 +41,7 @@ export function Header() {
 
                     {/* Bloco do usuário (desktop/tablet) */}
                     <div className="hidden lg:flex items-center gap-4">
-                        <CircleUserIcon className="h-20 w-20 lg:h-12 lg:w-12 text-[#044710]" />
+                        <CircleUserIcon className="h-10 w-10 text-[#044710]" />
 
                         <div className="flex flex-col gap-[0.2rem] leading-[1.1]">
                             <p className="m-0 whitespace-nowrap text-[#044710]">
@@ -59,25 +71,16 @@ export function Header() {
                         <ArrowRightFromLineIcon />
                     </button>
 
-                    {/* Botão hambúrguer (mobile) */}
-                    <button
-                        type="button"
-                        className="ml-auto inline-flex lg:hidden items-center justify-center rounded-lg border border-black/10 p-2"
-                        aria-label={open ? "Fechar menu" : "Abrir menu"}
-                        onClick={() => setOpen((v) => !v)}
-                    >
-                        {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                    </button>
-
                     {/* Painel mobile (dropdown) */}
                     {open && (
                         <div
                             className="
-                absolute left-0 right-0 top-full mt-3
+                w-full
                 rounded-xl border border-black/10
                 bg-white shadow-lg
                 lg:hidden
                 p-4
+                mt-2
               "
                             role="dialog"
                             aria-modal="true"
@@ -137,7 +140,7 @@ export function Header() {
                     )}
                 </nav>
 
-                <hr className="border border-black" />
+                {/* ✅ removido o <hr /> */}
             </header>
         </ContainerHeader>
     );
