@@ -33,6 +33,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "midrewear"  ],
   "exclude": ["node_modules"]
 }
