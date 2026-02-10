@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useRef } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/Input';
 import { estadioSchema, EstadioFormData } from '@/lib/validations';
 import { formatarMilhar } from '@/utils/formatters'; 
+import toast from 'react-hot-toast';
 
 interface ModalEstadioProps {
   isOpen: boolean;
@@ -15,6 +17,8 @@ interface ModalEstadioProps {
 export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
   // Referência para detectar o clique fora do modal
   const modalRef = useRef<HTMLDivElement>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<EstadioFormData>({
     resolver: zodResolver(estadioSchema),
@@ -28,10 +32,19 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
   };
 
   const onSubmit = async (data: EstadioFormData) => {
-    console.log("Dados prontos para o backend:", data);
-    alert("Estádio Adicionado!");
-    reset();
-    onClose();
+    setIsLoading(true);
+  
+      setTimeout(() => {
+      setIsLoading(false);
+      toast.success('Estádio salvo com sucesso!', {
+        style: {
+          background: '#004a1b',
+          color: '#fff',
+          fontFamily: 'Roboto, sans-serif',
+        },
+      });
+      onClose();
+    }, 1500);
   };
 
   if (!isOpen) return null;

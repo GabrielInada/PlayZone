@@ -9,8 +9,6 @@ export default function AdicionarEstadioPage() {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   const handleConfirmDelete = () => {
-    // Aqui entrará a integração com o backend futuramente
-    alert("Estádio excluído com sucesso (Mock)!");
     setIsDeleteOpen(false);
   };
 
@@ -31,7 +29,7 @@ export default function AdicionarEstadioPage() {
         onClick={() => setIsDeleteOpen(true)}
         className="w-64 border-2 border-red-600 text-red-600 py-3 rounded-lg font-bold hover:bg-red-50 transition-all"
       >
-        🗑️ Testar Exclusão
+        Testar Exclusão
       </button>
 
       {/* Modals */}
