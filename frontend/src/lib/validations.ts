@@ -17,3 +17,12 @@ export const signupSchema = z.object({
   message: "Senhas diferentes",
   path: ["confirmPassword"]
 });
+
+// Validação de Adicionar Estádio
+export const estadioSchema = z.object({
+  nome: z.string().min(3, "O nome do estádio deve ter pelo menos 3 caracteres"),
+  capacidade: z.coerce.number().min(1, "A capacidade deve ser maior que zero"),
+  localizacao: z.string().min(5, "Informe uma localização mais detalhada"),
+});
+
+export type EstadioFormData = z.infer<typeof estadioSchema>;

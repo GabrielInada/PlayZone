@@ -1,1 +1,3 @@
-export class CreatePlayerDto {}
+export class CreatePlayerDto {
+    name: string;
+}

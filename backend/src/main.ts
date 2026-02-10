@@ -6,7 +6,8 @@ import configuration from './config/configuration';
 const logger = new Logger('NestApplication');
 
 async function bootstrap() {
-  const { port } = configuration();
+  const config = configuration();
+  const { port } = config;
   const app = await NestFactory.create(AppModule);
   await app.listen(port);
   logger.log('Backend is alive on ', await app.getUrl());

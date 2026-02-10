@@ -1,3 +1,4 @@
+
 const backendPort = parseInt(process.env.BACKEND_PORT ?? '3000', 10);
 
 export default () => ({
@@ -7,5 +8,6 @@ export default () => ({
   dbName: process.env.DB_NAME,
   dbUser: process.env.DB_USER,
   dbPass: process.env.DB_PASS,
+  dbUrl: process.env.DATABASE_URL,
   backendUrl: process.env.BACKEND_URL || `http://localhost:${backendPort}`,
 });
