@@ -11,7 +11,7 @@ export function Footer() {
         gap-6
         bg-[#F5F5F5]
         text-[1.2rem]
-        px-6 py-4
+        px-10 py-4
         md:gap-[1.2rem] md:text-[1.1rem]
         max-md:flex-col max-md:gap-[0.8rem] max-md:px-5 max-md:py-6 max-md:text-[1.1rem]
       "
@@ -19,7 +19,7 @@ export function Footer() {
             <img
                 src="/logo.png"
                 alt="UFRA Playzone"
-                className="h-16 w-16 bg-transparent md:h-20 md:w-20 max-md:h-[5.2rem] max-md:w-[5.2rem] max-[479px]:h-[4.6rem] max-[479px]:w-[4.6rem]"
+                className="h-16 w-16 bg-transparent md:h-20 md:w-20 lg:h-16 lg:w-16 max-md:h-[5.2rem] max-md:w-[5.2rem] max-[479px]:h-[4.6rem] max-[479px]:w-[4.6rem]"
             />
 
             <a className="inline-flex items-center justify-center text-[#116A24]">
