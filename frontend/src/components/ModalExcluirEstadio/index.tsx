@@ -14,7 +14,7 @@ export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm }: ModalExcluir
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
       {/* Container do Modal de Exclusão */}
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200">
+      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-8 animate-in fade-in zoom-in duration-200">
         
         <h2 className="text-xl font-bold text-gray-900 mb-2">Excluir Estádio</h2>
         
