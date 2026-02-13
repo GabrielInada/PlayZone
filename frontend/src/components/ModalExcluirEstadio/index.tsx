@@ -23,6 +23,7 @@ export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, nomeEstadio }:
   const handleConfirm = () => {
     onConfirm();
     toast.error(`Estádio ${nomeEstadio || ''} removido com sucesso!`, {
+      position: 'bottom-right',
       style: {
         borderRadius: '8px',
         background: '#333',
