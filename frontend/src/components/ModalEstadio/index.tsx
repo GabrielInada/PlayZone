@@ -37,6 +37,7 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
       setTimeout(() => {
       setIsLoading(false);
       toast.success('Estádio salvo com sucesso!', {
+        position: 'bottom-right',
         style: {
           background: '#004a1b',
           color: '#fff',
@@ -54,21 +55,21 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
       className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
       onClick={handleOverlayClick}
     >
-      {/* Ajuste de Width: max-w-sm para um modal mais compacto */}
+      
       <div 
         ref={modalRef}
         className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-8 animate-in fade-in zoom-in duration-200"
       > 
-        {/* X Removido conforme solicitado */}
+        
 
         <div className="mb-6">
-          {/* Tamanho da fonte ajustado para text-xl */}
+          
           <h2 className="text-xl font-bold text-gray-800">Adicionar Estádio</h2>
           <p className="text-[12px] text-gray-500">Crie e configure as informações do estádio</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          {/* Input sem fundo escuro: o componente Input precisa lidar com o bg-white */}
+          
           <Input 
             {...register("nome")} 
             label="Nome do Estádio" 
@@ -79,8 +80,8 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
           <Input 
             {...register("capacidade")}
             label="Capacidade"
-            placeholder="00.000"
-            type="text" // Mudamos para text para aceitar a máscara
+            placeholder="Quantidade"
+            type="text" 
             onChange={(e) => {
               const valorFormatado = formatarMilhar(e.target.value);
               e.target.value = valorFormatado;
@@ -96,7 +97,7 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
           />
 
           <div className="flex justify-end gap-2 mt-6">
-            {/* Botões reduzidos: px-3 py-1.5 e texto menor */}
+            
             <button 
               type="button" 
               onClick={onClose} 
