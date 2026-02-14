@@ -1,6 +1,13 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Roboto, Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
+import { Toaster } from 'react-hot-toast';
+
+const roboto = Roboto({
+  weight: ['400', '500', '700'],
+  subsets: ['latin'],
+  display: 'swap',
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,15 +24,13 @@ export const metadata: Metadata = {
   description: "Sistema de gerenciamento de partidas",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang="pt-br" className={roboto.className}>
+      <body>
         {children}
+        {/* Posiciona as notificações no topo e centro por padrão */}
+        <Toaster position="top-center" reverseOrder={false} />
       </body>
     </html>
   );

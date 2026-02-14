@@ -7,4 +7,22 @@ export class Player {
 
     @Column()
     name: string;
+
+    @Column()
+    shirtNumber: number;
+
+    @Column()
+    position: string;
+
+    @Column()
+    birthDate: Date;
+    
+    @Column()
+    teamId: number;
+
+    @Column()
+    CreatedAt: Date;
+
+    @Column()
+    UpdatedAt: Date;
 }
