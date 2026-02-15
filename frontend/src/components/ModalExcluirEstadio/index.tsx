@@ -46,7 +46,7 @@ export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, nomeEstadio }:
         ref={modalRef}
         className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200 font-roboto"
       >
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Excluir Estádio</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Excluir</h2>
         
         <p className="text-[14px] text-gray-600 mb-6">
           Tem a certeza de que deseja excluir este estádio? Esta ação não pode ser desfeita.

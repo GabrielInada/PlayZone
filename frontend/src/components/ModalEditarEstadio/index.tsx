@@ -65,7 +65,7 @@ export const ModalEditarEstadio = ({ isOpen, onClose, estadioData }: ModalEditar
         className="bg-white rounded-xl shadow-2xl w-full max-w-lg p-8 animate-in fade-in zoom-in duration-200 font-roboto"
       > 
         <div className="mb-6">
-          <h2 className="text-xl font-bold text-gray-800 text-[20px]">Editar Estádio</h2>
+          <h2 className="text-xl font-bold text-black-800">Editar</h2>
           <p className="text-[12px] text-gray-500 italic">Edite as configurações e informações do estádio</p>
         </div>
 
