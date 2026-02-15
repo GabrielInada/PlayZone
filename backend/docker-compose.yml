@@ -1,9 +1,0 @@
-services:
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: federacao_db
-    ports:
-      - '5432:5432'
