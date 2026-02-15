@@ -22,14 +22,13 @@ export const ModalEditarEstadio = ({ isOpen, onClose, estadioData }: ModalEditar
     resolver: zodResolver(estadioSchema),
   });
 
-  // Preenche o formulário automaticamente quando o modal abre com dados
   useEffect(() => {
     if (isOpen && estadioData) {
-      setValue('nome', estadioData.nome);
-      setValue('capacidade', formatarMilhar(estadioData.capacidade.toString()) as any);
-      setValue('localizacao', estadioData.localizacao);
+    setValue('nome', estadioData.nome);
+    setValue('capacidade', formatarMilhar(estadioData.capacidade.toString()) as any);
+    setValue('localizacao', estadioData.localizacao);
     }
-  }, [isOpen, estadioData, setValue]);
+    }, [isOpen, estadioData, setValue]);
 
   const handleOverlayClick = (e: React.MouseEvent) => {
     if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
