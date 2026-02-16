@@ -19,7 +19,7 @@ export function Footer() {
             <img
                 src="/logo.png"
                 alt="UFRA Playzone"
-                className="h-16 w-16 bg-transparent md:h-20 md:w-20 lg:h-16 lg:w-16 max-md:h-[5.2rem] max-md:w-[5.2rem] max-[479px]:h-[4.6rem] max-[479px]:w-[4.6rem]"
+                className="h-16 w-16 bg-transparent md:h-20 md:w-20 lg:h-12 lg:w-12 max-md:h-[5.2rem] max-md:w-[5.2rem] max-[479px]:h-[4.6rem] max-[479px]:w-[4.6rem]"
             />
 
             <a className="inline-flex items-center justify-center text-[#116A24]">
