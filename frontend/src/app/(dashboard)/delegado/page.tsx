@@ -18,7 +18,7 @@ type CurrentMatch = {
     city: string;
     spectators: number;
     teams: string;
-    imageUrl: string; // pode ser um placeholder
+    imageUrl: string;
 };
 
 const mockStats: DelegateStats = {
@@ -40,41 +40,41 @@ const mockCurrentMatch: CurrentMatch = {
 
 export default function DelegatePage() {
     return (
-        <main className="min-h-screen bg-white">
-            <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 lg:px-8">
+        <main className="bg-white">
+            <div className="mx-auto w-full max-w-5xl px-4 py-3 sm:px-6 lg:px-8">
                 <DelegateHeader title="Painel do Delegado" />
 
-                <div className="mt-4">
+                <div className="mt-3">
                     <ResponsibilityBanner
                         eyebrow="SUAS RESPONSABILIDADES"
                         highlight={`${mockStats.assignedMatches} Partidas Designadas`}
                         description="Gerencie suas partidas e relatórios"
-                        icon={<CalendarDays className="h-6 w-6" />}
+                        icon={<CalendarDays className="h-5 w-5" />}
                         href="/delegado/partidas"
                     />
                 </div>
 
-                <section className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <section className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <StatCard
                         title="Relatórios Aprovados"
                         value={mockStats.approvedReports}
-                        icon={<ClipboardCheck className="h-6 w-6" />}
+                        icon={<ClipboardCheck className="h-5 w-5" />}
                         iconTone="success"
                     />
                     <StatCard
                         title="Próximas Partidas"
                         value={mockStats.upcomingMatches}
-                        icon={<Trophy className="h-6 w-6" />}
+                        icon={<Trophy className="h-5 w-5" />}
                         iconTone="success"
                     />
                 </section>
 
-                <section className="mt-6">
-                    <h2 className="text-center text-sm font-semibold text-gray-900">
+                <section className="mt-3">
+                    <h2 className="text-center text-xs font-semibold text-gray-900">
                         Partida Atual
                     </h2>
 
-                    <div className="mt-3">
+                    <div className="mt-2">
                         <CurrentMatchCard
                             matchId={mockCurrentMatch.id}
                             stadiumName={mockCurrentMatch.stadiumName}

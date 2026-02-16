@@ -14,8 +14,8 @@ const mockRecentGames = [
 
 export default function AdminPage() {
     return (
-        <main className="min-h-screen bg-white">
-            <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-6 lg:px-8">
+        <main className="bg-white">
+            <div className="mx-auto w-full max-w-4xl px-4 py-2 sm:px-6 lg:px-8">
                 <AdminHeader title="Painel Administrativo" />
 
                 <div className="mt-4">
