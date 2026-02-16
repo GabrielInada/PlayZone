@@ -28,7 +28,7 @@ export default function ModalExcluirCampeonato({
           Excluir Campeonato
         </h2>
 
-        <div className="text-gray-600 mb-6 space-y-1">
+        <div className="text-gray-600 mb-6 space-y-0.2">
           <p className="text-base">
             Tem certeza de que deseja excluir esse campeonato?
           </p>
