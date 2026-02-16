@@ -6,33 +6,39 @@ import { CampeonatoCard } from './CampeonatoCard/CampeonatoCard';
 import ModalCriarCampeonato from '@/components/ModalCriarCampeonato';
 import ModalExcluirCampeonato from '@/components/ModalExcluirCampeonato';
 import ModalEditarCampeonato from '@/components/ModalEditarCampeonato';
+import ModalErroExcluirCampeonato from '@/components/ModalErroExcluirCampeonato';
 
 const MOCK_CAMPEONATOS = [
   { id: 1, nome: "Copa UFRA 2025", ano: "2025", status: "Em Andamento", formato: "Mata Mata - 16 Times" },
   { id: 2, nome: "Libertadores BSI 2025", ano: "2025", status: "Em Andamento", formato: "Mata Mata - 16 Times" },
   { id: 3, nome: "Brasileirão Série A 2025", ano: "2025", status: "Em Andamento", formato: "Mata Mata - 16 Times" },
   { id: 4, nome: "UFRA Regional 2025", ano: "2025", status: "Em Andamento", formato: "Mata Mata - 16 Times" },
-  { id: 5, nome: "UEPA Cup 2025", ano: "2025", status: "Em Andamento", formato: "Mata Mata - 16 Times" },
+  { id: 5, nome: "UEPA Cup 2025", ano: "2025", status: "Finalizado", formato: "Mata Mata - 16 Times" },
 ];
 
 export default function CampeonatosPage() {
   const [searchTerm, setSearchTerm] = useState("");
   
+  // Estados para Modais
   const [isModalOpen, setIsModalOpen] = useState(false);
-  
   const [isExcluirModalOpen, setIsExcluirModalOpen] = useState(false);
-  const [campeonatoParaExcluir, setCampeonatoParaExcluir] = useState<number | null>(null);
-
+  const [isErroModalOpen, setIsErroModalOpen] = useState(false); 
   const [isEditarModalOpen, setIsEditarModalOpen] = useState(false);
+  
+  const [campeonatoParaExcluir, setCampeonatoParaExcluir] = useState<number | null>(null);
   const [campeonatoParaEditar, setCampeonatoParaEditar] = useState<any>(null);
 
   const filtrados = MOCK_CAMPEONATOS.filter(c => 
     c.nome.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleOpenExcluir = (id: number) => {
-    setCampeonatoParaExcluir(id);
-    setIsExcluirModalOpen(true);
+  const handleOpenExcluir = (camp: any) => {
+    if (camp.status === "Em Andamento") {
+      setIsErroModalOpen(true); 
+    } else {
+      setCampeonatoParaExcluir(camp.id);
+      setIsExcluirModalOpen(true); 
+    }
   };
 
   const handleConfirmExcluir = () => {
@@ -87,7 +93,7 @@ export default function CampeonatosPage() {
                 status={camp.status}
                 formato={camp.formato}
                 onEdit={() => handleOpenEditar(camp)}
-                onDelete={() => handleOpenExcluir(camp.id)}
+                onDelete={() => handleOpenExcluir(camp)} 
               />
             ))}
           </div>
@@ -115,6 +121,11 @@ export default function CampeonatosPage() {
         isOpen={isEditarModalOpen}
         onClose={() => setIsEditarModalOpen(false)}
         campeonato={campeonatoParaEditar}
+      />
+
+      <ModalErroExcluirCampeonato 
+        isOpen={isErroModalOpen}
+        onClose={() => setIsErroModalOpen(false)}
       />
     </>
   );
