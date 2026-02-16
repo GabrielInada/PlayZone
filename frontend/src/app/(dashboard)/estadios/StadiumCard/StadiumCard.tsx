@@ -28,7 +28,7 @@ export function StadiumCard({
       className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-300 flex flex-col transition-all duration-300 hover:scale-105 hover:shadow-xl group"
       data-testid="card-estadio-item"
     >
-      {/* Imagem com Badge Ativo */}
+      
       <div className="relative h-48 bg-gray-200">
         <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2.5 py-1 rounded-md shadow-sm border border-green-100">
