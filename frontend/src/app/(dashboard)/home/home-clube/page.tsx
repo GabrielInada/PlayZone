@@ -5,7 +5,9 @@ import { Footer } from "@/components/Footer";
 import { Calendar } from "lucide-react";
 
 export default function HomeClubePage() {
-  const classificacao = [
+  const classificacao = [ 
+// Substituir por chamada de serviço quando a API de classificação estiver disponível. - Verificar com o Pedro o código da HOME ADMIN para que os códigos fiquem padronizados
+// Atualmente utilizando dados fixos apenas para simulação da interface.
     { pos: "1°", name: "Flamenguinho", active: false },
     { pos: "2°", name: "PSzinho", active: false },
     { pos: "3°", name: "Vasquinho", active: true },
