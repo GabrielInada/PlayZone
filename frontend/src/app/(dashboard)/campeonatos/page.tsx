@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import { CampeonatoCard } from './CampeonatoCard/CampeonatoCard';
 import ModalCriarCampeonato from '@/components/ModalCriarCampeonato';
+import ModalExcluirCampeonato from '@/components/ModalExcluirCampeonato';
 
 const MOCK_CAMPEONATOS = [
   { id: 1, nome: "Copa UFRA 2025", ano: "2025", status: "Em Andamento", formato: "Mata Mata - 16 Times" },
@@ -16,10 +17,28 @@ const MOCK_CAMPEONATOS = [
 export default function CampeonatosPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Estados para o Modal de Exclusão
+  const [isExcluirModalOpen, setIsExcluirModalOpen] = useState(false);
+  const [campeonatoParaExcluir, setCampeonatoParaExcluir] = useState<number | null>(null);
 
   const filtrados = MOCK_CAMPEONATOS.filter(c => 
     c.nome.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Função para abrir o modal de exclusão salvando o ID
+  const handleOpenExcluir = (id: number) => {
+    setCampeonatoParaExcluir(id);
+    setIsExcluirModalOpen(true);
+  };
+
+  // Função para confirmar a exclusão
+  const handleConfirmExcluir = () => {
+    console.log(`Campeonato ${campeonatoParaExcluir} excluído com sucesso!`);
+    // Lógica de API viria aqui
+    setIsExcluirModalOpen(false);
+    setCampeonatoParaExcluir(null);
+  };
 
   return (
     <>
@@ -62,7 +81,7 @@ export default function CampeonatosPage() {
                 status={camp.status}
                 formato={camp.formato}
                 onEdit={() => console.log("Editar", camp.id)}
-                onDelete={() => console.log("Excluir", camp.id)}
+                onDelete={() => handleOpenExcluir(camp.id)} // Passa o ID para a função
               />
             ))}
           </div>
@@ -79,6 +98,13 @@ export default function CampeonatosPage() {
       <ModalCriarCampeonato 
         isOpen={isModalOpen} 
         onClose={() => setIsModalOpen(false)} 
+      />
+
+      {/* Modal de Exclusão */}
+      <ModalExcluirCampeonato 
+        isOpen={isExcluirModalOpen}
+        onClose={() => setIsExcluirModalOpen(false)}
+        onConfirm={handleConfirmExcluir}
       />
     </>
   );
