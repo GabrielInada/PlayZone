@@ -14,16 +14,16 @@ export default function AlertBanner({ title, highlight, description, href }: Pro
         <Link
             href={href}
             className={[
-                "rounded-xl bg-red-700 text-white",
+                "rounded-md bg-red-700 text-white",
                 "px-4 py-4 sm:px-5",
                 "flex items-center justify-between gap-4",
                 "cursor-pointer hover:bg-red-800 transition-colors",
             ].join(" ")}
             aria-label={`Abrir: ${highlight}`}
         >
-            <div className="min-w-0">
+            <div className="min-w-0 p-1">
                 <p className="text-[11px] font-semibold tracking-wide opacity-95">{title}</p>
-                <p className="mt-0.5 text-xl font-bold leading-tight">{highlight}</p>
+                <p className="mt-0.5 text-xl md:text-2xl font-bold leading-tight">{highlight}</p>
                 {description ? <p className="mt-1 text-sm opacity-90">{description}</p> : null}
             </div>
 

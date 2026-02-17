@@ -24,7 +24,7 @@ export default function CurrentMatchCard({
                                              cancelHref,
                                          }: Props) {
     return (
-        <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="rounded-xl border border-gray-100 bg-white shadow-md">
             <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-[280px_1fr] sm:items-stretch">
                 {/* Imagem */}
                 <div className="relative h-40 w-full overflow-hidden rounded-xl sm:h-full">
@@ -62,17 +62,17 @@ export default function CurrentMatchCard({
                     </div>
 
                     {/* Ações */}
-                    <div className="flex flex-col gap-2 sm:items-end">
+                    <div className="flex flex-col p-2 gap-2 sm:items-end">
                         <Link
                             href={registerHref}
-                            className="inline-flex w-full items-center justify-center rounded-full bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 transition sm:w-auto"
+                            className="inline-flex w-full items-center justify-center rounded-full bg-[#136B19] px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-800 transition sm:w-auto"
                         >
                             Registrar Súmula
                         </Link>
 
                         <Link
                             href={cancelHref}
-                            className="inline-flex w-full items-center justify-center rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition sm:w-auto"
+                            className="inline-flex w-full items-center justify-center rounded-sm bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition sm:w-auto"
                         >
                             Cancelar Partida
                         </Link>

@@ -12,8 +12,8 @@ export default function ActionCard({ title, description, href }: Props) {
         <Link
             href={href}
             className={[
-                "block rounded-xl border border-gray-200 bg-white px-4 py-4 shadow-sm",
-                "text-left cursor-pointer hover:shadow-md hover:border-gray-300 transition",
+                "block rounded-xl px-5 py-5 bg-white border border-gray-100 rounded-md p-4 shadow-lg hover:border-emerald-200 transition-colors",
+                "text-left cursor-pointer ",
             ].join(" ")}
             aria-label={`Abrir: ${title}`}
         >

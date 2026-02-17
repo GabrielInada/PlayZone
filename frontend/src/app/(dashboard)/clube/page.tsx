@@ -34,7 +34,7 @@ export default function HomeClubePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-        <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-lg flex justify-between items-center group hover:border-emerald-200 transition-colors">
+        <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-md flex justify-between items-center group hover:border-emerald-200 transition-colors">
           <div className="flex-1">
             <p className="text-[9px] font-bold text-gray-500 uppercase">
               Próxima Partida

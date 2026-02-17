@@ -20,7 +20,7 @@ export default function ResponsibilityBanner({
         <Link
             href={href}
             className={[
-                "rounded-xl bg-sky-600 text-white",
+                "rounded-md bg-sky-600 text-white",
                 "px-4 py-4 sm:px-5",
                 "flex items-center justify-between gap-4",
                 "cursor-pointer hover:bg-sky-700 transition-colors",
