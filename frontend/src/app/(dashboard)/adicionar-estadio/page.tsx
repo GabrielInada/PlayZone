@@ -3,17 +3,19 @@
 import { useState } from 'react';
 import { ModalEstadio } from '@/components/ModalEstadio';
 import { ModalExcluirEstadio } from '@/components/ModalExcluirEstadio';
+import { ModalEditarEstadio } from '@/components/ModalEditarEstadio';
 
 export default function AdicionarEstadioPage() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isEditOpen, setIsEditOpen] = useState(false); // Novo estado para edição
 
   const handleConfirmDelete = () => {
     setIsDeleteOpen(false);
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 flex flex-col items-center justify-center gap-4">
+    <div className="min-h-screen bg-gray-50 p-8 flex flex-col items-center justify-center gap-4 font-roboto">
       <h1 className="text-2xl font-bold mb-6">Testes de Modals - Gestão</h1>
 
       {/* Botão de Adicionar */}
@@ -22,6 +24,14 @@ export default function AdicionarEstadioPage() {
         className="w-64 bg-[#004a1b] text-white py-3 rounded-lg font-bold hover:bg-green-900 shadow-md transition-all"
       >
         + Adicionar Estádio
+      </button>
+
+      {/* Botão de Editar */}
+      <button 
+        onClick={() => setIsEditOpen(true)}
+        className="w-64 bg-white border-2 border-blue-600 text-blue-600 py-3 rounded-lg font-bold hover:bg-blue-50 transition-all shadow-sm"
+      >
+        ✏️ Editar Estádio
       </button>
 
       {/* Botão de Excluir */}
@@ -35,6 +45,12 @@ export default function AdicionarEstadioPage() {
       {/* Modals */}
       <ModalEstadio isOpen={isAddOpen} onClose={() => setIsAddOpen(false)} />
       
+      <ModalEditarEstadio 
+        isOpen={isEditOpen} 
+        onClose={() => setIsEditOpen(false)} 
+        // Aqui futuramente você passará os dados do estádio selecionado
+      />
+
       <ModalExcluirEstadio 
         isOpen={isDeleteOpen} 
         onClose={() => setIsDeleteOpen(false)} 
