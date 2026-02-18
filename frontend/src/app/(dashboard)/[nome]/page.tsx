@@ -2,11 +2,12 @@
 
 import React, { useState } from 'react';
 import { CalendarPlus, Users, Clock } from 'lucide-react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import ModalAgendarPartida from '@/components/ModalAgendarPartida';
 
 export default function GerenciarCampeonatoPage() {
   const params = useParams();
+  const router = useRouter();
   const [isAgendarModalOpen, setIsAgendarModalOpen] = useState(false);
   
   const nomeCampeonato = params.nome 
@@ -17,6 +18,7 @@ export default function GerenciarCampeonatoPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col font-bold" data-testid="page-gerenciar-campeonato">
       <div className="w-full max-w-6xl mx-auto px-6 pt-10 pb-20 text-gray-900">
         
+        {/* Cabeçalho Dinâmico */}
         <div className="mb-10 text-left">
           <h1 className="text-3xl font-bold tracking-tight text-gray-900">
             {nomeCampeonato}
@@ -26,6 +28,7 @@ export default function GerenciarCampeonatoPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           
+          {/* Card: Agendar nova partida */}
           <button 
             onClick={() => setIsAgendarModalOpen(true)}
             className="flex items-center gap-5 p-6 bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-[#007a33] hover:shadow-md transition-all text-left group cursor-pointer"
@@ -39,6 +42,7 @@ export default function GerenciarCampeonatoPage() {
             </div>
           </button>
 
+          {/* Card: Importar Times */}
           <button className="flex items-center gap-5 p-6 bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-[#007a33] hover:shadow-md transition-all text-left group cursor-pointer">
             <div className="p-4 bg-gray-100 rounded-xl group-hover:bg-green-50 transition-colors">
               <Users size={36} className="text-gray-700 group-hover:text-[#007a33]" />
@@ -49,8 +53,11 @@ export default function GerenciarCampeonatoPage() {
             </div>
           </button>
 
-          {/* Card: Ver Partidas */}
-          <button className="flex items-center gap-5 p-6 bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-[#007a33] hover:shadow-md transition-all text-left group cursor-pointer">
+          {/* Card: Ver Partidas - Agora com Redirecionamento */}
+          <button 
+            onClick={() => router.push(`/${encodeURIComponent(nomeCampeonato)}/ver-partidas`)}
+            className="flex items-center gap-5 p-6 bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-[#007a33] hover:shadow-md transition-all text-left group cursor-pointer"
+          >
             <div className="p-4 bg-gray-100 rounded-xl group-hover:bg-green-50 transition-colors">
               <Clock size={36} className="text-gray-700 group-hover:text-[#007a33]" />
             </div>
@@ -62,6 +69,7 @@ export default function GerenciarCampeonatoPage() {
 
         </div>
 
+        {/* Botão Voltar */}
         <div className="flex justify-center">
           <button 
             onClick={() => window.history.back()}
@@ -72,6 +80,7 @@ export default function GerenciarCampeonatoPage() {
         </div>
       </div>
 
+      {/* Modais */}
       <ModalAgendarPartida 
         isOpen={isAgendarModalOpen}
         onClose={() => setIsAgendarModalOpen(false)}
