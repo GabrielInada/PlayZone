@@ -7,7 +7,8 @@ interface CampeonatoCardProps {
   status: string;
   formato: string;
   onDelete: () => void;
-  onEdit: () => void; 
+  onEdit: () => void;
+  onGerenciar: () => void; 
 }
 
 export function CampeonatoCard({ nome, ano, status, formato, onDelete, onEdit }: CampeonatoCardProps) {

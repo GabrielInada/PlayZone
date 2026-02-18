@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { CampeonatoCard } from './CampeonatoCard/CampeonatoCard';
 import ModalCriarCampeonato from '@/components/ModalCriarCampeonato';
 import ModalExcluirCampeonato from '@/components/ModalExcluirCampeonato';
@@ -17,9 +18,9 @@ const MOCK_CAMPEONATOS = [
 ];
 
 export default function CampeonatosPage() {
+  const router = useRouter(); 
   const [searchTerm, setSearchTerm] = useState("");
   
-  // Estados para Modais
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isExcluirModalOpen, setIsExcluirModalOpen] = useState(false);
   const [isErroModalOpen, setIsErroModalOpen] = useState(false); 
@@ -52,6 +53,10 @@ export default function CampeonatosPage() {
     setIsEditarModalOpen(true);
   };
 
+  const handleGerenciar = (id: number) => {
+    router.push('/gerenciar-campeonato');
+  };
+
   return (
     <>
       <div className="min-h-screen bg-white flex flex-col font-bold" data-testid="page-campeonatos">
@@ -62,22 +67,22 @@ export default function CampeonatosPage() {
             <p className="text-sm text-gray-500 font-medium">Visualize os campeonatos criados</p>
           </div>
 
-           <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-6">
             <div className="relative flex-grow w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" size={20} />
-            <input 
-              type="text" 
-              placeholder="Buscar ginásio..." 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-[#007a33] outline-none  font-bold" 
-            />
-          </div>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-600" size={20} />
+              <input 
+                type="text" 
+                placeholder="Buscar ginásio..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-[#007a33] outline-none font-bold" 
+              />
+            </div>
 
             <button 
               onClick={() => setIsModalOpen(true)}
               data-testid="btn-criar-campeonato" 
-              className="min-w-[40vh] flex justify-center bg-[#007a33] hover:bg-[#005f27] text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer text-20px"
+              className="min-w-[40vh] flex justify-center bg-[#007a33] hover:bg-[#005f27] text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer"
             >
               Criar Novo Campeonato
             </button>
@@ -92,7 +97,8 @@ export default function CampeonatosPage() {
                 status={camp.status}
                 formato={camp.formato}
                 onEdit={() => handleOpenEditar(camp)}
-                onDelete={() => handleOpenExcluir(camp)} 
+                onDelete={() => handleOpenExcluir(camp)}
+                onGerenciar={() => handleGerenciar(camp.id)}
               />
             ))}
           </div>
