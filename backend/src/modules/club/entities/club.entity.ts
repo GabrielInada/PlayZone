@@ -1,1 +1,6 @@
-export class Club {}
+import { Entity } from 'typeorm';
+
+@Entity()
+export class Club {
+    
+}

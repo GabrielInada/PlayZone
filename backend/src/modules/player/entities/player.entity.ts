@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Team } from 'src/modules/team/entities/team.entity';
+import { EnumPlayerPosition } from 'src/types/player';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('player')
 export class Player {
@@ -12,7 +14,10 @@ export class Player {
     shirtNumber: number;
 
     @Column()
-    position: string;
+    position: EnumPlayerPosition;
+
+    @ManyToOne(() => Team, (team) => team.players)
+    team: Team;
 
     @Column()
     birthDate: Date;

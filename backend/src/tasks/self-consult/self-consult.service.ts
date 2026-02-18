@@ -6,7 +6,6 @@ import configuration from 'src/config/configuration';
 export class SelfConsultService {
   private readonly logger = new Logger(SelfConsultService.name);
 
-  // Executa a cada minuto (Usando Enum do CronExpression)
   @Cron(CronExpression.EVERY_MINUTE)
   async keepAlivePing() {
     try {
