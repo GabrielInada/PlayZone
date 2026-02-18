@@ -1,11 +1,13 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { CalendarPlus, Users, Clock } from 'lucide-react';
 import { useParams } from 'next/navigation';
+import ModalAgendarPartida from '@/components/ModalAgendarPartida';
 
 export default function GerenciarCampeonatoPage() {
   const params = useParams();
+  const [isAgendarModalOpen, setIsAgendarModalOpen] = useState(false);
   
   const nomeCampeonato = params.nome 
     ? decodeURIComponent(params.nome as string) 
@@ -24,7 +26,10 @@ export default function GerenciarCampeonatoPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           
-          <button className="flex items-center gap-5 p-6 bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-[#007a33] hover:shadow-md transition-all text-left group cursor-pointer">
+          <button 
+            onClick={() => setIsAgendarModalOpen(true)}
+            className="flex items-center gap-5 p-6 bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-[#007a33] hover:shadow-md transition-all text-left group cursor-pointer"
+          >
             <div className="p-4 bg-gray-100 rounded-xl group-hover:bg-green-50 transition-colors">
               <CalendarPlus size={36} className="text-gray-700 group-hover:text-[#007a33]" />
             </div>
@@ -44,6 +49,7 @@ export default function GerenciarCampeonatoPage() {
             </div>
           </button>
 
+          {/* Card: Ver Partidas */}
           <button className="flex items-center gap-5 p-6 bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-[#007a33] hover:shadow-md transition-all text-left group cursor-pointer">
             <div className="p-4 bg-gray-100 rounded-xl group-hover:bg-green-50 transition-colors">
               <Clock size={36} className="text-gray-700 group-hover:text-[#007a33]" />
@@ -65,6 +71,12 @@ export default function GerenciarCampeonatoPage() {
           </button>
         </div>
       </div>
+
+      <ModalAgendarPartida 
+        isOpen={isAgendarModalOpen}
+        onClose={() => setIsAgendarModalOpen(false)}
+        nomeCampeonato={nomeCampeonato}
+      />
     </div>
   );
 }
