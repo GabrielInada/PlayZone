@@ -11,7 +11,15 @@ interface CampeonatoCardProps {
   onGerenciar: () => void; 
 }
 
-export function CampeonatoCard({ nome, ano, status, formato, onDelete, onEdit }: CampeonatoCardProps) {
+export function CampeonatoCard({ 
+  nome, 
+  ano, 
+  status, 
+  formato, 
+  onDelete, 
+  onEdit, 
+  onGerenciar 
+}: CampeonatoCardProps) {
   return (
     <div 
       data-testid="campeonato-card"
@@ -59,6 +67,7 @@ export function CampeonatoCard({ nome, ano, status, formato, onDelete, onEdit }:
         <div className="flex items-center justify-between w-full md:w-auto gap-3">
           <button 
             data-testid="btn-gerenciar" 
+            onClick={onGerenciar}
             className="flex-1 md:flex-none bg-[#007a33] hover:bg-[#005f27] text-white px-6 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 shadow-sm cursor-pointer whitespace-nowrap"
           >
             Gerenciar

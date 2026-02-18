@@ -53,8 +53,8 @@ export default function CampeonatosPage() {
     setIsEditarModalOpen(true);
   };
 
-  const handleGerenciar = (id: number) => {
-    router.push('/gerenciar-campeonato');
+  const handleGerenciar = (nome: string) => {
+    router.push(`/${encodeURIComponent(nome)}`);
   };
 
   return (
@@ -75,14 +75,14 @@ export default function CampeonatosPage() {
                 placeholder="Buscar ginásio..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-[#007a33] outline-none font-bold" 
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-600 rounded-lg focus:ring-2 focus:ring-[#007a33] outline-none font-bold shadow-sm" 
               />
             </div>
 
             <button 
               onClick={() => setIsModalOpen(true)}
               data-testid="btn-criar-campeonato" 
-              className="min-w-[40vh] flex justify-center bg-[#007a33] hover:bg-[#005f27] text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer"
+              className="min-w-[40vh] flex justify-center bg-[#007a33] hover:bg-[#005f27] text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer active:scale-95"
             >
               Criar Novo Campeonato
             </button>
@@ -98,13 +98,17 @@ export default function CampeonatosPage() {
                 formato={camp.formato}
                 onEdit={() => handleOpenEditar(camp)}
                 onDelete={() => handleOpenExcluir(camp)}
-                onGerenciar={() => handleGerenciar(camp.id)}
+                onGerenciar={() => handleGerenciar(camp.nome)}
               />
             ))}
           </div>
 
           <div className="mt-16 flex justify-center">
-            <button data-testid="btn-voltar-campeonatos" onClick={() => window.history.back()} className="bg-[#007a33] hover:bg-[#005f27] text-white px-12 py-2.5 rounded-lg font-bold shadow-md transition-all active:scale-95 cursor-pointer">
+            <button 
+              data-testid="btn-voltar-campeonatos" 
+              onClick={() => window.history.back()} 
+              className="bg-[#007a33] hover:bg-[#005f27] text-white px-12 py-2.5 rounded-lg font-bold shadow-md transition-all active:scale-95 cursor-pointer"
+            >
               Voltar
             </button>
           </div>
