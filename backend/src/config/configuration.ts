@@ -1,4 +1,3 @@
-
 const backendPort = parseInt(process.env.BACKEND_PORT ?? '3000', 10);
 
 export default () => ({
