@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { useParams } from "next/navigation";
 import { Trophy, Trash2 } from "lucide-react";
+import ModalExcluirPartida from "@/components/ModalExcluirPartida";
 
 const MOCK_PARTIDAS = [
   {
@@ -57,6 +58,23 @@ export default function VerPartidasPage() {
     ? decodeURIComponent(params.nome as string)
     : "Campeonato";
 
+  const [partidas, setPartidas] = useState(MOCK_PARTIDAS);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [partidaParaExcluir, setPartidaParaExcluir] = useState<number | null>(null);
+
+  const handleOpenExcluir = (id: number) => {
+    setPartidaParaExcluir(id);
+    setIsModalOpen(true);
+  };
+
+  const handleConfirmExcluir = () => {
+    if (partidaParaExcluir !== null) {
+      setPartidas((prev) => prev.filter((p) => p.id !== partidaParaExcluir));
+      setIsModalOpen(false);
+      setPartidaParaExcluir(null);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col font-bold">
       <div className="w-full max-w-5xl mx-auto px-6 pt-10 pb-20 text-gray-900">
@@ -71,7 +89,7 @@ export default function VerPartidasPage() {
         </div>
 
         <div className="flex flex-col gap-6 mb-12">
-          {MOCK_PARTIDAS.map((partida) => (
+          {partidas.map((partida) => (
             <div
               key={partida.id}
               className="w-full bg-gray-100 rounded-2xl px-6 py-4 border border-gray-200 shadow-sm"
@@ -112,7 +130,10 @@ export default function VerPartidasPage() {
                     Gerenciar
                   </button>
 
-                  <button className="p-1 text-gray-800 hover:text-red-600 transition cursor-pointer">
+                  <button 
+                    onClick={() => handleOpenExcluir(partida.id)}
+                    className="p-1 text-gray-800 hover:text-red-600 transition cursor-pointer"
+                  >
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -131,6 +152,12 @@ export default function VerPartidasPage() {
           </button>
         </div>
       </div>
+
+      <ModalExcluirPartida 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmExcluir}
+      />
     </div>
   );
 }
