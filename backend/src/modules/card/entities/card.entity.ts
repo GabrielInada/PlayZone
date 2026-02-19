@@ -1,19 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { MatchReport } from './match-report.entity';
-import { Player } from '../../teams/entities/player.entity';
-
-export enum CardType {
-  YELLOW = 'YELLOW',
-  RED = 'RED',
-}
+import { MatchReport } from "src/modules/match-report/entities/match-report.entity";
+import { Player } from "src/modules/player/entities/player.entity";
+import { EnumCardType } from "src/types/card";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Card {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'enum', enum: CardType })
-  type: CardType;
+  @Column({ type: 'enum', enum: EnumCardType })
+  type: EnumCardType;
 
   // Relacionamento com a Súmula
   @ManyToOne(() => MatchReport, (report) => report.cards, { onDelete: 'CASCADE' })

@@ -1,20 +1,44 @@
 import { Injectable } from '@nestjs/common';
+import { CreateStandingDto } from './dto/create-standing.dto';
+import { UpdateStandingDto } from './dto/update-standing.dto';
+import { MatchReport } from '../match-report/entities/match-report.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MatchReport } from '../match-reports/entities/match-report.entity';
-import { ReportStatus } from '../../common/enums/status.enum';
+
+import { EnumReportStatus } from '../../types/report';
 
 @Injectable()
 export class StandingsService {
+
   constructor(
     @InjectRepository(MatchReport)
-    private reportRepo: Repository<MatchReport>,
+    private reportRepository: Repository<MatchReport>,
   ) {}
+
+  create(createStandingDto: CreateStandingDto) {
+    return 'This action adds a new standing';
+  }
+
+  findAll() {
+    return `This action returns all standings`;
+  }
+
+  findOne(id: number) {
+    return `This action returns a #${id} standing`;
+  }
+
+  update(id: number, updateStandingDto: UpdateStandingDto) {
+    return `This action updates a #${id} standing`;
+  }
+
+  remove(id: number) {
+    return `This action removes a #${id} standing`;
+  }
 
   async getStandings() {
     // Busca súmulas validadas com relacionamentos necessários
-    const reports = await this.reportRepo.find({
-      where: { status: ReportStatus.VALIDATED },
+    const reports = await this.reportRepository.find({
+      where: { status: EnumReportStatus.VALIDATED },
       relations: ['match', 'match.homeTeam', 'match.awayTeam'],
     });
 

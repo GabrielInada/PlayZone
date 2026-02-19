@@ -1,39 +1,53 @@
-import { 
-  BadRequestException, 
-  ForbiddenException, 
-  Injectable, 
-  NotFoundException 
-} from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
-
-// DTOs
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateMatchReportDto } from './dto/create-match-report.dto';
-import { ReviewMatchReportDto, ReviewAction } from './dto/review-match-report.dto';
-
-// Entidades e Enums
+import { UpdateMatchReportDto } from './dto/update-match-report.dto';
+import { DataSource, Repository } from 'typeorm';
+import { Match } from '../match/entities/match.entity';
 import { MatchReport } from './entities/match-report.entity';
-import { Match } from '../matches/entities/match.entity';
-import { Goal } from './entities/goal.entity';
-import { Card } from './entities/card.entity';
-import { MatchStatus, ReportStatus } from '../../common/enums/status.enum';
+import { InjectRepository } from '@nestjs/typeorm';
+import { EnumReportStatus } from 'src/types/report';
+import { Goal } from '../goal/entities/goal.entity';
+import { Card } from '../card/entities/card.entity';
+import { EnumMatchStatus } from 'src/types/match';
+import { ReviewAction, ReviewMatchReportDto } from '../match-reports/dto/review-match-report.dto';
 
 @Injectable()
-export class MatchReportsService {
+export class MatchReportService {
+
   constructor(
     @InjectRepository(Match)
-    private matchRepo: Repository<Match>,
+    private matchRepository: Repository<Match>,
     
     @InjectRepository(MatchReport)
-    private reportRepo: Repository<MatchReport>,
+    private matchReportRepository: Repository<MatchReport>,
     
     // DataSource é necessário para criar transações manuais no TypeORM
-    private dataSource: DataSource, 
+    private dataSource: DataSource
   ) {}
+
+  //async create(createMatchReportDto: CreateMatchReportDto) {
+  //  return 'This action adds a new matchReport';
+  //}
+
+  async findAll() {
+    return `This action returns all matchReport`;
+  }
+
+  async findOne(id: number) {
+    return `This action returns a #${id} matchReport`;
+  }
+
+  async update(id: number, updateMatchReportDto: UpdateMatchReportDto) {
+    return `This action updates a #${id} matchReport`;
+  }
+
+  async remove(id: number) {
+    return `This action removes a #${id} matchReport`;
+  }
 
   // Listar partidas designadas ao delegado logado
   async getAssignedMatches(delegateId: number) {
-    return this.matchRepo.find({
+    return this.matchRepository.find({
       where: { delegateId },
       relations: ['homeTeam', 'awayTeam', 'report'], // Traz os dados dos times e status da súmula
       order: { date: 'ASC' }
@@ -43,7 +57,7 @@ export class MatchReportsService {
   // US008: Criar ou Regravar Súmula (Transação Atômica)
   async create(delegateId: number, dto: CreateMatchReportDto) {
     // 1. Validar existência da partida
-    const match = await this.matchRepo.findOne({
+    const match = await this.matchRepository.findOne({
       where: { id: dto.matchId },
       relations: ['report'],
     });
@@ -57,7 +71,7 @@ export class MatchReportsService {
     }
     
     // 3. Bloquear edição se já validada
-    if (match.report && match.report.status === ReportStatus.VALIDATED) {
+    if (match.report && match.report.status === EnumReportStatus.VALIDATED) {
       throw new BadRequestException('Súmula já validada pelo Admin, não pode ser alterada');
     }
 
@@ -82,7 +96,7 @@ export class MatchReportsService {
         homeScore: dto.homeScore,
         awayScore: dto.awayScore,
         observations: dto.observations,
-        status: ReportStatus.PENDING, // Volta para status PENDENTE para nova aprovação
+        status: EnumReportStatus.PENDING, // Volta para status PENDENTE para nova aprovação
         goals: dto.goals.map(g => ({ ...g })), // Mapeia DTO para objeto de entidade
         cards: dto.cards.map(c => ({ ...c })),
       });
@@ -90,7 +104,7 @@ export class MatchReportsService {
       const savedReport = await queryRunner.manager.save(newReport);
 
       // 6. Atualizar status da Partida para FINISHED
-      await queryRunner.manager.update(Match, dto.matchId, { status: MatchStatus.FINISHED });
+      await queryRunner.manager.update(Match, dto.matchId, { status: EnumMatchStatus.FINISHED });
 
       // CONFIRMA A TRANSAÇÃO
       await queryRunner.commitTransaction();
@@ -105,24 +119,20 @@ export class MatchReportsService {
     }
   }
 
-  //  Admin Valida ou Rejeita
+  // Auditoria
   async review(reportId: number, dto: ReviewMatchReportDto) {
-    const report = await this.reportRepo.findOne({ where: { id: reportId } });
-    
-    if (!report) throw new NotFoundException('Súmula não encontrada');
-
-    if (dto.action === ReviewAction.REJECT) {
-      if (!dto.reason) throw new BadRequestException('Motivo é obrigatório ao rejeitar');
-      
-      report.status = ReportStatus.REJECTED;
-      report.adminNote = dto.reason;
-    } else {
-      report.status = ReportStatus.VALIDATED;
-      report.adminNote = null; 
-      // Ao validar, a tabela de classificação (Self-Consult) será atualizada automaticamente
-      // pois ela consulta apenas partidas com status VALIDATED.
+    const report = await this.matchReportRepository.findOne({ where: { id: reportId } });
+    if (!report) throw new NotFoundException('Súmula não encontrada');  
+      if (dto.action === ReviewAction.REJECT) {
+        if (!dto.reason) throw new BadRequestException('Motivo obrigatório');
+        report.status = EnumReportStatus.REJECTED;
+        report.adminNote = dto.reason;
+      } else {
+        report.status = EnumReportStatus.VALIDATED;
+        report.adminNote = null;
+      }
+  
+      return this.matchReportRepository.save(report);
     }
 
-    return this.reportRepo.save(report);
-  }
 }

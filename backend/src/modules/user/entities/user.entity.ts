@@ -1,5 +1,6 @@
+import { Match } from "src/modules/match/entities/match.entity";
 import { EnumUserRole, EnumUserType } from "src/types/user";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class User {
@@ -20,6 +21,10 @@ export class User {
 
     @Column()
     type: EnumUserType;
+
+    // Relacionamento inverso: Um delegado pode ter várias partidas atribuídas
+    @OneToMany(() => Match, (match) => match.delegate)
+    assignedMatches: Match[];
 
     @Column()
     createdAt: Date;
