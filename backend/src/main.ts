@@ -16,6 +16,9 @@ async function bootstrap() {
     transform: true,  // Converte tipos (ex: string "1" vira number 1)
   }));
 
+  // ✅ HABILITA CORS - Permite requisições do frontend
+  app.enableCors();
+
   // Swagger config
   const config = new DocumentBuilder()
     .setTitle('Playzone API')
