@@ -5,7 +5,7 @@ import { MatchReport } from '../match-report/entities/match-report.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { EnumReportStatus } from '../../types/report';
+import { EnumMatchReportStatus } from '../../types/match-report';
 
 @Injectable()
 export class StandingsService {
@@ -38,7 +38,7 @@ export class StandingsService {
   async getStandings() {
     // Busca súmulas validadas com relacionamentos necessários
     const reports = await this.reportRepository.find({
-      where: { status: EnumReportStatus.VALIDATED },
+      where: { status: EnumMatchReportStatus.VALIDATED },
       relations: ['match', 'match.homeTeam', 'match.awayTeam'],
     });
 
