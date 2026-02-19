@@ -1,16 +1,12 @@
 import { IsEnum, IsString, ValidateIf } from 'class-validator';
-
-export enum ReviewAction {
-  ACCEPT = 'ACCEPT',
-  REJECT = 'REJECT',
-}
+import { EnumReviewAction } from 'src/types/reviewMatchReport';
 
 export class ReviewMatchReportDto {
-  @IsEnum(ReviewAction, { message: 'A ação deve ser ACCEPT ou REJECT' })
-  action: ReviewAction;
+  @IsEnum(EnumReviewAction, { message: 'A ação deve ser ACCEPT ou REJECT' })
+  action: EnumReviewAction;
 
   // O motivo é obrigatório APENAS se a ação for REJECT
-  @ValidateIf(o => o.action === ReviewAction.REJECT)
+  @ValidateIf(o => o.action === EnumReviewAction.REJECT)
   @IsString()
   reason?: string;
 }

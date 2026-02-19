@@ -9,7 +9,8 @@ import { EnumReportStatus } from 'src/types/report';
 import { Goal } from '../goal/entities/goal.entity';
 import { Card } from '../card/entities/card.entity';
 import { EnumMatchStatus } from 'src/types/match';
-import { ReviewAction, ReviewMatchReportDto } from '../match-reports/dto/review-match-report.dto';
+import { ReviewMatchReportDto } from '../match-reports/dto/review-match-report.dto';
+import { EnumReviewAction } from 'src/types/reviewMatchReport';
 
 @Injectable()
 export class MatchReportService {
@@ -123,7 +124,7 @@ export class MatchReportService {
   async review(reportId: number, dto: ReviewMatchReportDto) {
     const report = await this.matchReportRepository.findOne({ where: { id: reportId } });
     if (!report) throw new NotFoundException('Súmula não encontrada');  
-      if (dto.action === ReviewAction.REJECT) {
+      if (dto.action === EnumReviewAction.REJECT) {
         if (!dto.reason) throw new BadRequestException('Motivo obrigatório');
         report.status = EnumReportStatus.REJECTED;
         report.adminNote = dto.reason;
