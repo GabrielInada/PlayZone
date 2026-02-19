@@ -12,9 +12,8 @@ async function bootstrap() {
 
   // Deve vir ANTES do app.listen
   app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,            // Remove campos extras do JSON recebido
-    forbidNonWhitelisted: true, // Retorna erro se enviarem campos desconhecidos
-    transform: true,            // Converte tipos (ex: string "1" vira number 1)
+    whitelist: true,  // Remove campos extras do JSON recebido
+    transform: true,  // Converte tipos (ex: string "1" vira number 1)
   }));
 
   // Swagger config
