@@ -14,7 +14,7 @@ interface Player {
 
 const CadastroTime: React.FC = () => {
   const router = useRouter();
-  const TEAM_ID = 1; // ⚠️ ID fixo do time do clube logado - ajustar conforme autenticação
+  const TEAM_ID = 1;
 
   const [players, setPlayers] = useState<Player[]>([]);
   const [coachName, setCoachName] = useState('');
@@ -44,7 +44,6 @@ const CadastroTime: React.FC = () => {
     'pivô': 'Pivo',
   };
 
-  // Carregar dados do backend ao montar o componente
   useEffect(() => {
     loadTeamData();
   }, []);
@@ -54,29 +53,22 @@ const CadastroTime: React.FC = () => {
       setLoadingData(true);
       const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
-      // 1. Buscar dados do time
       const teamResponse = await fetch(`${API_URL}/team/${TEAM_ID}`);
       if (teamResponse.ok) {
         const team = await teamResponse.json();
         setCoachName(team.coachName || '');
       }
 
-      // 2. Buscar jogadores do time
       const playersResponse = await fetch(`${API_URL}/player`);
       if (playersResponse.ok) {
         const allPlayers = await playersResponse.json();
-        
-        // Filtrar apenas jogadores deste time
         const teamPlayers = allPlayers.filter((p: any) => p.teamId === TEAM_ID);
-        
-        // Converter para formato da interface
         const formattedPlayers: Player[] = teamPlayers.map((p: any) => ({
           id: p.id.toString(),
           number: p.shirtNumber.toString(),
           name: p.name,
           position: reversePositionMap[p.position] || p.position,
         }));
-
         setPlayers(formattedPlayers);
       }
     } catch (error) {
@@ -106,9 +98,49 @@ const CadastroTime: React.FC = () => {
     setTempEditData({ ...player });
   };
 
-  const saveEdit = () => {
-    if (tempEditData && editingId) {
+  const saveEdit = async () => {
+    if (!tempEditData || !editingId) return;
+
+    try {
+      // Se o ID é numérico, o jogador existe no backend
+      if (!isNaN(Number(editingId))) {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+        
+        console.log(`✏️ Atualizando jogador ID ${editingId} no backend...`);
+        
+        const updatePayload = {
+          name: tempEditData.name.trim(),
+          shirtNumber: parseInt(tempEditData.number, 10),
+          position: positionMap[tempEditData.position],
+          updatedAt: new Date().toISOString(),
+        };
+
+        console.log("📤 Payload de atualização:", updatePayload);
+
+        const updateResponse = await fetch(`${API_URL}/player/${editingId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatePayload),
+        });
+
+        if (!updateResponse.ok) {
+          const errorText = await updateResponse.text();
+          console.error("❌ Erro ao atualizar jogador:", errorText);
+          throw new Error("Erro ao atualizar jogador no backend");
+        }
+
+        const updatedPlayer = await updateResponse.json();
+        console.log(`✅ Jogador atualizado no backend:`, updatedPlayer);
+      }
+
+      // Atualiza estado local
       setPlayers(players.map(p => (p.id === editingId ? tempEditData : p)));
+      setEditingId(null);
+      setTempEditData(null);
+
+    } catch (error) {
+      console.error("💥 Erro ao salvar edição:", error);
+      alert("Erro ao salvar alterações. Tente novamente.");
       setEditingId(null);
       setTempEditData(null);
     }
@@ -119,9 +151,35 @@ const CadastroTime: React.FC = () => {
     setIsDeleteOpen(true);
   };
 
-  const confirmDeletion = () => {
-    if (playerToDeleteId) {
+  const confirmDeletion = async () => {
+    if (!playerToDeleteId) return;
+
+    try {
+      if (!isNaN(Number(playerToDeleteId))) {
+        const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+        
+        console.log(`🗑️ Deletando jogador ID ${playerToDeleteId} do backend...`);
+        
+        const deleteResponse = await fetch(`${API_URL}/player/${playerToDeleteId}`, {
+          method: "DELETE",
+        });
+
+        if (!deleteResponse.ok) {
+          const errorText = await deleteResponse.text();
+          console.error("❌ Erro ao deletar jogador:", errorText);
+          throw new Error("Erro ao deletar jogador do backend");
+        }
+
+        console.log(`✅ Jogador ${playerToDeleteId} deletado do backend`);
+      }
+
       setPlayers(players.filter(p => p.id !== playerToDeleteId));
+      setIsDeleteOpen(false);
+      setPlayerToDeleteId(null);
+
+    } catch (error) {
+      console.error("💥 Erro ao deletar:", error);
+      alert("Erro ao deletar jogador. Tente novamente.");
       setIsDeleteOpen(false);
       setPlayerToDeleteId(null);
     }
@@ -138,7 +196,6 @@ const CadastroTime: React.FC = () => {
     try {
       const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
-      // 1. Atualizar dados do time (técnico)
       const teamUpdateResponse = await fetch(`${API_URL}/team/${TEAM_ID}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
@@ -152,9 +209,7 @@ const CadastroTime: React.FC = () => {
         console.error("Erro ao atualizar time");
       }
 
-      // 2. Criar apenas jogadores novos (que não têm ID numérico do backend)
       for (const player of players) {
-        // Se o ID não é numérico, é um jogador novo
         if (isNaN(Number(player.id))) {
           const playerPayload = {
             name: player.name.trim(),
@@ -183,9 +238,7 @@ const CadastroTime: React.FC = () => {
         }
       }
 
-      // 3. Recarregar dados do backend
       await loadTeamData();
-
       setIsSuccessOpen(true);
 
     } catch (error) {
