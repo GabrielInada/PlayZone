@@ -50,7 +50,7 @@ export default function DelegatePage() {
                         highlight={`${mockStats.assignedMatches} Partidas Designadas`}
                         description="Gerencie suas partidas e relatórios"
                         icon={<CalendarDays className="h-5 w-5" />}
-                        href="/delegado/partidas"
+                        href="#"
                     />
                 </div>
 

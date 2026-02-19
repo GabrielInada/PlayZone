@@ -23,7 +23,7 @@ export default function AdminPage() {
                         title="ATENÇÃO NECESSÁRIA"
                         highlight={`${mockStats.pendingSummaries} Súmulas Pendentes`}
                         description="Clique para revisar e aprovar"
-                        href="/admin/sumulas" // rota mock
+                        href="#" // rota mock
                     />
                 </div>
 
@@ -68,22 +68,22 @@ export default function AdminPage() {
                     <ActionCard
                         title="Estádios Cadastrados"
                         description="Gerencie estádios, adicione, edite ou exclua"
-                        href="/admin/estadios"
+                        href="/estadios"
                     />
                     <ActionCard
                         title="Cadastrar Novo Usuário"
                         description="Crie novos perfis de usuários"
-                        href="/admin/usuarios/novo"
+                        href="/cadastro"
                     />
                     <ActionCard
                         title="Validar Cadastro"
                         description="Valide novos usuários do sistema"
-                        href="/admin/usuarios/validar"
+                        href="#"
                     />
                     <ActionCard
                         title="Validar Punições"
                         description="Valide possíveis punições enviadas"
-                        href="/admin/punicoes/validar"
+                        href="#"
                     />
                 </section>
 
