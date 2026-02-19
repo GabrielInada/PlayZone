@@ -64,14 +64,14 @@ export default function CurrentMatchCard({
                     {/* Ações */}
                     <div className="flex flex-col p-2 gap-2 sm:items-end">
                         <Link
-                            href={registerHref}
+                            href= "#"//{registerHref}
                             className="inline-flex w-full items-center justify-center rounded-full bg-[#136B19] px-4 py-3 text-sm font-semibold text-white hover:bg-emerald-800 transition sm:w-auto"
                         >
                             Registrar Súmula
                         </Link>
 
                         <Link
-                            href={cancelHref}
+                            href="#"//{cancelHref}
                             className="inline-flex w-full items-center justify-center rounded-sm bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700 transition sm:w-auto"
                         >
                             Cancelar Partida
