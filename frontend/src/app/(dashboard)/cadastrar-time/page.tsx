@@ -97,7 +97,7 @@ const CadastroTime: React.FC = () => {
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-md border border-gray-100 p-6 md:p-8">
         
         <div className="flex justify-between items-center border-b border-gray-800 pb-2 mb-6">
-          <h1 className="text-lg font-bold text-black uppercase tracking-tight">Gestão de Elenco • Computação FC</h1>
+          <h1 className="text-lg font-bold text-black uppercase tracking-tight">Gestão de Elenco • Computação</h1>
           <span className="bg-gray-500 text-white px-3 py-1 rounded-md text-sm font-bold" data-testid="form-elenco-contador">
             {players.length}/10 Jogadores Cadastrados
           </span>
