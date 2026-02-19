@@ -93,7 +93,7 @@ const CadastroTime: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans flex flex-col items-center p-4 md:p-6">
+    <div className="min-h-screen font-sans flex flex-col items-center p-4 md:p-6">
       <div className="w-full max-w-4xl bg-white rounded-2xl shadow-md border border-gray-100 p-6 md:p-8">
         
         <div className="flex justify-between items-center border-b border-gray-800 pb-2 mb-6">
@@ -113,7 +113,7 @@ const CadastroTime: React.FC = () => {
             value={coachName}
             onChange={(e) => setCoachName(e.target.value)}
             placeholder="Digite o nome do treinador..." 
-            className="w-full md:w-64 border border-gray-300 rounded-md p-2 text-sm outline-none focus:border-green-600"
+            className="w-full md:w-64 border border-gray-400 rounded-md p-2 text-sm outline-none focus:border-green-600"
           />
         </div>
 
@@ -122,15 +122,15 @@ const CadastroTime: React.FC = () => {
           <div className="flex flex-wrap items-end gap-3">
             <div className="w-16">
               <label className="block text-[10px] font-bold text-gray-700 mb-1">Nº *</label>
-              <input name="number" data-testid="form-jogador-numero-input" value={newPlayer.number} onChange={handleInputChange} type="text" placeholder="Nº" className="w-full border border-gray-300 rounded-md p-2 text-xs" />
+              <input name="number" data-testid="form-jogador-numero-input" value={newPlayer.number} onChange={handleInputChange} type="text" placeholder="Nº" className="w-full border border-gray-400 rounded-md p-2 text-xs" />
             </div>
             <div className="flex-1 min-w-[200px]">
               <label className="block text-[10px] font-bold text-gray-700 mb-1">Nome do Jogador *</label>
-              <input name="name" data-testid="form-jogador-nome-input" value={newPlayer.name} onChange={handleInputChange} type="text" placeholder="Digite o nome do jogador" className="w-full border border-gray-300 rounded-md p-2 text-xs" />
+              <input name="name" data-testid="form-jogador-nome-input" value={newPlayer.name} onChange={handleInputChange} type="text" placeholder="Digite o nome do jogador" className="w-full border border-gray-400 rounded-md p-2 text-xs" />
             </div>
             <div className="w-40">
               <label className="block text-[10px] font-bold text-gray-700 mb-1">Posição *</label>
-              <select name="position" data-testid="form-jogador-posicao-select" value={newPlayer.position} onChange={handleInputChange} className="w-full border border-gray-300 rounded-md p-2 text-xs bg-white">
+              <select name="position" data-testid="form-jogador-posicao-select" value={newPlayer.position} onChange={handleInputChange} className="w-full border border-gray-400 rounded-md p-2 text-xs bg-white">
                 <option value="">Posição do jogador</option>
                 <option value="Fixo">Fixo</option>
                 <option value="Ala">Ala</option>

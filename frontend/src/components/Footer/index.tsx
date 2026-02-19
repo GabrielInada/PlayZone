@@ -8,11 +8,11 @@ export function Footer() {
         flex w-full mt-auto
         flex-row flex-wrap
         items-center justify-center
-        gap-6
+        gap-8
         bg-[#F5F5F5]
         text-[1.2rem]
         px-10 py-4
-        md:gap-[1.2rem] md:text-[1.1rem]
+        md:gap-[3.2rem] md:text-[1.1rem]
         max-md:flex-col max-md:gap-[0.8rem] max-md:px-5 max-md:py-6 max-md:text-[1.1rem]
       "
         >

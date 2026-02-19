@@ -24,7 +24,7 @@ export function Header() {
                     {/* LINKS centralizados (desktop) */}
                     <div className="hidden lg:flex flex-1 items-center justify-center gap-10">
                         <a className={linkClass}>Início</a>
-                        <a className={linkClass}>Campeonatos</a>
+                        <a className={linkClass} href="/campeonatos">Campeonatos</a>
                         <a className={linkClass}>Tabelas</a>
                         <a className={linkClass}>Minha Conta</a>
                     </div>
