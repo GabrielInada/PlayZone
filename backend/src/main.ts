@@ -5,7 +5,7 @@ import configuration from './config/configuration';
 
 async function bootstrap() {
   const config = configuration();
-  const port = config.port || 3000; // Usa a porta da config ou 3000 como padrão
+  const port = Number(process.env.PORT ?? config.port ?? 3000);
   const logger = new Logger('NestApplication');
 
   const app = await NestFactory.create(AppModule);
