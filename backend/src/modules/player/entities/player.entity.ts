@@ -1,4 +1,8 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Card } from 'src/modules/card/entities/card.entity';
+import { Goal } from 'src/modules/goal/entities/goal.entity';
+import { Team } from 'src/modules/team/entities/team.entity';
+import { EnumPlayerPosition } from 'src/types/player';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('player')
 export class Player {
@@ -12,17 +16,24 @@ export class Player {
     shirtNumber: number;
 
     @Column()
-    position: string;
+    position: EnumPlayerPosition;
 
-    @Column()
-    birthDate: Date;
+    @ManyToOne(() => Team, (team) => team.players)
+    team: Team;
     
     @Column()
     teamId: number;
 
-    @Column()
-    CreatedAt: Date;
+    // Relacionamentos inversos (opcional, útil para estatísticas do jogador)
+    @OneToMany(() => Goal, (goal) => goal.player)
+    goals: Goal[];
 
-    @Column()
-    UpdatedAt: Date;
+    @OneToMany(() => Card, (card) => card.player)
+    cards: Card[];
+
+    @Column({ type: 'timestamp' })
+    createdAt: Date;
+
+    @Column({ type: 'timestamp', nullable: true })
+    updatedAt: Date | null;
 }

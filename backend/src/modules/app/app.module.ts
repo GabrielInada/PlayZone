@@ -22,7 +22,6 @@ import { Club } from '../club/entities/club.entity';
 import { ClubModule } from '../club/club.module';
 import { SelfConsultModule } from 'src/tasks/self-consult/self-consult.module';
 import { ScheduleModule } from '@nestjs/schedule';
-
 @Module({
   imports: [
     ScheduleModule.forRoot(),
@@ -39,7 +38,7 @@ import { ScheduleModule } from '@nestjs/schedule';
         return {
           type: 'postgres',
           url: dbUrl,
-          entities: [Player],
+          entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club],
           synchronize: true, // Não vai ter migrations por enquanto
         };
       },
