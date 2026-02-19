@@ -13,7 +13,7 @@ export default function ModalExcluirPartida({ isOpen, onClose, onConfirm }: Moda
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={onClose}>
       <div 
-        className="bg-white w-full max-w-[420px] rounded-[24px] shadow-2xl p-7 animate-in fade-in zoom-in duration-200"
+        className="bg-white w-full max-w-[550px] rounded-lg shadow-2xl p-7 animate-in fade-in zoom-in duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Título */}
@@ -31,13 +31,13 @@ export default function ModalExcluirPartida({ isOpen, onClose, onConfirm }: Moda
         <div className="flex justify-end gap-3">
           <button 
             onClick={onClose}
-            className="px-6 py-2 border-2 border-[#cbd5e1] rounded-xl font-black text-[#475569] hover:bg-gray-50 transition-all cursor-pointer text-xs"
+            className="px-6 py-2 text-sm font-bold border-2 border-[#cbd5e1] rounded-lg hover:bg-gray-100 transition-all cursor-pointer"
           >
             Cancelar
           </button>
           <button 
             onClick={onConfirm}
-            className="px-8 py-2 bg-[#e31c1c] hover:bg-[#c11818] text-white rounded-xl font-black transition-all active:scale-95 cursor-pointer shadow-md text-xs"
+            className="px-8 py-2 text-sm bg-[#e31c1c] hover:bg-[#c11818] text-white rounded-lg font-bold transition-all active:scale-95 cursor-pointer"
           >
             Excluir
           </button>

@@ -15,8 +15,8 @@ export default function GerenciarCampeonatoPage() {
     : "Campeonato";
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col font-bold" data-testid="page-gerenciar-campeonato">
-      <div className="w-full max-w-6xl mx-auto px-6 pt-10 pb-20 text-gray-900">
+    <div className="flex flex-col font-bold" data-testid="page-gerenciar-campeonato">
+      <div className="w-full max-w-6xl mx-auto px-6 pt-10 pb-20 text-gray-900 ">
         
         {/* Cabeçalho Dinâmico */}
         <div className="mb-10 text-left">
@@ -26,12 +26,12 @@ export default function GerenciarCampeonatoPage() {
           <p className="text-base text-gray-500 font-medium mt-1">Gerencie seu campeonato</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           
           {/* Card: Agendar nova partida */}
           <button 
             onClick={() => setIsAgendarModalOpen(true)}
-            className="flex items-center gap-5 p-6 bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-[#007a33] hover:shadow-md transition-all text-left group cursor-pointer"
+            className="flex items-center gap-5 p-6 bg-white border-2 border-gray-100 rounded-xl shadow-md hover:border-emerald-200 hover:shadow-md transition-all text-left group cursor-pointer"
           >
             <div className="p-4 bg-gray-100 rounded-xl group-hover:bg-green-50 transition-colors">
               <CalendarPlus size={36} className="text-gray-700 group-hover:text-[#007a33]" />
@@ -43,7 +43,7 @@ export default function GerenciarCampeonatoPage() {
           </button>
 
           {/* Card: Importar Times */}
-          <button className="flex items-center gap-5 p-6 bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-[#007a33] hover:shadow-md transition-all text-left group cursor-pointer">
+          <button className="flex items-center gap-5 p-6 bg-white border-2 border-gray-100 rounded-xl shadow-md hover:border-emerald-200 hover:shadow-md transition-all text-left group cursor-pointer">
             <div className="p-4 bg-gray-100 rounded-xl group-hover:bg-green-50 transition-colors">
               <Users size={36} className="text-gray-700 group-hover:text-[#007a33]" />
             </div>
@@ -52,22 +52,21 @@ export default function GerenciarCampeonatoPage() {
               <p className="text-sm text-gray-500 font-medium">Adicione os times participantes</p>
             </div>
           </button>
+        </div>
 
-          {/* Card: Ver Partidas - Agora com Redirecionamento */}
+        {/* Card: Ver Partidas - Agora com Redirecionamento */}
           <button 
             onClick={() => router.push(`/${encodeURIComponent(nomeCampeonato)}/ver-partidas`)}
-            className="flex items-center gap-5 p-6 bg-white border-2 border-gray-300 rounded-2xl shadow-sm hover:border-[#007a33] hover:shadow-md transition-all text-left group cursor-pointer"
+            className="w-full mb-12 flex items-center gap-5 p-6 bg-white border-2 border-gray-100 rounded-xl shadow-md hover:border-emerald-200 hover:shadow-md transition-all text-left group cursor-pointer"
           >
             <div className="p-4 bg-gray-100 rounded-xl group-hover:bg-green-50 transition-colors">
               <Clock size={36} className="text-gray-700 group-hover:text-[#007a33]" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-gray-900 leading-tight">Ver Partidas</h3>
+              <h3 className="text-xl font-bold text-gray-900 leading-tight">Ver Partidas do Campeonato</h3>
               <p className="text-sm text-gray-500 font-medium">Visualize a agenda de jogos</p>
             </div>
           </button>
-
-        </div>
 
         {/* Botão Voltar */}
         <div className="flex justify-center">

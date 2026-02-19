@@ -13,7 +13,7 @@ export default function AdicionarEstadioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8 flex flex-col items-center justify-center gap-4">
+    <div className="p-8 flex flex-col items-center justify-center gap-4">
       <h1 className="text-2xl font-bold mb-6">Testes de Modals - Gestão</h1>
 
       {/* Botão de Adicionar */}

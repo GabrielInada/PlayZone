@@ -76,8 +76,8 @@ export default function VerPartidasPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col font-bold">
-      <div className="w-full max-w-5xl mx-auto px-6 pt-10 pb-20 text-gray-900">
+    <div className="bg-white flex flex-col font-bold">
+      <div className="w-full max-w-6xl mx-auto px-6 pt-2 pb-20 text-gray-900">
         
         <div className="mb-10">
           <h1 className="text-3xl font-bold tracking-tight">
@@ -92,7 +92,7 @@ export default function VerPartidasPage() {
           {partidas.map((partida) => (
             <div
               key={partida.id}
-              className="w-full bg-gray-100 rounded-2xl px-6 py-4 border border-gray-200 shadow-sm"
+              className="w-full rounded-2xl px-6 py-4 border border-gray-200 shadow-md"
             >
               <div className="flex items-center justify-between">
 
