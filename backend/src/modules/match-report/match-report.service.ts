@@ -5,7 +5,7 @@ import { DataSource, Repository } from 'typeorm';
 import { Match } from '../match/entities/match.entity';
 import { MatchReport } from './entities/match-report.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EnumReportStatus } from 'src/types/report';
+import { EnumMatchReportStatus } from 'src/types/match-report';
 import { Goal } from '../goal/entities/goal.entity';
 import { Card } from '../card/entities/card.entity';
 import { EnumMatchStatus } from 'src/types/match';
@@ -72,7 +72,7 @@ export class MatchReportService {
     }
     
     // 3. Bloquear edição se já validada
-    if (match.report && match.report.status === EnumReportStatus.VALIDATED) {
+    if (match.report && match.report.status === EnumMatchReportStatus.VALIDATED) {
       throw new BadRequestException('Súmula já validada pelo Admin, não pode ser alterada');
     }
 
@@ -97,7 +97,7 @@ export class MatchReportService {
         homeScore: dto.homeScore,
         awayScore: dto.awayScore,
         observations: dto.observations,
-        status: EnumReportStatus.PENDING, // Volta para status PENDENTE para nova aprovação
+        status: EnumMatchReportStatus.PENDING, // Volta para status PENDENTE para nova aprovação
         goals: dto.goals.map(g => ({ ...g })), // Mapeia DTO para objeto de entidade
         cards: dto.cards.map(c => ({ ...c })),
       });
@@ -126,10 +126,10 @@ export class MatchReportService {
     if (!report) throw new NotFoundException('Súmula não encontrada');  
       if (dto.action === EnumReviewAction.REJECT) {
         if (!dto.reason) throw new BadRequestException('Motivo obrigatório');
-        report.status = EnumReportStatus.REJECTED;
+        report.status = EnumMatchReportStatus.REJECTED;
         report.adminNote = dto.reason;
       } else {
-        report.status = EnumReportStatus.VALIDATED;
+        report.status = EnumMatchReportStatus.VALIDATED;
         report.adminNote = null;
       }
   

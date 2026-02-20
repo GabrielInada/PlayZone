@@ -1,56 +1,82 @@
 import { FacebookIcon, MailIcon, TwitterIcon } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
+import { ContainerHeader } from "../ContainerHeader";
+import { Logo } from "../Logo";
 
+// ── Constantes estáticas ──────────────────────────────────────────────────────
+const NAV_LINKS = [
+  { label: "suporte@ufraplayzone.com.br", href: "mailto:suporte@ufraplayzone.com.br" },
+  { label: "Política de Privacidade",     href: "/privacidade" },
+  { label: "© 2026 UFRA Playzone",        href: "#" },
+];
+
+const SOCIAL_LINKS = [
+  { label: "WhatsApp", href: "#", icon: <FaWhatsapp size={22} /> },
+  { label: "Facebook", href: "#", icon: <FacebookIcon className="h-[22px] w-[22px]" /> },
+  { label: "E-mail",   href: "#", icon: <MailIcon     className="h-[22px] w-[22px]" /> },
+  { label: "Twitter",  href: "#", icon: <TwitterIcon  className="h-[22px] w-[22px]" /> },
+];
+
+const linkClass =
+  "text-[#116A24] font-semibold opacity-90 hover:opacity-100 hover:underline cursor-pointer transition-opacity";
+
+// ── Componente ────────────────────────────────────────────────────────────────
 export function Footer() {
-    return (
-        <nav
-            className="
-        flex w-full mt-auto
-        flex-row flex-wrap
-        items-center justify-center
-        gap-8
-        bg-[#F5F5F5]
-        text-[1.2rem]
-        px-10 py-4
-        md:gap-[3.2rem] md:text-[1.1rem]
-        max-md:flex-col max-md:gap-[0.8rem] max-md:px-5 max-md:py-6 max-md:text-[1.1rem]
-      "
-        >
-            <img
-                src="/logo.png"
-                alt="UFRA Playzone"
-                className="h-16 w-16 bg-transparent md:h-20 md:w-20 lg:h-12 lg:w-12 max-md:h-[5.2rem] max-md:w-[5.2rem] max-[479px]:h-[4.6rem] max-[479px]:w-[4.6rem]"
-            />
+  return (
+    <footer className="bg-[#F5F5F5] mt-auto">
+      <ContainerHeader>
 
-            <a className="inline-flex items-center justify-center text-[#116A24]">
-                suporte@ufraplayzone.com.br
-            </a>
+        <nav className="flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6 py-2">
 
-            <a className="inline-flex items-center justify-center text-[#116A24]">
-                &copy; 2026 UFRA Playzone
-            </a>
-
-            <div className="flex gap-2 bg-transparent max-md:gap-[0.8rem]">
-                <a className="inline-flex items-center justify-center text-[#116A24] bg-transparent">
-                    <FaWhatsapp size={24} style={{ color: "#117A24", fill: "#117A24" }} />
-                </a>
-
-                <a className="inline-flex items-center justify-center text-[#116A24] bg-transparent">
-                    <FacebookIcon className="h-6 w-6 md:h-7 md:w-7 max-md:h-8 max-md:w-8" />
-                </a>
-
-                <a className="inline-flex items-center justify-center text-[#116A24] bg-transparent">
-                    <MailIcon className="h-6 w-6 md:h-7 md:w-7 max-md:h-8 max-md:w-8" />
-                </a>
-
-                <a className="inline-flex items-center justify-center text-[#116A24] bg-transparent">
-                    <TwitterIcon className="h-6 w-6 md:h-7 md:w-7 max-md:h-8 max-md:w-8" />
-                </a>
+          {/* Logo */}
+          <div className="shrink-0 lg:flex lg:items-center">
+            <div className="scale-[0.85] origin-center lg:scale-[0.75] lg:origin-left">
+              <Logo />
             </div>
+          </div>
 
-            <a className="inline-flex items-center justify-center text-[#116A24]">
-                Política de Privacidade
-            </a>
+          {/* Links — desktop */}
+          <div className="hidden lg:flex flex-1 items-center justify-center gap-10">
+            {NAV_LINKS.map(({ label, href }) => (
+              <a key={label} href={href} className={linkClass}>{label}</a>
+            ))}
+          </div>
+
+          {/* Ícones sociais — desktop */}
+          <div className="hidden lg:flex items-center gap-4">
+            {SOCIAL_LINKS.map(({ label, href, icon }) => (
+              <a
+                key={label}
+                href={href}
+                aria-label={label}
+                className="text-[#116A24] opacity-60 hover:opacity-100 cursor-pointer transition-opacity"
+              >
+                {icon}
+              </a>
+            ))}
+          </div>
+
+          {/* Mobile — links + ícones empilhados */}
+          <div className="flex flex-col items-center gap-3 lg:hidden w-full">
+            {NAV_LINKS.map(({ label, href }) => (
+              <a key={label} href={href} className={linkClass}>{label}</a>
+            ))}
+            <div className="flex items-center gap-4 pt-1">
+              {SOCIAL_LINKS.map(({ label, href, icon }) => (
+                <a
+                  key={label}
+                  href={href}
+                  aria-label={label}
+                  className="text-[#116A24] opacity-60 hover:opacity-100 cursor-pointer transition-opacity"
+                >
+                  {icon}
+                </a>
+              ))}
+            </div>
+          </div>
+
         </nav>
-    );
+      </ContainerHeader>
+    </footer>
+  );
 }

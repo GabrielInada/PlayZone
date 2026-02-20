@@ -22,10 +22,12 @@ import { Club } from '../club/entities/club.entity';
 import { ClubModule } from '../club/club.module';
 import { SelfConsultModule } from 'src/tasks/self-consult/self-consult.module';
 import { ScheduleModule } from '@nestjs/schedule';
+
+const appConfig = configuration();
+const isServerlessRuntime = appConfig.isServerlessRuntime;
 @Module({
   imports: [
-    ScheduleModule.forRoot(),
-    SelfConsultModule,
+    ...(!isServerlessRuntime ? [ScheduleModule.forRoot(), SelfConsultModule] : []),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -35,6 +37,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const dbUrl = configService.get<string>('dbUrl');
+
         return {
           type: 'postgres',
           url: dbUrl,
