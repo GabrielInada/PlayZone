@@ -6,9 +6,28 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import configuration from 'src/config/configuration';
 import { Player } from '../player/entities/player.entity';
 import { PlayerModule } from '../player/player.module';
+import { TeamModule } from '../team/team.module';
+import { Team } from '../team/entities/team.entity';
+import { Match } from '../match/entities/match.entity';
+import { MatchModule } from '../match/match.module';
+import { User } from '../user/entities/user.entity';
+import { UserModule } from '../user/user.module';
+import { Card } from '../card/entities/card.entity';
+import { Goal } from '../goal/entities/goal.entity';
+import { MatchReport } from '../match-report/entities/match-report.entity';
+import { MatchReportModule } from '../match-report/match-report.module';
+import { CardModule } from '../card/card.module';
+import { GoalModule } from '../goal/goal.module';
+import { Club } from '../club/entities/club.entity';
+import { ClubModule } from '../club/club.module';
+import { SelfConsultModule } from 'src/tasks/self-consult/self-consult.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
+const appConfig = configuration();
+const isServerlessRuntime = appConfig.isServerlessRuntime;
 @Module({
   imports: [
+    ...(!isServerlessRuntime ? [ScheduleModule.forRoot(), SelfConsultModule] : []),
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -18,15 +37,16 @@ import { PlayerModule } from '../player/player.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const dbUrl = configService.get<string>('dbUrl');
+
         return {
           type: 'postgres',
           url: dbUrl,
-          entities: [Player],
+          entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club],
           synchronize: true, // Não vai ter migrations por enquanto
         };
       },
     }),
-    PlayerModule,
+    PlayerModule, TeamModule, MatchModule, UserModule, MatchReportModule, GoalModule, CardModule, ClubModule,
   ],
   controllers: [AppController],
   providers: [AppService],
