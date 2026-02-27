@@ -5,6 +5,8 @@ import { StadiumCard } from './StadiumCard/StadiumCard';
 import { Plus, Search } from 'lucide-react';
 import { ContainerHeader } from "@/components/ContainerHeader";
 import { ModalEstadio } from '@/components/ModalEstadio';
+import { ModalEditarEstadio } from '@/components/ModalEditarEstadio';
+import { ModalExcluirEstadio } from '@/components/ModalExcluirEstadio';
 
 const MOCK_STADIUMS = [
   {
@@ -68,6 +70,10 @@ export default function EstadiosHome() {
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
+  const [selectedStadium, setSelectedStadium] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  
   const filtrados = MOCK_STADIUMS.filter(stadium => 
     stadium.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -112,8 +118,14 @@ export default function EstadiosHome() {
                 match={stadium.match}
                 date={stadium.date}
                 imageUrl={stadium.imageUrl}
-                onEdit={() => console.log("Editar", stadium.id)}
-                onDelete={() => console.log("Excluir", stadium.id)}
+                onEdit={() => {
+                  setSelectedStadium(stadium);
+                  setIsEditModalOpen(true);
+                }}
+                onDelete={() => {
+                  setSelectedStadium(stadium);
+                  setIsDeleteModalOpen(true);
+                }}
               />
             ))}
           </div>
@@ -135,6 +147,21 @@ export default function EstadiosHome() {
         onClose={() => setIsAddModalOpen(false)} 
       />
     )}
+      {isEditModalOpen && (
+        <ModalEditarEstadio 
+          isOpen={isEditModalOpen} 
+          onClose={() => setIsEditModalOpen(false)} 
+          stadiumData={selectedStadium} 
+        />
+      )}
+
+      {isDeleteModalOpen && (
+        <ModalExcluirEstadio 
+          isOpen={isDeleteModalOpen} 
+          onClose={() => setIsDeleteModalOpen(false)} 
+          stadiumName={selectedStadium?.name}
+        />
+      )}
 
     </div>
   );
