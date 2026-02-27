@@ -36,12 +36,19 @@ import { AuthModule } from '../auth/auth.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const dbUrl = configService.get<string>('dbUrl');
+        const dbSynchronizeEnv = configService.get<string>('dbSynchronize');
+        const isProduction = configService.get<string>('nodeEnv') === 'production';
+        const isVercel = process.env.VERCEL === '1' || Boolean(process.env.VERCEL_URL);
+
+        const synchronize = dbSynchronizeEnv
+          ? dbSynchronizeEnv === 'true' || dbSynchronizeEnv === '1'
+          : !(isProduction || isVercel);
 
         return {
           type: 'postgres',
           url: dbUrl,
           entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club],
-          synchronize: true, // Não vai ter migrations por enquanto
+          synchronize,
         };
       },
     }),
