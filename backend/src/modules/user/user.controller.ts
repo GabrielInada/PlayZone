@@ -1,9 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { Query } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 
 @ApiTags('User')
@@ -30,6 +31,21 @@ export class UserController {
     return this.userService.findAll(pageNumber, sizeNumber);
   }
 
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary:
+      'Retorna os dados do usuário logado, incluindo salas, favoritos e agendamentos',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Dados do usuário retornados com sucesso.',
+  })
+  getMe(@Req() req) {
+    return this.userService.getUserProfile(req.user.userId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Busca um usuário pelo ID' })
   @ApiParam({ name: 'id', type: Number })
@@ -37,6 +53,17 @@ export class UserController {
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findOne(id);
+  }
+
+  @Get(':id/details')
+  @ApiOperation({ summary: 'Retorna detalhes do usuário e seus agendamentos' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'Detalhes do usuário retornados com sucesso.',
+  })
+  getUserDetails(@Param('id', ParseIntPipe) id: number) {
+    return this.userService.getUserDetails(id);
   }
 
 

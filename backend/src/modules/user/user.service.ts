@@ -27,6 +27,25 @@ export class UserService {
     return user;
   }
 
+  async getUserProfile(userId: number) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: [
+        'assignedMatches',
+        'assignedMatches.homeTeam',
+        'assignedMatches.awayTeam',
+        'assignedMatches.report',
+      ],
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    const { password, ...result } = user;
+    return result;
+  }
+
   async create(createUserDto: CreateUserDto) {
     const user = this.userRepository.create(createUserDto as Partial<User>);
     user.createdAt = new Date();

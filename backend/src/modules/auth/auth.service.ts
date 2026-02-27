@@ -3,6 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcryptjs';
 import { User } from '../user/entities/user.entity';
+import { SignupDto } from './dto/signup.dto';
+import { EnumUserRole } from '../../types/user';
 
 @Injectable()
 export class AuthService {
@@ -34,12 +36,12 @@ export class AuthService {
     };
   }
 
-  async signup(userPayload: any) {
+  async signup(userPayload: SignupDto) {
     const hash = await bcrypt.hash(userPayload.password, 10);
     return this.userService.create({
       ...userPayload,
       password: hash,
-      role: 'user', // Por padrão no cadastro só pode ser criado usuários com a role "user"
+      role: EnumUserRole.USER, // Por padrão no cadastro só pode ser criado usuários com a role "user"
     });
   }
 }
