@@ -73,14 +73,14 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
       > 
         <div className="mb-6 w-full text-left">
           <h2 className="text-xl font-bold text-black-800">Adicionar</h2>
-          <p className="text-[12px] text-gray-500">Crie e configure as informações do estádio</p>
+          <p className="text-[12px] text-gray-500">Crie e configure as informações do ginásio</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full max-w-md">
           {/* 1. Campos de Texto Primeiro */}
           <Input 
             {...register("nome")} 
-            label="Nome do Estádio" 
+            label="Nome do Ginásio" 
             placeholder="Nome do local" 
             className="bg-white border-gray-300" 
           />
