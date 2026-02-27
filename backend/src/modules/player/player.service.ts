@@ -28,8 +28,6 @@ export class PlayerService {
 
     const createdPlayer = await this.playerRepository.save(player);
 
-    
-
     return createdPlayer;
   }
 
