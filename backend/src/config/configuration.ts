@@ -3,6 +3,7 @@ const backendPort = parseInt(process.env.BACKEND_PORT ?? '3000', 10);
 export default () => ({
   port: backendPort,
   nodeEnv: process.env.NODE_ENV,
+  isVercel: process.env.VERCEL === '1' || Boolean(process.env.VERCEL_URL),
   dbPort: parseInt(process.env.DATABASE_PORT ?? '5432', 10),
   dbUrl: process.env.DATABASE_URL,
   dbSynchronize: process.env.DB_SYNCHRONIZE,

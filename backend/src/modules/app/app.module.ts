@@ -38,8 +38,9 @@ import { AuthModule } from '../auth/auth.module';
         const dbUrl = configService.get<string>('dbUrl');
         const dbSynchronizeEnv = configService.get<string>('dbSynchronize');
         const isProduction = configService.get<string>('nodeEnv') === 'production';
-        const isVercel = process.env.VERCEL === '1' || Boolean(process.env.VERCEL_URL);
+        const isVercel = Boolean(configService.get<boolean>('isVercel'));
 
+        // Por padrão, synchronize é true em ambientes de desenvolvimento e false em produção/vercel, a menos que seja explicitamente configurado via DB_SYNCHRONIZE
         const synchronize = dbSynchronizeEnv
           ? dbSynchronizeEnv === 'true' || dbSynchronizeEnv === '1'
           : !(isProduction || isVercel);
