@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.ts",
+      "src": "src/main.ts",
       "use": "@vercel/node",
       "config": {
         "includeFiles": ["node_modules/swagger-ui-dist/**"]
@@ -12,7 +12,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/index.ts"
+      "dest": "src/main.ts"
     }
   ]
 }
