@@ -1,7 +1,7 @@
 import { Card } from "../../card/entities/card.entity";
 import { Goal } from "../../goal/entities/goal.entity";
 import { Match } from "../../match/entities/match.entity";
-import { EnumMatchReportStatus } from "src/types/match-report";
+import { EnumMatchReportStatus } from "../../../types/match-report";
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne, JoinColumn, OneToMany } from "typeorm";
 
 

@@ -1,5 +1,5 @@
 import { Match } from "../../match/entities/match.entity";
-import { EnumUserRole, EnumUserType } from "src/types/user";
+import { EnumUserRole, EnumUserType } from "../../../types/user";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()

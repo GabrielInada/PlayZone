@@ -1,5 +1,5 @@
-import { Match } from 'src/modules/match/entities/match.entity';
-import { Player } from 'src/modules/player/entities/player.entity';
+import { Match } from '../../match/entities/match.entity';
+import { Player } from '../../player/entities/player.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
