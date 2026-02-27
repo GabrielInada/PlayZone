@@ -7,10 +7,10 @@ interface ModalExcluirProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  nomeEstadio?: string; 
+  stadiumName?: string; 
 }
 
-export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, nomeEstadio }: ModalExcluirProps) => {
+export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, stadiumName }: ModalExcluirProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Fechar ao clicar fora, como no modal de adicionar
@@ -22,7 +22,7 @@ export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, nomeEstadio }:
 
   const handleConfirm = () => {
     onConfirm();
-    toast.error(`Estádio ${nomeEstadio || ''} removido com sucesso!`, {
+    toast.error(`Estádio ${stadiumName || ''} removido com sucesso!`, {
       position: 'bottom-right',
       style: {
         borderRadius: '8px',
