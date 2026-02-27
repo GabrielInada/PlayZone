@@ -1,4 +1,4 @@
-import { Match } from "src/modules/match/entities/match.entity";
+import { Match } from "../../match/entities/match.entity";
 import { EnumUserRole, EnumUserType } from "src/types/user";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 

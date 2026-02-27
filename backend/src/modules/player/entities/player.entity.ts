@@ -1,6 +1,6 @@
-import { Card } from 'src/modules/card/entities/card.entity';
-import { Goal } from 'src/modules/goal/entities/goal.entity';
-import { Team } from 'src/modules/team/entities/team.entity';
+import { Card } from '../../card/entities/card.entity';
+import { Goal } from '../../goal/entities/goal.entity';
+import { Team } from '../../team/entities/team.entity';
 import { EnumPlayerPosition } from 'src/types/player';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
