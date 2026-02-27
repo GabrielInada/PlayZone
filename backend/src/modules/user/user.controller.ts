@@ -56,7 +56,7 @@ export class UserController {
   }
 
   @Get(':id/details')
-  @ApiOperation({ summary: 'Retorna detalhes do usuário e seus agendamentos' })
+  @ApiOperation({ summary: 'Retorna detalhes do usuário' })
   @ApiParam({ name: 'id', type: Number })
   @ApiResponse({
     status: 200,
