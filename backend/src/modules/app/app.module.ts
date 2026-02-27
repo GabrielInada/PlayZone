@@ -3,7 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import configuration from 'src/config/configuration';
+import configuration from '../../config/configuration';
 import { Player } from '../player/entities/player.entity';
 import { PlayerModule } from '../player/player.module';
 import { TeamModule } from '../team/team.module';
@@ -20,7 +20,7 @@ import { CardModule } from '../card/card.module';
 import { GoalModule } from '../goal/goal.module';
 import { Club } from '../club/entities/club.entity';
 import { ClubModule } from '../club/club.module';
-import { SelfConsultModule } from 'src/tasks/self-consult/self-consult.module';
+import { SelfConsultModule } from '../../tasks/self-consult/self-consult.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from '../auth/auth.module';
 
