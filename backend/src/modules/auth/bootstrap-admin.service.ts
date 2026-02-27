@@ -75,14 +75,42 @@ export class BootstrapAdminService implements OnApplicationBootstrap {
 
     const passwordHash = await bcrypt.hash(adminPassword, 10);
 
-    await this.userService.createWithRole({
-      name: adminName,
-      email: normalizedEmail,
-      password: passwordHash,
-      type: adminTypeRaw as EnumUserType,
-    }, EnumUserRole.ADMIN);
+    try {
+      await this.userService.createWithRole(
+        {
+          name: adminName,
+          email: normalizedEmail,
+          password: passwordHash,
+          type: adminTypeRaw as EnumUserType,
+        },
+        EnumUserRole.ADMIN,
+      );
 
-    this.logger.log(`Bootstrap admin created: ${normalizedEmail}`);
+      this.logger.log(`Bootstrap admin created: ${normalizedEmail}`);
+    } catch (error) {
+      const conflictByUniqueEmail =
+        typeof error === 'object' &&
+        error !== null &&
+        'code' in error &&
+        (error as { code?: string }).code === '23505';
+
+      if (!conflictByUniqueEmail) {
+        throw error;
+      }
+
+      const userAfterConflict = await this.userService.findByEmail(normalizedEmail);
+
+      if (userAfterConflict?.role === EnumUserRole.ADMIN) {
+        this.logger.log(
+          'Bootstrap admin already created by another instance. Skipping.',
+        );
+        return;
+      }
+
+      this.logger.warn(
+        `Bootstrap admin email already exists with non-admin role (${normalizedEmail}). Skipping creation.`,
+      );
+    }
   }
 
   private readBoolean(value: string | undefined): boolean {
