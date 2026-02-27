@@ -68,15 +68,26 @@ const MOCK_STADIUMS = [
 export default function EstadiosHome() {
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [stadiums, setStadiums] = useState(MOCK_STADIUMS);
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const [selectedStadium, setSelectedStadium] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   
-  const filtrados = MOCK_STADIUMS.filter(stadium => 
+  const filtrados = stadiums.filter(stadium => 
     stadium.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // função que remove o item da lista
+  const handleConfirmDelete = () => {
+    if (selectedStadium) {
+      setStadiums(prev => prev.filter(s => s.id !== selectedStadium.id));
+      setIsDeleteModalOpen(false);
+      // Aqui você pode adicionar um toast.success('Excluído!') se quiser
+    }
+  };
 
   return (
     <div className=" bg-white flex flex-col font-bold">
@@ -158,7 +169,8 @@ export default function EstadiosHome() {
       {isDeleteModalOpen && (
         <ModalExcluirEstadio 
           isOpen={isDeleteModalOpen} 
-          onClose={() => setIsDeleteModalOpen(false)} 
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={handleConfirmDelete}
           stadiumName={selectedStadium?.name}
         />
       )}

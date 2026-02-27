@@ -82,7 +82,7 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
             {...register("nome")} 
             label="Nome do Ginásio" 
             placeholder="Nome do local" 
-            className="bg-white border-gray-300" 
+            className="bg-white border-gray-300 font-normal" 
           />
           
           <Input 
@@ -94,14 +94,14 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
               const valorFormatado = formatarMilhar(e.target.value);
               e.target.value = valorFormatado;
             }}
-            className="bg-white border-gray-300"
+            className="bg-white border-gray-300 font-normal"
           />
 
           <Input 
             {...register("localizacao")} 
             label="Localização" 
             placeholder="Cidade, Estado" 
-            className="bg-white border-gray-300"
+            className="bg-white border-gray-300 font-normal"
           />
 
           {/* 2. Foto do Ginásio agora na Parte de Baixo */}
