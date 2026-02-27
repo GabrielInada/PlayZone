@@ -3,23 +3,22 @@ import { AppModule } from './modules/app/app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import configuration from './config/configuration';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import serverless from 'serverless-http';
 
-async function bootstrap() {
-  const { port } = configuration();
-  const logger = new Logger('NestApplication');
+let cachedHandler: ((req: any, res: any) => Promise<any>) | null = null;
 
+async function createApp() {
   const app = await NestFactory.create(AppModule);
 
-  // Deve vir ANTES do app.listen
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,  // Remove campos extras do JSON recebido
-    transform: true,  // Converte tipos (ex: string "1" vira number 1)
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      transform: true,
+    }),
+  );
 
-  // ✅ HABILITA CORS - Permite requisições do frontend
   app.enableCors();
 
-  // Swagger config
   const config = new DocumentBuilder()
     .setTitle('Playzone API')
     .setDescription('Documentação da API PlayZone')
@@ -28,9 +27,30 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
+
+  return app;
+}
+
+async function bootstrap() {
+  const { port } = configuration();
+  const logger = new Logger('NestApplication');
+  const app = await createApp();
   
   await app.listen(port);
   logger.log(`Backend is alive on ${await app.getUrl()}`);
 }
 
-void bootstrap();
+export default async function handler(req: any, res: any) {
+  if (!cachedHandler) {
+    const app = await createApp();
+    await app.init();
+    const expressApp = app.getHttpAdapter().getInstance();
+    cachedHandler = serverless(expressApp) as (req: any, res: any) => Promise<any>;
+  }
+
+  return cachedHandler(req, res);
+}
+
+if (!process.env.VERCEL) {
+  void bootstrap();
+}
