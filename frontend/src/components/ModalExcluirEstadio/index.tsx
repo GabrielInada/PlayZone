@@ -28,7 +28,7 @@ export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, nomeEstadio }:
         borderRadius: '8px',
         background: '#333',
         color: '#fff',
-        fontFamily: 'Roboto, sans-serif',
+        fontFamily: 'Arial, sans-serif',
       },
       icon: '🗑️',
     });
@@ -49,7 +49,8 @@ export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, nomeEstadio }:
         <h2 className="text-xl font-bold text-gray-900 mb-2">Excluir</h2>
         
         <p className="text-[14px] text-gray-600 mb-6">
-          Tem a certeza de que deseja excluir este estádio? Esta ação não pode ser desfeita.
+        Tem a certeza de que deseja excluir este ginásio?
+        Esta ação não pode ser desfeita.
         </p>
 
         <div className="flex justify-end gap-3 font-bold">
