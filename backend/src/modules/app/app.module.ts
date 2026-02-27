@@ -22,12 +22,11 @@ import { Club } from '../club/entities/club.entity';
 import { ClubModule } from '../club/club.module';
 import { SelfConsultModule } from 'src/tasks/self-consult/self-consult.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { AuthModule } from '../auth/auth.module';
 
-const appConfig = configuration();
-const isServerlessRuntime = appConfig.isServerlessRuntime;
 @Module({
   imports: [
-    ...(!isServerlessRuntime ? [ScheduleModule.forRoot(), SelfConsultModule] : []),
+    ScheduleModule.forRoot(), SelfConsultModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -46,7 +45,7 @@ const isServerlessRuntime = appConfig.isServerlessRuntime;
         };
       },
     }),
-    PlayerModule, TeamModule, MatchModule, UserModule, MatchReportModule, GoalModule, CardModule, ClubModule,
+    PlayerModule, TeamModule, MatchModule, UserModule, MatchReportModule, GoalModule, CardModule, ClubModule, AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
