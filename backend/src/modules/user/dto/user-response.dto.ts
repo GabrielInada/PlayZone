@@ -2,7 +2,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { EnumUserRole, EnumUserType } from '../../../types/user';
 
-export class UserDto {
+export class UserResponseDto {
   @ApiProperty({ example: 1 })
   @Expose()
   id: number;

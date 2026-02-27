@@ -10,13 +10,20 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { ApiBody, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { UserService } from '../user/user.service';
 import { Serialize } from '../../interceptors/serialize.interceptor';
-import { UserDto } from '../user/dto/user.dto';
+import { UserResponseDto } from '../user/dto/user-response.dto';
 
+@ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -25,7 +32,10 @@ export class AuthController {
   ) {}
 
   @Post('login')
+  @ApiOperation({ summary: 'Autentica usuário e retorna token JWT' })
   @ApiBody({ type: LoginDto })
+  @ApiResponse({ status: 200, description: 'Login realizado com sucesso.' })
+  @ApiResponse({ status: 401, description: 'Credenciais inválidas.' })
   async login(@Body() body: LoginDto) {
     const user = await this.authService.validateUser(body.email, body.password);
     if (!user)
@@ -34,24 +44,29 @@ export class AuthController {
     return this.authService.login(user);
   }
 
-  @Serialize(UserDto)
+  @Serialize(UserResponseDto)
   @Post('signup')
+  @ApiOperation({ summary: 'Cria um novo usuário' })
   @ApiBody({ type: SignupDto })
   @ApiResponse({
     status: 200,
     description: 'Usuário criado com sucesso.',
+    type: UserResponseDto,
   })
   async signup(@Body() body: SignupDto) {
     return this.authService.signup(body);
   }
 
-  @Serialize(UserDto)
+  @Serialize(UserResponseDto)
   @Get('profile')
+  @ApiOperation({ summary: 'Retorna perfil do usuário autenticado' })
   @ApiBearerAuth()
   @ApiResponse({
     status: 200,
     description: 'Usuário autenticado retornado com sucesso.',
+    type: UserResponseDto,
   })
+  @ApiResponse({ status: 401, description: 'Não autorizado.' })
   @UseGuards(JwtAuthGuard)
   getProfile(@Request() req) {
     return this.userService.findByEmail(req.user.email);

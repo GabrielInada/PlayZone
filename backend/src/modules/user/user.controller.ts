@@ -1,11 +1,13 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, UseGuards, Req } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserRequestDto } from './dto/create-user-request.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiBearerAuth, ApiQuery, ApiOkResponse } from '@nestjs/swagger';
 import { Query } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { UserDto } from './dto/user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { FindAllUsersResponseDto } from './dto/find-all-users-response.dto';
+import { DeleteUserResponseDto } from './dto/delete-user-response.dto';
 
 
 @ApiTags('User')
@@ -15,9 +17,9 @@ export class UserController {
 
   @Post()
   @ApiOperation({ summary: 'Cria um usuário' })
-  @ApiBody({ type: CreateUserDto })
-  @ApiResponse({ status: 200, description: 'Usuário criado com sucesso.', type: UserDto })
-  create(@Body() userPayload: CreateUserDto) {
+  @ApiBody({ type: CreateUserRequestDto })
+  @ApiResponse({ status: 200, description: 'Usuário criado com sucesso.', type: UserResponseDto })
+  create(@Body() userPayload: CreateUserRequestDto) {
     return this.userService.create(userPayload);
   }
 
@@ -28,6 +30,31 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Lista de usuários retornada com sucesso.',
+    type: FindAllUsersResponseDto,
+  })
+  @ApiOkResponse({
+    description: 'Exemplo de resposta paginada de usuários.',
+    schema: {
+      example: {
+        data: [
+          {
+            id: 1,
+            name: 'Gabriel Inada',
+            email: 'gabrielinada@email.com',
+            type: 'delegado',
+            role: 'user',
+            createdAt: '2026-02-27T12:00:00.000Z',
+            updatedAt: '2026-02-27T12:00:00.000Z',
+          },
+        ],
+        meta: {
+          total: 1,
+          page: 1,
+          lastPage: 1,
+          size: 10,
+        },
+      },
+    },
   })
   findAll(@Query('page') page?: number, @Query('size') size?: number) {
     const pageNumber = page && page > 0 ? Number(page) : 1;
@@ -45,7 +72,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Dados do usuário retornados com sucesso.',
-    type: UserDto,
+    type: UserResponseDto,
   })
   @ApiResponse({ status: 401, description: 'Não autorizado.' })
   getMe(@Req() req) {
@@ -55,7 +82,7 @@ export class UserController {
   @Get(':id')
   @ApiOperation({ summary: 'Busca um usuário pelo ID' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ status: 200, description: 'Usuário encontrado.', type: UserDto })
+  @ApiResponse({ status: 200, description: 'Usuário encontrado.', type: UserResponseDto })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.userService.findOne(id);
@@ -67,7 +94,7 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'Detalhes do usuário retornados com sucesso.',
-    type: UserDto,
+    type: UserResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   getUserDetails(@Param('id', ParseIntPipe) id: number) {
@@ -79,7 +106,7 @@ export class UserController {
   @ApiOperation({ summary: 'Atualiza um usuário pelo ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateUserDto })
-  @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso.', type: UserDto })
+  @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso.', type: UserResponseDto })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -91,7 +118,7 @@ export class UserController {
   @Delete(':id')
   @ApiOperation({ summary: 'Remove um usuário pelo ID' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ status: 200, description: 'Usuário removido com sucesso.' })
+  @ApiResponse({ status: 200, description: 'Usuário removido com sucesso.', type: DeleteUserResponseDto })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.userService.remove(id);

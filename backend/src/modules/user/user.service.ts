@@ -1,9 +1,10 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserRequestDto } from './dto/create-user-request.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { EnumUserRole } from '../../types/user';
 
 @Injectable()
 export class UserService {
@@ -46,9 +47,18 @@ export class UserService {
     return result;
   }
 
-  async create(createUserDto: CreateUserDto) {
-    const user = this.userRepository.create(createUserDto as Partial<User>);
+  async create(createUserDto: CreateUserRequestDto) {
+    return this.createWithRole(createUserDto, EnumUserRole.USER);
+  }
+
+  async createWithRole(createUserDto: CreateUserRequestDto, role: EnumUserRole) {
+    const user = this.userRepository.create({
+      ...(createUserDto as Partial<User>),
+      email: createUserDto.email.toLowerCase(),
+      role,
+    });
     user.createdAt = new Date();
+    user.updatedAt = new Date();
     return this.userRepository.save(user);
   }
 
@@ -99,7 +109,16 @@ export class UserService {
   }
 
   async remove(id: number) {
-    return this.userRepository.delete(id);
+    const result = await this.userRepository.delete(id);
+
+    if (!result.affected) {
+      throw new HttpException(
+        `User with ID ${id} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return { id, deleted: true };
   }
 
    async findByEmail(email: string) {
