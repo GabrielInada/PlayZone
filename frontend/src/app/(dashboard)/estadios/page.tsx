@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { StadiumCard } from './StadiumCard/StadiumCard'; 
 import { Plus, Search } from 'lucide-react';
 import { ContainerHeader } from "@/components/ContainerHeader";
+import { ModalEstadio } from '@/components/ModalEstadio';
 
 const MOCK_STADIUMS = [
   {
@@ -65,6 +66,8 @@ const MOCK_STADIUMS = [
 export default function EstadiosHome() {
   const [searchTerm, setSearchTerm] = useState("");
 
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
   const filtrados = MOCK_STADIUMS.filter(stadium => 
     stadium.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -91,7 +94,9 @@ export default function EstadiosHome() {
               />
             </div>
 
-            <button className="min-w-[40vh] flex justify-center bg-[#007a33] hover:bg-[#005f27] text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer">
+            <button 
+              onClick={() => setIsAddModalOpen(true)}
+              className="min-w-[40vh] flex justify-center bg-[#007a33] hover:bg-[#005f27] text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer">
               <Plus className="h-5 w-5" />
               Adicionar Ginásio
             </button>
@@ -123,6 +128,14 @@ export default function EstadiosHome() {
           </div>
         </div>
       </ContainerHeader>
+
+      {isAddModalOpen && (
+       <ModalEstadio 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+      />
+    )}
+
     </div>
   );
 }
