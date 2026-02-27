@@ -40,7 +40,7 @@ async function bootstrap() {
   logger.log(`Backend is alive on ${await app.getUrl()}`);
 }
 
-export default async function handler(req: any, res: any) {
+export async function handler(req: any, res: any) {
   if (!cachedHandler) {
     const app = await createApp();
     await app.init();
@@ -50,6 +50,10 @@ export default async function handler(req: any, res: any) {
 
   return cachedHandler(req, res);
 }
+
+export default handler;
+
+module.exports = handler;
 
 if (!process.env.VERCEL) {
   void bootstrap();
