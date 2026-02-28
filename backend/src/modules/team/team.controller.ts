@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiOkResponse } from '@nestjs/swagger';
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
@@ -44,7 +44,8 @@ export class TeamController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a team by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Team ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Team ID' })
+  @ApiResponse({ status: 400, description: 'Invalid team ID' })
   @ApiResponse({ status: 200, description: 'Team found', type: TeamResponseDto })
   @ApiOkResponse({
     description: 'Example team response',
@@ -60,27 +61,29 @@ export class TeamController {
     },
   })
   @ApiResponse({ status: 404, description: 'Team not found' })
-  findOne(@Param('id') id: string) {
-    return this.teamService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.teamService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a team by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Team ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Team ID' })
   @ApiBody({ type: UpdateTeamDto })
+  @ApiResponse({ status: 400, description: 'Invalid team ID' })
   @ApiResponse({ status: 200, description: 'Team updated successfully', type: TeamResponseDto })
   @ApiResponse({ status: 404, description: 'Team not found' })
-  update(@Param('id') id: string, @Body() updateTeamDto: UpdateTeamDto) {
-    return this.teamService.update(+id, updateTeamDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateTeamDto: UpdateTeamDto) {
+    return this.teamService.update(id, updateTeamDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a team by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Team ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Team ID' })
+  @ApiResponse({ status: 400, description: 'Invalid team ID' })
   @ApiResponse({ status: 200, description: 'Team deleted successfully', type: TeamResponseDto })
   @ApiResponse({ status: 404, description: 'Team not found' })
   @ApiResponse({ status: 409, description: 'Cannot delete team with players' })
-  remove(@Param('id') id: string) {
-    return this.teamService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.teamService.remove(id);
   }
 }

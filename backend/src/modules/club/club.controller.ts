@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ClubService } from './club.service';
 import { CreateClubDto } from './dto/create-club.dto';
@@ -27,28 +27,31 @@ export class ClubController {
   @Get(':id')
   @ApiOperation({ summary: 'Busca um clube por ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Clube encontrado.' })
   @ApiResponse({ status: 404, description: 'Clube não encontrado.' })
-  findOne(@Param('id') id: string) {
-    return this.clubService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.clubService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Atualiza um clube por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateClubDto })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Clube atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Clube não encontrado.' })
-  update(@Param('id') id: string, @Body() updateClubDto: UpdateClubDto) {
-    return this.clubService.update(+id, updateClubDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateClubDto: UpdateClubDto) {
+    return this.clubService.update(id, updateClubDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remove um clube por ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Clube removido com sucesso.' })
   @ApiResponse({ status: 404, description: 'Clube não encontrado.' })
-  remove(@Param('id') id: string) {
-    return this.clubService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.clubService.remove(id);
   }
 }

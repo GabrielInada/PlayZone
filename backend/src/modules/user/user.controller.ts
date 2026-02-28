@@ -18,7 +18,7 @@ export class UserController {
   @Post()
   @ApiOperation({ summary: 'Cria um usuário' })
   @ApiBody({ type: CreateUserRequestDto })
-  @ApiResponse({ status: 200, description: 'Usuário criado com sucesso.', type: UserResponseDto })
+  @ApiResponse({ status: 201, description: 'Usuário criado com sucesso.', type: UserResponseDto })
   create(@Body() userPayload: CreateUserRequestDto) {
     return this.userService.create(userPayload);
   }
@@ -66,8 +66,7 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({
-    summary:
-      'Retorna os dados do usuário logado, incluindo salas, favoritos e agendamentos',
+    summary: 'Retorna os dados do usuário autenticado',
   })
   @ApiResponse({
     status: 200,
@@ -82,6 +81,7 @@ export class UserController {
   @Get(':id')
   @ApiOperation({ summary: 'Busca um usuário pelo ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Usuário encontrado.', type: UserResponseDto })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   findOne(@Param('id', ParseIntPipe) id: number) {
@@ -91,6 +91,7 @@ export class UserController {
   @Get(':id/details')
   @ApiOperation({ summary: 'Retorna detalhes do usuário' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({
     status: 200,
     description: 'Detalhes do usuário retornados com sucesso.',
@@ -106,6 +107,7 @@ export class UserController {
   @ApiOperation({ summary: 'Atualiza um usuário pelo ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateUserDto })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Usuário atualizado com sucesso.', type: UserResponseDto })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   update(
@@ -118,6 +120,7 @@ export class UserController {
   @Delete(':id')
   @ApiOperation({ summary: 'Remove um usuário pelo ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Usuário removido com sucesso.', type: DeleteUserResponseDto })
   @ApiResponse({ status: 404, description: 'Usuário não encontrado.' })
   remove(@Param('id', ParseIntPipe) id: number) {

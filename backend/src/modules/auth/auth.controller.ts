@@ -49,7 +49,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Cria um novo usuário' })
   @ApiBody({ type: SignupDto })
   @ApiResponse({
-    status: 200,
+    status: 201,
     description: 'Usuário criado com sucesso.',
     type: UserResponseDto,
   })

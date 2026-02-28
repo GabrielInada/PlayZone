@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { GoalService } from './goal.service';
 import { CreateGoalDto } from './dto/create-goal.dto';
@@ -27,28 +27,31 @@ export class GoalController {
   @Get(':id')
   @ApiOperation({ summary: 'Busca um gol por ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Gol encontrado.' })
   @ApiResponse({ status: 404, description: 'Gol não encontrado.' })
-  findOne(@Param('id') id: string) {
-    return this.goalService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.goalService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Atualiza um gol por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateGoalDto })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Gol atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Gol não encontrado.' })
-  update(@Param('id') id: string, @Body() updateGoalDto: UpdateGoalDto) {
-    return this.goalService.update(+id, updateGoalDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateGoalDto: UpdateGoalDto) {
+    return this.goalService.update(id, updateGoalDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remove um gol por ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Gol removido com sucesso.' })
   @ApiResponse({ status: 404, description: 'Gol não encontrado.' })
-  remove(@Param('id') id: string) {
-    return this.goalService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.goalService.remove(id);
   }
 }

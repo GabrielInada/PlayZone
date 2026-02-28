@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiOkResponse } from '@nestjs/swagger';
 import { PlayerService } from './player.service';
 import { CreatePlayerDto } from './dto/create-player.dto';
@@ -45,7 +45,8 @@ export class PlayerController {
 
   @Get(':id')
   @ApiOperation({ summary: 'Get a player by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Player ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Player ID' })
+  @ApiResponse({ status: 400, description: 'Invalid player ID' })
   @ApiResponse({ status: 200, description: 'Player found', type: PlayerResponseDto })
   @ApiOkResponse({
     description: 'Example player response',
@@ -62,26 +63,28 @@ export class PlayerController {
     },
   })
   @ApiResponse({ status: 404, description: 'Player not found' })
-  findOne(@Param('id') id: string) {
-    return this.playersService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.playersService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update a player by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Player ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Player ID' })
   @ApiBody({ type: UpdatePlayerDto })
+  @ApiResponse({ status: 400, description: 'Invalid player ID' })
   @ApiResponse({ status: 200, description: 'Player updated successfully', type: PlayerResponseDto })
   @ApiResponse({ status: 404, description: 'Player not found' })
-  update(@Param('id') id: string, @Body() updatePlayerDto: UpdatePlayerDto) {
-    return this.playersService.update(+id, updatePlayerDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updatePlayerDto: UpdatePlayerDto) {
+    return this.playersService.update(id, updatePlayerDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a player by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Player ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'Player ID' })
+  @ApiResponse({ status: 400, description: 'Invalid player ID' })
   @ApiResponse({ status: 200, description: 'Player deleted successfully', type: PlayerResponseDto })
   @ApiResponse({ status: 404, description: 'Player not found' })
-  remove(@Param('id') id: string) {
-    return this.playersService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.playersService.remove(id);
   }
 }

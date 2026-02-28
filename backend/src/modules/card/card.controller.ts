@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
@@ -27,28 +27,31 @@ export class CardController {
   @Get(':id')
   @ApiOperation({ summary: 'Busca um cartão por ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Cartão encontrado.' })
   @ApiResponse({ status: 404, description: 'Cartão não encontrado.' })
-  findOne(@Param('id') id: string) {
-    return this.cardService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.cardService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Atualiza um cartão por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateCardDto })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Cartão atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Cartão não encontrado.' })
-  update(@Param('id') id: string, @Body() updateCardDto: UpdateCardDto) {
-    return this.cardService.update(+id, updateCardDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateCardDto: UpdateCardDto) {
+    return this.cardService.update(id, updateCardDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remove um cartão por ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Cartão removido com sucesso.' })
   @ApiResponse({ status: 404, description: 'Cartão não encontrado.' })
-  remove(@Param('id') id: string) {
-    return this.cardService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.cardService.remove(id);
   }
 }
