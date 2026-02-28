@@ -5,11 +5,10 @@ import DelegateHeader from "@/components/delegado/DelegateHeader";
 import ResponsibilityBanner from "@/components/delegado/ResponsibilityBanner";
 import StatCard from "@/components/delegado/StatCard";
 import CurrentMatchCard from "@/components/delegado/CurrentMatchCard";
-import { CalendarDays, X } from "lucide-react";
+import { CalendarDays } from "lucide-react";
 import {
   DELEGADO_ROUTE,
   SUMULA_ROUTE,
-  CANCELAR_PARTIDA_ROUTE,
 } from "@/constants/routes";
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
@@ -70,10 +69,34 @@ const IconTrophy = (
   </svg>
 );
 
+// ── Motivos de cancelamento ───────────────────────────────────────────────────
+const MOTIVOS_CANCELAMENTO = [
+  { id: "chuva",  label: "Chuva Forte" },
+  { id: "calor",  label: "Calor Excessivo" },
+  { id: "briga",  label: "Briga Generalizada" },
+  { id: "wo",     label: "W.O." },
+];
+
 // ── Página ────────────────────────────────────────────────────────────────────
 export default function DelegatePage() {
   const router = useRouter();
   const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [motivosSelecionados, setMotivosSelecionados] = useState<string[]>([]);
+  const [detalheMotivo, setDetalheMotivo] = useState("");
+
+  const toggleMotivo = (id: string) =>
+    setMotivosSelecionados((prev) =>
+      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
+    );
+
+  const handleFinalizarCancelamento = async () => {
+    if (motivosSelecionados.length === 0) return;
+    const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+    console.log("Cancelando partida:", { motivos: motivosSelecionados, detalhe: detalheMotivo });
+    setCancelModalOpen(false);
+    setMotivosSelecionados([]);
+    setDetalheMotivo("");
+  };
 
   return (
     <main className="bg-white">
@@ -115,32 +138,72 @@ export default function DelegatePage() {
 
       </div>
 
-      {/* Modal de cancelamento — placeholder */}
+      {/* Modal de cancelamento */}
       {cancelModalOpen && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={() => setCancelModalOpen(false)}
         >
           <div
-            className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6"
+            className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-bold text-gray-800">Cancelar Partida</h2>
+            {/* Header */}
+            <h2 className="text-lg font-bold text-gray-800">Cancelar Partida</h2>
+            <p className="text-sm text-red-500 font-medium mt-0.5">
+              Informe o motivo para o cancelamento da partida
+            </p>
+
+            {/* Motivos — label em cima, checkbox embaixo, 4 colunas */}
+            <div className="grid grid-cols-4 gap-2 mt-5">
+              {MOTIVOS_CANCELAMENTO.map(({ id, label }) => (
+                <label
+                  key={id}
+                  className="flex flex-col items-center gap-2 cursor-pointer"
+                >
+                  <span className="text-xs text-gray-700 text-center leading-tight">
+                    {label}
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={motivosSelecionados.includes(id)}
+                    onChange={() => toggleMotivo(id)}
+                    className="w-4 h-4 accent-[#1b6928] cursor-pointer"
+                  />
+                </label>
+              ))}
+            </div>
+
+            {/* Detalhe */}
+            <div className="mt-5">
+              <label className="text-sm font-semibold text-gray-700 block mb-1">
+                Detalhar Motivo
+              </label>
+              <textarea
+                value={detalheMotivo}
+                onChange={(e) => setDetalheMotivo(e.target.value)}
+                placeholder="Descreva o ocorrido em detalhes para aplicação do cancelamento"
+                rows={5}
+                className="w-full border border-gray-300 rounded-lg p-3 text-sm text-gray-700 placeholder:text-gray-400 outline-none focus:border-[#1b6928] resize-none transition-colors"
+              />
+            </div>
+
+            {/* Ações — alinhados à direita */}
+            <div className="flex justify-end gap-3 mt-5">
               <button
                 onClick={() => setCancelModalOpen(false)}
-                className="text-gray-400 hover:text-gray-700 cursor-pointer transition-colors"
+                className="px-6 py-2 text-sm font-bold border border-gray-300 rounded-sm text-gray-700 hover:bg-gray-50 cursor-pointer transition-colors"
               >
-                <X size={18} />
+                Cancelar
+              </button>
+              <button
+                onClick={handleFinalizarCancelamento}
+                disabled={motivosSelecionados.length === 0}
+                className="px-6 py-2 text-sm font-bold bg-red-600 text-white rounded-sm hover:bg-red-700 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Finalizar Partida
               </button>
             </div>
-            <p className="text-sm text-gray-500">Funcionalidade em desenvolvimento.</p>
-            <button
-              onClick={() => router.push(`${CANCELAR_PARTIDA_ROUTE}?match=${mockCurrentMatch.id}`)}
-              className="mt-6 w-full py-2 text-sm font-bold bg-red-500 text-white rounded-lg hover:bg-red-600 cursor-pointer transition-colors"
-            >
-              Ir para Cancelamento
-            </button>
           </div>
         </div>
       )}

@@ -6,11 +6,11 @@ export const loginSchema = z.object({
   password: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
 });
 
-// Validação de Cadastro (Sem CPF, com Perfil)
+// Validação de Cadastro
 export const signupSchema = z.object({
   name: z.string().min(3, "Nome muito curto"),
   email: z.string().email("E-mail inválido"),
-  perfil: z.string().min(1, "Selecione um perfil"), // Campo obrigatório
+  type: z.string().min(1, "Selecione um perfil"), // era "perfil" — renomeado para bater com a API
   password: z.string().min(6, "Senha curta"),
   confirmPassword: z.string()
 }).refine((data) => data.password === data.confirmPassword, {

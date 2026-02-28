@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRightFromLineIcon, CircleUserIcon, Menu, X } from "lucide-react";
 import { ContainerHeader } from "../ContainerHeader";
 import { Logo } from "../Logo";
-import {CAMPEONATOS_ROUTE, HOME_ROUTE,} from "@/constants/routes";
+import {CAMPEONATOS_ROUTE, HOME_ROUTE,TABELAS_ROUTE,} from "@/constants/routes";
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 interface NavLink {
@@ -16,7 +16,7 @@ interface NavLink {
 const NAV_LINKS: NavLink[] = [
   { label: "Início",        href: HOME_ROUTE },
   { label: "Campeonatos",   href: CAMPEONATOS_ROUTE},
-  { label: "Tabelas",       href: "/tabelas" },
+  { label: "Tabelas",       href: TABELAS_ROUTE },
   { label: "Minha Conta",   href: "/conta" },
 ];
 
