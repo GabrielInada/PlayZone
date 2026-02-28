@@ -15,6 +15,7 @@ export class PlayerController {
   @ApiBody({ type: CreatePlayerDto })
   @ApiResponse({ status: 201, description: 'Player created successfully', type: PlayerResponseDto })
   @ApiResponse({ status: 400, description: 'Bad request - validation error' })
+  @ApiResponse({ status: 404, description: 'Team not found' })
   create(@Body() createPlayerDto: CreatePlayerDto) {
     return this.playersService.create(createPlayerDto);
   }
@@ -73,7 +74,7 @@ export class PlayerController {
   @ApiBody({ type: UpdatePlayerDto })
   @ApiResponse({ status: 400, description: 'Invalid player ID' })
   @ApiResponse({ status: 200, description: 'Player updated successfully', type: PlayerResponseDto })
-  @ApiResponse({ status: 404, description: 'Player not found' })
+  @ApiResponse({ status: 404, description: 'Player or team not found' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updatePlayerDto: UpdatePlayerDto) {
     return this.playersService.update(id, updatePlayerDto);
   }
