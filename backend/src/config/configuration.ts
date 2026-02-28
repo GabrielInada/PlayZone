@@ -7,6 +7,7 @@ export default () => ({
   dbPort: parseInt(process.env.DATABASE_PORT ?? '5432', 10),
   dbUrl: process.env.DATABASE_URL,
   dbSynchronize: process.env.DB_SYNCHRONIZE,
+  dbMigrationsRun: process.env.DB_MIGRATIONS_RUN,
   backendUrl: process.env.BACKEND_URL || `http://localhost:${backendPort}`,
   
   jwtSecret: process.env.JWT_SECRET,
