@@ -57,6 +57,49 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Migrations (TypeORM + Postgres)
+
+Para usar migrations com segurança:
+
+1. Desative sincronização automática do schema:
+
+```env
+DB_SYNCHRONIZE=false
+```
+
+2. Garanta que o banco esteja configurado:
+
+```env
+DATABASE_URL=postgres://user:password@host:5432/database
+```
+
+3. (Opcional) Executar migrations automaticamente no startup:
+
+```env
+DB_MIGRATIONS_RUN=true
+```
+
+Comandos:
+
+```bash
+# cria arquivo vazio de migration (Windows npm config)
+npm run migration:create --name=InitSchema
+
+# gera migration comparando entities x banco (Windows npm config)
+npm run migration:generate --name=InitSchema
+
+# executa migrations pendentes
+npm run migration:run
+
+# reverte última migration aplicada
+npm run migration:revert
+
+# lista status das migrations
+npm run migration:show
+```
+
+Observação: As migrations ficam em `src/database/migrations` e o DataSource da CLI está em `src/database/data-source.ts`.
+
 ## Bootstrap do primeiro admin
 
 Para criar automaticamente um admin no startup (apenas uma vez, de forma idempotente), configure no `.env`:

@@ -23,6 +23,7 @@ import { ClubModule } from '../club/club.module';
 import { SelfConsultModule } from '../../tasks/self-consult/self-consult.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from '../auth/auth.module';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { AuthModule } from '../auth/auth.module';
       useFactory: (configService: ConfigService) => {
         const dbUrl = configService.get<string>('dbUrl');
         const dbSynchronizeEnv = configService.get<string>('dbSynchronize');
+        const dbMigrationsRunEnv = configService.get<string>('dbMigrationsRun');
         const isProduction = configService.get<string>('nodeEnv') === 'production';
         const isVercel = Boolean(configService.get<boolean>('isVercel'));
 
@@ -45,10 +47,16 @@ import { AuthModule } from '../auth/auth.module';
           ? dbSynchronizeEnv === 'true' || dbSynchronizeEnv === '1'
           : !(isProduction || isVercel);
 
+        const migrationsRun = dbMigrationsRunEnv
+          ? dbMigrationsRunEnv === 'true' || dbMigrationsRunEnv === '1'
+          : false;
+
         return {
           type: 'postgres',
           url: dbUrl,
           entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club],
+          migrations: [join(__dirname, '../../database/migrations/*{.ts,.js}')],
+          migrationsRun,
           synchronize,
         };
       },
