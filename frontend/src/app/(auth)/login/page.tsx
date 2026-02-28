@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validations";
+import React, { useRef } from 'react';
+import toast from 'react-hot-toast';
 
 // 1. Ajuste nomes para 'email' e 'password' para bater com o Zod
 type LoginField = {
@@ -44,16 +46,21 @@ export default function LoginPage() {
   // Log para verificar se o Zod capturou os dados corretamente
   console.log("Tentativa de Login com:", data);
 
-  // Simulação de autenticação no backend
   setTimeout(() => {
-    setIsLoading(false);
+  setIsLoading(false);
 
-    //Sucesso se os dados passarem pela validação do Zod
-    // No futuro, aqui você verificará se a resposta do fetch foi 'ok'
-    alert("Login realizado com sucesso! Bem-vindo ao UFRA PlayZone.");
-    
-    router.push('/home'); 
-  }, 1500);
+  toast.success("Login realizado com sucesso!", {
+    position: 'bottom-right',
+    style: {
+      borderRadius: '8px',
+      background: '#004a1b',
+      color: '#fff',
+      fontFamily: 'Roboto, sans-serif',
+    },
+  });
+  
+  router.push('/home'); 
+}, 1500);
 };
 
   return (

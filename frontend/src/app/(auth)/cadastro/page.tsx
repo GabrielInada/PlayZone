@@ -7,6 +7,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import React, { useRef } from 'react';
+import toast from 'react-hot-toast';
+
 
 const SIGNUP_FIELDS = [
   { name: 'name', label: 'Nome Completo:', type: 'text', placeholder: 'Seu nome' },
@@ -36,10 +39,26 @@ export default function SignupPage() {
 
     // 3. Teste de Lógica: Sucesso apenas se o nome for "Teste"
     if (data.name === "Teste") {
-      alert("Usuário validado com sucesso!");
+  
+      toast.success("Usuário validado com sucesso!", {
+        position: 'bottom-right',
+        style: {
+          borderRadius: '8px',
+          background: '#004a1b',
+          color: '#fff',
+          fontFamily: 'Roboto, sans-serif',
+        },
+      });
       router.push('/login'); 
     } else {
-      alert("Erro simulado! Tente usar o nome 'Teste' para passar.");
+      
+      toast.error("Erro simulado! Tente usar o nome 'Teste' para passar.", {
+        position: 'bottom-right',
+        style: {
+          borderRadius: '8px',
+          fontFamily: 'Roboto, sans-serif',
+        },
+      });
     }
   }, 1500);
 };
