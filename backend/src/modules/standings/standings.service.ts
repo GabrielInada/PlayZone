@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateStandingDto } from './dto/create-standing.dto';
 import { UpdateStandingDto } from './dto/update-standing.dto';
 import { MatchReport } from '../match-report/entities/match-report.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { EnumReportStatus } from '../../types/report';
+import { EnumMatchReportStatus } from '../../types/match-report';
 
 @Injectable()
 export class StandingsService {
@@ -15,30 +15,37 @@ export class StandingsService {
     private reportRepository: Repository<MatchReport>,
   ) {}
 
-  create(createStandingDto: CreateStandingDto) {
-    return 'This action adds a new standing';
+  create(_createStandingDto: CreateStandingDto) {
+    throw new BadRequestException('Operação não suportada. Use GET /standings para consultar a classificação.');
   }
 
-  findAll() {
-    return `This action returns all standings`;
+  async findAll() {
+    return this.getStandings();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} standing`;
+  async findOne(id: number) {
+    const standings = await this.getStandings();
+    const teamStanding = standings.find((team) => team.id === id);
+
+    if (!teamStanding) {
+      throw new NotFoundException(`Classificação para o time ${id} não encontrada`);
+    }
+
+    return teamStanding;
   }
 
-  update(id: number, updateStandingDto: UpdateStandingDto) {
-    return `This action updates a #${id} standing`;
+  update(_id: number, _updateStandingDto: UpdateStandingDto) {
+    throw new BadRequestException('Operação não suportada. A classificação é calculada automaticamente.');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} standing`;
+  remove(_id: number) {
+    throw new BadRequestException('Operação não suportada. A classificação é calculada automaticamente.');
   }
 
   async getStandings() {
     // Busca súmulas validadas com relacionamentos necessários
     const reports = await this.reportRepository.find({
-      where: { status: EnumReportStatus.VALIDATED },
+      where: { status: EnumMatchReportStatus.VALIDATED },
       relations: ['match', 'match.homeTeam', 'match.awayTeam'],
     });
 

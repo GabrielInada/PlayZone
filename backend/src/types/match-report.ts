@@ -1,4 +1,4 @@
-export enum EnumReportStatus {
+export enum EnumMatchReportStatus {
     PENDING = 'pending',
     VALIDATED = 'validated',
     REJECTED = 'rejected',

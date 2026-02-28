@@ -6,11 +6,9 @@ import { MatchReport } from './entities/match-report.entity';
 import { Card } from '../card/entities/card.entity';
 import { Goal } from '../goal/entities/goal.entity';
 import { Match } from '../match/entities/match.entity';
-import { User } from '../user/entities/user.entity';
-import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MatchReport, Match, Goal, Card, User]), UserModule],
+  imports: [TypeOrmModule.forFeature([MatchReport, Match, Goal, Card])],
   controllers: [MatchReportController],
   providers: [MatchReportService],
 })

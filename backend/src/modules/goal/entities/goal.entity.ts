@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { Player } from '../../player/entities/player.entity';
-import { MatchReport } from 'src/modules/match-report/entities/match-report.entity';
+import { MatchReport } from '../../match-report/entities/match-report.entity';
 
 @Entity()
 export class Goal {

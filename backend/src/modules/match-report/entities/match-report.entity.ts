@@ -1,7 +1,7 @@
-import { Card } from "src/modules/card/entities/card.entity";
-import { Goal } from "src/modules/goal/entities/goal.entity";
-import { Match } from "src/modules/match/entities/match.entity";
-import { EnumReportStatus } from "src/types/report";
+import { Card } from "../../card/entities/card.entity";
+import { Goal } from "../../goal/entities/goal.entity";
+import { Match } from "../../match/entities/match.entity";
+import { EnumMatchReportStatus } from "../../../types/match-report";
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne, JoinColumn, OneToMany } from "typeorm";
 
 
@@ -19,8 +19,8 @@ export class MatchReport {
   @Column({ type: 'text', nullable: true })
   observations: string;
 
-  @Column({ type: 'enum', enum: EnumReportStatus, default: EnumReportStatus.PENDING })
-  status: EnumReportStatus;
+  @Column({ type: 'enum', enum: EnumMatchReportStatus, default: EnumMatchReportStatus.PENDING })
+  status: EnumMatchReportStatus;
 
   @Column({ type: 'text', nullable: true })
   adminNote: string | null;

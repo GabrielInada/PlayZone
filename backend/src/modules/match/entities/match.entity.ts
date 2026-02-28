@@ -1,7 +1,7 @@
-import { MatchReport } from "src/modules/match-report/entities/match-report.entity";
-import { Team } from "src/modules/team/entities/team.entity";
-import { User } from "src/modules/user/entities/user.entity";
-import { EnumMatchStatus } from "src/types/match";
+import { MatchReport } from "../../match-report/entities/match-report.entity";
+import { Team } from "../../team/entities/team.entity";
+import { User } from "../../user/entities/user.entity";
+import { EnumMatchStatus } from "../../../types/match";
 import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -24,9 +24,9 @@ export class Match {
   @ManyToOne(() => Team, (team) => team.awayMatches)
   awayTeam: Team;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'delegateId' })
-  delegate: User;
+  delegate?: User;
 
   @Column({ nullable: true })
   delegateId: number;

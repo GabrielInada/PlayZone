@@ -57,6 +57,28 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Bootstrap do primeiro admin
+
+Para criar automaticamente um admin no startup (apenas uma vez, de forma idempotente), configure no `.env`:
+
+```env
+BOOTSTRAP_ADMIN_ENABLED=true
+BOOTSTRAP_ADMIN_NAME=PlayZone Admin
+BOOTSTRAP_ADMIN_EMAIL=admin@playzone.com
+BOOTSTRAP_ADMIN_PASSWORD=troque-por-uma-senha-forte
+BOOTSTRAP_ADMIN_TYPE=delegado
+```
+
+Regras importantes:
+
+- Se já existir usuário com esse email e role `admin`, nada é criado.
+- Se existir usuário com esse email mas role diferente, a criação é ignorada e um warning é emitido.
+- Em produção, o bootstrap só roda se também definir:
+
+```env
+BOOTSTRAP_ADMIN_ALLOW_IN_PRODUCTION=true
+```
+
 ## Deployment
 
 When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.

@@ -1,5 +1,5 @@
-import { Match } from "src/modules/match/entities/match.entity";
-import { EnumUserRole, EnumUserType } from "src/types/user";
+import { Match } from "../../match/entities/match.entity";
+import { EnumUserRole, EnumUserType } from "../../../types/user";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
@@ -16,10 +16,10 @@ export class User {
     @Column()
     password: string; // Lembre-se de hashear a senha antes de salvar
     
-    @Column()
+    @Column({ type: 'enum', enum: EnumUserRole })
     role: EnumUserRole;
 
-    @Column()
+    @Column({ type: 'enum', enum: EnumUserType })
     type: EnumUserType;
 
     // Relacionamento inverso: Um delegado pode ter várias partidas atribuídas
