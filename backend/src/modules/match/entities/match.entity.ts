@@ -24,9 +24,9 @@ export class Match {
   @ManyToOne(() => Team, (team) => team.awayMatches)
   awayTeam: Team;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'delegateId' })
-  delegate: User;
+  delegate?: User;
 
   @Column({ nullable: true })
   delegateId: number;

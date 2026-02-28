@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { StandingsService } from './standings.service';
 import { CreateStandingDto } from './dto/create-standing.dto';
@@ -10,9 +10,9 @@ export class StandingsController {
   constructor(private readonly standingsService: StandingsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Cria um registro de classificação' })
+  @ApiOperation({ summary: 'Operação não suportada para classificação' })
   @ApiBody({ type: CreateStandingDto })
-  @ApiResponse({ status: 201, description: 'Classificação criada com sucesso.' })
+  @ApiResponse({ status: 400, description: 'Operação não suportada.' })
   create(@Body() createStandingDto: CreateStandingDto) {
     return this.standingsService.create(createStandingDto);
   }
@@ -27,28 +27,27 @@ export class StandingsController {
   @Get(':id')
   @ApiOperation({ summary: 'Busca classificação por ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Classificação encontrada.' })
   @ApiResponse({ status: 404, description: 'Classificação não encontrada.' })
-  findOne(@Param('id') id: string) {
-    return this.standingsService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.standingsService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Atualiza classificação por ID' })
+  @ApiOperation({ summary: 'Operação não suportada para classificação' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateStandingDto })
-  @ApiResponse({ status: 200, description: 'Classificação atualizada com sucesso.' })
-  @ApiResponse({ status: 404, description: 'Classificação não encontrada.' })
-  update(@Param('id') id: string, @Body() updateStandingDto: UpdateStandingDto) {
-    return this.standingsService.update(+id, updateStandingDto);
+  @ApiResponse({ status: 400, description: 'Operação não suportada.' })
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateStandingDto: UpdateStandingDto) {
+    return this.standingsService.update(id, updateStandingDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Remove classificação por ID' })
+  @ApiOperation({ summary: 'Operação não suportada para classificação' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ status: 200, description: 'Classificação removida com sucesso.' })
-  @ApiResponse({ status: 404, description: 'Classificação não encontrada.' })
-  remove(@Param('id') id: string) {
-    return this.standingsService.remove(+id);
+  @ApiResponse({ status: 400, description: 'Operação não suportada.' })
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.standingsService.remove(id);
   }
 }

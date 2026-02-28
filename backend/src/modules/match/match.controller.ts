@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MatchService } from './match.service';
 import { CreateMatchDto } from './dto/create-match.dto';
@@ -27,28 +27,31 @@ export class MatchController {
   @Get(':id')
   @ApiOperation({ summary: 'Busca uma partida por ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Partida encontrada.' })
   @ApiResponse({ status: 404, description: 'Partida não encontrada.' })
-  findOne(@Param('id') id: string) {
-    return this.matchService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.matchService.findOne(id);
   }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Atualiza uma partida por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateMatchDto })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Partida atualizada com sucesso.' })
   @ApiResponse({ status: 404, description: 'Partida não encontrada.' })
-  update(@Param('id') id: string, @Body() updateMatchDto: UpdateMatchDto) {
-    return this.matchService.update(+id, updateMatchDto);
+  update(@Param('id', ParseIntPipe) id: number, @Body() updateMatchDto: UpdateMatchDto) {
+    return this.matchService.update(id, updateMatchDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Remove uma partida por ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Partida removida com sucesso.' })
   @ApiResponse({ status: 404, description: 'Partida não encontrada.' })
-  remove(@Param('id') id: string) {
-    return this.matchService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.matchService.remove(id);
   }
 }
