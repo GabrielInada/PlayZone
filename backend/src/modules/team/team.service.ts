@@ -4,15 +4,21 @@ import { Repository } from 'typeorm';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './entities/team.entity';
+import { Club } from '../club/entities/club.entity';
 
 @Injectable()
 export class TeamService {
   constructor(
     @InjectRepository(Team)
     private teamRepository: Repository<Team>,
+
+    @InjectRepository(Club)
+    private clubRepository: Repository<Club>,
   ) {}
 
   async create(createTeamDto: CreateTeamDto) {
+    await this.ensureClubExists(createTeamDto.clubId);
+
     const team = this.teamRepository.create({
       ...createTeamDto,
       createdAt: new Date(),
@@ -25,7 +31,7 @@ export class TeamService {
 
   async findAll() {
     const teams = await this.teamRepository.find({
-      relations: ['players'],
+      relations: ['players', 'club'],
     });
     if (!teams || teams.length === 0) {
       throw new HttpException('No teams found', 404);
@@ -36,7 +42,7 @@ export class TeamService {
   async findOne(id: number) {
     const team = await this.teamRepository.findOne({
       where: { id },
-      relations: ['players', 'homeMatches', 'awayMatches'],
+      relations: ['players', 'homeMatches', 'awayMatches', 'club'],
     });
     if (!team) {
       throw new HttpException(`Team with ID ${id} not found`, 404);
@@ -45,6 +51,10 @@ export class TeamService {
   }
 
   async update(id: number, updateTeamDto: UpdateTeamDto) {
+    if (updateTeamDto.clubId !== undefined) {
+      await this.ensureClubExists(updateTeamDto.clubId);
+    }
+
     const team = await this.teamRepository.preload({
       id,
       ...updateTeamDto,
@@ -69,5 +79,13 @@ export class TeamService {
     }
 
     return this.teamRepository.remove(team);
+  }
+
+  private async ensureClubExists(clubId: number) {
+    const club = await this.clubRepository.findOne({ where: { id: clubId } });
+
+    if (!club) {
+      throw new HttpException(`Club with ID ${clubId} not found`, 404);
+    }
   }
 }

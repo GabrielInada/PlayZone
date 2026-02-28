@@ -15,6 +15,7 @@ export class TeamController {
   @ApiBody({ type: CreateTeamDto })
   @ApiResponse({ status: 201, description: 'Team created successfully', type: TeamResponseDto })
   @ApiResponse({ status: 400, description: 'Bad request - validation error' })
+  @ApiResponse({ status: 404, description: 'Club not found' })
   create(@Body() createTeamDto: CreateTeamDto) {
     return this.teamService.create(createTeamDto);
   }
@@ -71,7 +72,7 @@ export class TeamController {
   @ApiBody({ type: UpdateTeamDto })
   @ApiResponse({ status: 400, description: 'Invalid team ID' })
   @ApiResponse({ status: 200, description: 'Team updated successfully', type: TeamResponseDto })
-  @ApiResponse({ status: 404, description: 'Team not found' })
+  @ApiResponse({ status: 404, description: 'Team or club not found' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updateTeamDto: UpdateTeamDto) {
     return this.teamService.update(id, updateTeamDto);
   }

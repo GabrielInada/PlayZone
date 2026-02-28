@@ -1,6 +1,7 @@
 import { Match } from "../../match/entities/match.entity";
+import { Club } from "../../club/entities/club.entity";
 import { EnumUserRole, EnumUserType } from "../../../types/user";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class User {
@@ -25,6 +26,9 @@ export class User {
     // Relacionamento inverso: Um delegado pode ter várias partidas atribuídas
     @OneToMany(() => Match, (match) => match.delegate)
     assignedMatches: Match[];
+
+    @OneToOne(() => Club, (club) => club.owner)
+    clubProfile?: Club;
 
     @Column()
     createdAt: Date;

@@ -1,6 +1,7 @@
 import { Match } from '../../match/entities/match.entity';
 import { Player } from '../../player/entities/player.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Club } from '../../club/entities/club.entity';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Team {
@@ -12,6 +13,10 @@ export class Team {
 
     @Column()
     clubId: number;
+
+    @ManyToOne(() => Club, (club) => club.teams)
+    @JoinColumn({ name: 'clubId' })
+    club: Club;
 
     @Column()
     coachName: string;
