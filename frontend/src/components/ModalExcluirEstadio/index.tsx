@@ -7,10 +7,10 @@ interface ModalExcluirProps {
   isOpen: boolean;
   onClose: () => void;
   onConfirm: () => void;
-  nomeEstadio?: string; 
+  stadiumName?: string; 
 }
 
-export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, nomeEstadio }: ModalExcluirProps) => {
+export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, stadiumName }: ModalExcluirProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
   // Fechar ao clicar fora, como no modal de adicionar
@@ -22,12 +22,13 @@ export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, nomeEstadio }:
 
   const handleConfirm = () => {
     onConfirm();
-    toast.error(`Estádio ${nomeEstadio || ''} removido com sucesso!`, {
+    toast.error(`Estádio ${stadiumName || ''} removido com sucesso!`, {
+      position: 'bottom-right',
       style: {
         borderRadius: '8px',
         background: '#333',
         color: '#fff',
-        fontFamily: 'Roboto, sans-serif',
+        fontFamily: 'Arial, sans-serif',
       },
       icon: '🗑️',
     });
@@ -45,10 +46,11 @@ export const ModalExcluirEstadio = ({ isOpen, onClose, onConfirm, nomeEstadio }:
         ref={modalRef}
         className="bg-white rounded-xl shadow-2xl w-full max-w-sm p-6 animate-in fade-in zoom-in duration-200 font-roboto"
       >
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Excluir Estádio</h2>
+        <h2 className="text-xl font-bold text-gray-900 mb-2">Excluir</h2>
         
         <p className="text-[14px] text-gray-600 mb-6">
-          Tem a certeza de que deseja excluir este estádio? Esta ação não pode ser desfeita.
+        Tem a certeza de que deseja excluir este ginásio?
+        Esta ação não pode ser desfeita.
         </p>
 
         <div className="flex justify-end gap-3 font-bold">

@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import { StadiumCard } from './StadiumCard/StadiumCard'; 
 import { Plus, Search } from 'lucide-react';
 import { ContainerHeader } from "@/components/ContainerHeader";
+import { ModalEstadio } from '@/components/ModalEstadio';
+import { ModalEditarEstadio } from '@/components/ModalEditarEstadio';
+import { ModalExcluirEstadio } from '@/components/ModalExcluirEstadio';
 
 const MOCK_STADIUMS = [
   {
@@ -65,9 +68,26 @@ const MOCK_STADIUMS = [
 export default function EstadiosHome() {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filtrados = MOCK_STADIUMS.filter(stadium => 
+  const [stadiums, setStadiums] = useState(MOCK_STADIUMS);
+
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const [selectedStadium, setSelectedStadium] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  
+  const filtrados = stadiums.filter(stadium => 
     stadium.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // função que remove o item da lista
+  const handleConfirmDelete = () => {
+    if (selectedStadium) {
+      setStadiums(prev => prev.filter(s => s.id !== selectedStadium.id));
+      setIsDeleteModalOpen(false);
+      // Aqui você pode adicionar um toast.success('Excluído!') se quiser
+    }
+  };
 
   return (
     <div className=" bg-white flex flex-col font-bold">
@@ -91,7 +111,9 @@ export default function EstadiosHome() {
               />
             </div>
 
-            <button className="min-w-[40vh] flex justify-center bg-[#007a33] hover:bg-[#005f27] text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer">
+            <button 
+              onClick={() => setIsAddModalOpen(true)}
+              className="min-w-[40vh] flex justify-center bg-[#007a33] hover:bg-[#005f27] text-white font-bold py-2.5 px-6 rounded-lg shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer">
               <Plus className="h-5 w-5" />
               Adicionar Ginásio
             </button>
@@ -107,8 +129,14 @@ export default function EstadiosHome() {
                 match={stadium.match}
                 date={stadium.date}
                 imageUrl={stadium.imageUrl}
-                onEdit={() => console.log("Editar", stadium.id)}
-                onDelete={() => console.log("Excluir", stadium.id)}
+                onEdit={() => {
+                  setSelectedStadium(stadium);
+                  setIsEditModalOpen(true);
+                }}
+                onDelete={() => {
+                  setSelectedStadium(stadium);
+                  setIsDeleteModalOpen(true);
+                }}
               />
             ))}
           </div>
@@ -123,6 +151,30 @@ export default function EstadiosHome() {
           </div>
         </div>
       </ContainerHeader>
+
+      {isAddModalOpen && (
+       <ModalEstadio 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+      />
+    )}
+      {isEditModalOpen && (
+        <ModalEditarEstadio 
+          isOpen={isEditModalOpen} 
+          onClose={() => setIsEditModalOpen(false)} 
+          stadiumData={selectedStadium} 
+        />
+      )}
+
+      {isDeleteModalOpen && (
+        <ModalExcluirEstadio 
+          isOpen={isDeleteModalOpen} 
+          onClose={() => setIsDeleteModalOpen(false)}
+          onConfirm={handleConfirmDelete}
+          stadiumName={selectedStadium?.name}
+        />
+      )}
+
     </div>
   );
 }
