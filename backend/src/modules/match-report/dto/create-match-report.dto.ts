@@ -1,7 +1,7 @@
 import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, Min, IsArray, IsInt, IsString } from "class-validator";
-import { CreateCardDto } from "src/modules/card/dto/create-card.dto";
-import { CreateGoalDto } from "src/modules/goal/dto/create-goal.dto";
+import { CreateCardDto } from '../../card/dto/create-card.dto';
+import { CreateGoalDto } from '../../goal/dto/create-goal.dto';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 

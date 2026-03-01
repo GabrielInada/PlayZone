@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsDate, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
-import { EnumMatchStatus } from 'src/types/match';
+import { EnumMatchStatus } from '../../../types/match';
 
 export class CreateMatchDto {
 	@ApiProperty({ description: 'Data e hora da partida', example: '2026-03-10T19:00:00.000Z' })

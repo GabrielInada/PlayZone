@@ -18,6 +18,9 @@ export class Location {
 	@Column({ type: 'varchar', nullable: true })
 	state?: string | null;
 
+	@Column({ type: 'text', nullable: true })
+	imageUrl?: string | null;
+
 	@OneToMany(() => Match, (match) => match.location)
 	matches: Match[];
 

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { EnumPlayerPosition } from "src/types/player";
+import { EnumPlayerPosition } from '../../../types/player';
 
 export class CreatePlayerDto {
     @ApiProperty({ example: 'João Silva', description: 'Player name' })

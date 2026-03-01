@@ -21,6 +21,6 @@ export default new DataSource({
   type: 'postgres',
   url: dbUrl,
   entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club, Location],
-  migrations: ['src/database/migrations/*{.ts,.js}', 'dist/database/migrations/*{.ts,.js}'],
+  migrations: ['src/database/migrations/*.ts'],
   synchronize: false,
 });
