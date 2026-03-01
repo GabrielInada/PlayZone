@@ -5,12 +5,12 @@ import { DataSource, Repository } from 'typeorm';
 import { Match } from '../match/entities/match.entity';
 import { MatchReport } from './entities/match-report.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EnumMatchReportStatus } from 'src/types/match-report';
+import { EnumMatchReportStatus } from '../../types/match-report';
 import { Goal } from '../goal/entities/goal.entity';
 import { Card } from '../card/entities/card.entity';
-import { EnumMatchStatus } from 'src/types/match';
+import { EnumMatchStatus } from '../../types/match';
 import { ReviewMatchReportDto } from './dto/review-match-report.dto';
-import { EnumReviewAction } from 'src/types/reviewMatchReport';
+import { EnumReviewAction } from '../../types/reviewMatchReport';
 
 @Injectable()
 export class MatchReportService {

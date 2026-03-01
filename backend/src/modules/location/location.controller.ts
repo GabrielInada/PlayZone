@@ -12,6 +12,7 @@ export class LocationController {
   @Post()
   @ApiOperation({ summary: 'Cria um local' })
   @ApiBody({ type: CreateLocationDto })
+  @ApiResponse({ status: 400, description: 'Dados inválidos.' })
   @ApiResponse({ status: 201, description: 'Local criado com sucesso.' })
   create(@Body() createLocationDto: CreateLocationDto) {
     return this.locationService.create(createLocationDto);

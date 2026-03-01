@@ -2,31 +2,36 @@ import { Type } from "class-transformer";
 import { IsOptional, ValidateNested, Min, IsArray, IsInt, IsString } from "class-validator";
 import { CreateCardDto } from "src/modules/card/dto/create-card.dto";
 import { CreateGoalDto } from "src/modules/goal/dto/create-goal.dto";
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 
 export class CreateMatchReportDto {
+    @ApiProperty({ example: 1, description: 'ID da partida relacionada à súmula' })
     @IsInt()
     matchId: number;
 
+    @ApiProperty({ example: 2, description: 'Gols do time mandante' })
     @IsInt()
     @Min(0)
     homeScore: number;
 
+    @ApiProperty({ example: 1, description: 'Gols do time visitante' })
     @IsInt()
     @Min(0)
     awayScore: number;
     
+    @ApiPropertyOptional({ example: 'Partida sem incidentes graves', description: 'Observações gerais da partida' })
     @IsString()
     @IsOptional()
     observations?: string;
 
-    // Valida um array de objetos GoalDto
+    @ApiProperty({ type: [CreateGoalDto], description: 'Lista de gols registrados na súmula' })
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateGoalDto)
     goals: CreateGoalDto[];
 
-    // Valida um array de objetos CardDto
+    @ApiProperty({ type: [CreateCardDto], description: 'Lista de cartões registrados na súmula' })
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => CreateCardDto)

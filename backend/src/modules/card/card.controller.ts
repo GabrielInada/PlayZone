@@ -12,6 +12,7 @@ export class CardController {
   @Post()
   @ApiOperation({ summary: 'Cria um registro de cartão' })
   @ApiBody({ type: CreateCardDto })
+  @ApiResponse({ status: 400, description: 'Dados inválidos.' })
   @ApiResponse({ status: 201, description: 'Cartão criado com sucesso.' })
   create(@Body() createCardDto: CreateCardDto) {
     return this.cardService.create(createCardDto);

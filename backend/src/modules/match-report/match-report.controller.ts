@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UnauthorizedException, ParseIntPipe } from '@nestjs/common';
 import { Request } from 'express';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { MatchReportService } from './match-report.service';
 import { CreateMatchReportDto } from './dto/create-match-report.dto';
 import { UpdateMatchReportDto } from './dto/update-match-report.dto';
@@ -13,8 +13,12 @@ export class MatchReportController {
 
   @Post()
   @ApiOperation({ summary: 'Cria uma súmula de partida' })
+  @ApiBearerAuth()
   @ApiBody({ type: CreateMatchReportDto })
+  @ApiResponse({ status: 400, description: 'Dados da súmula inválidos.' })
   @ApiResponse({ status: 401, description: 'Usuário não autenticado.' })
+  @ApiResponse({ status: 403, description: 'Usuário sem permissão para esta partida.' })
+  @ApiResponse({ status: 404, description: 'Partida não encontrada.' })
   @ApiResponse({ status: 201, description: 'Súmula criada com sucesso.' })
   create(@Body() createMatchReportDto: CreateMatchReportDto, @Req() req: Request & { user?: { id?: number } }) {
     const user = req.user;
@@ -45,7 +49,7 @@ export class MatchReportController {
   @ApiOperation({ summary: 'Atualiza uma súmula por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateMatchReportDto })
-  @ApiResponse({ status: 400, description: 'ID inválido.' })
+  @ApiResponse({ status: 400, description: 'ID inválido, dados inválidos ou súmula validada não pode ser alterada.' })
   @ApiResponse({ status: 200, description: 'Súmula atualizada com sucesso.' })
   @ApiResponse({ status: 404, description: 'Súmula não encontrada.' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updateMatchReportDto: UpdateMatchReportDto) {

@@ -12,6 +12,7 @@ export class GoalController {
   @Post()
   @ApiOperation({ summary: 'Cria um registro de gol' })
   @ApiBody({ type: CreateGoalDto })
+  @ApiResponse({ status: 400, description: 'Dados inválidos.' })
   @ApiResponse({ status: 201, description: 'Gol criado com sucesso.' })
   create(@Body() createGoalDto: CreateGoalDto) {
     return this.goalService.create(createGoalDto);
