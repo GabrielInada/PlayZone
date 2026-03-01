@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { DataSource } from 'typeorm';
 import { Player } from '../modules/player/entities/player.entity';
 import { Team } from '../modules/team/entities/team.entity';
@@ -7,6 +8,7 @@ import { MatchReport } from '../modules/match-report/entities/match-report.entit
 import { Goal } from '../modules/goal/entities/goal.entity';
 import { Card } from '../modules/card/entities/card.entity';
 import { Club } from '../modules/club/entities/club.entity';
+import { Location } from '../modules/location/entities/location.entity';
 import configuration from '../config/configuration';
 
 const { dbUrl } = configuration();
@@ -18,7 +20,7 @@ if (!dbUrl) {
 export default new DataSource({
   type: 'postgres',
   url: dbUrl,
-  entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club],
+  entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club, Location],
   migrations: ['src/database/migrations/*{.ts,.js}', 'dist/database/migrations/*{.ts,.js}'],
   synchronize: false,
 });

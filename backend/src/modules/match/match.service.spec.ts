@@ -4,6 +4,7 @@ import { MatchService } from './match.service';
 import { Match } from './entities/match.entity';
 import { Team } from '../team/entities/team.entity';
 import { User } from '../user/entities/user.entity';
+import { Location } from '../location/entities/location.entity';
 
 describe('MatchService', () => {
   let service: MatchService;
@@ -15,6 +16,7 @@ describe('MatchService', () => {
         { provide: getRepositoryToken(Match), useValue: {} },
         { provide: getRepositoryToken(Team), useValue: {} },
         { provide: getRepositoryToken(User), useValue: {} },
+        { provide: getRepositoryToken(Location), useValue: {} },
       ],
     }).compile();
 

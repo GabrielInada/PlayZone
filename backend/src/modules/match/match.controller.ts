@@ -13,6 +13,7 @@ export class MatchController {
   @ApiOperation({ summary: 'Cria uma partida' })
   @ApiBody({ type: CreateMatchDto })
   @ApiResponse({ status: 201, description: 'Partida criada com sucesso.' })
+  @ApiResponse({ status: 404, description: 'Time, delegado ou local não encontrado.' })
   create(@Body() createMatchDto: CreateMatchDto) {
     return this.matchService.create(createMatchDto);
   }
@@ -40,7 +41,7 @@ export class MatchController {
   @ApiBody({ type: UpdateMatchDto })
   @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Partida atualizada com sucesso.' })
-  @ApiResponse({ status: 404, description: 'Partida não encontrada.' })
+  @ApiResponse({ status: 404, description: 'Partida, time, delegado ou local não encontrado.' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updateMatchDto: UpdateMatchDto) {
     return this.matchService.update(id, updateMatchDto);
   }

@@ -20,6 +20,8 @@ import { CardModule } from '../card/card.module';
 import { GoalModule } from '../goal/goal.module';
 import { Club } from '../club/entities/club.entity';
 import { ClubModule } from '../club/club.module';
+import { Location } from '../location/entities/location.entity';
+import { LocationModule } from '../location/location.module';
 import { SelfConsultModule } from '../../tasks/self-consult/self-consult.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from '../auth/auth.module';
@@ -54,14 +56,14 @@ import { join } from 'path';
         return {
           type: 'postgres',
           url: dbUrl,
-          entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club],
+          entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club, Location],
           migrations: [join(__dirname, '../../database/migrations/*{.ts,.js}')],
           migrationsRun,
           synchronize,
         };
       },
     }),
-    PlayerModule, TeamModule, MatchModule, UserModule, MatchReportModule, GoalModule, CardModule, ClubModule, AuthModule
+    PlayerModule, TeamModule, MatchModule, UserModule, MatchReportModule, GoalModule, CardModule, ClubModule, LocationModule, AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,6 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsDate, IsEnum, IsInt, IsOptional, IsString, Min } from 'class-validator';
+import { IsDate, IsEnum, IsInt, IsOptional, Min } from 'class-validator';
 import { EnumMatchStatus } from 'src/types/match';
 
 export class CreateMatchDto {
@@ -9,9 +9,10 @@ export class CreateMatchDto {
 	@IsDate()
 	date: Date;
 
-	@ApiProperty({ description: 'Local da partida', example: 'Estádio Municipal' })
-	@IsString()
-	location: string;
+	@ApiProperty({ description: 'ID do local da partida', example: 1 })
+	@IsInt()
+	@Min(1)
+	locationId: number;
 
 	@ApiProperty({ description: 'ID do time mandante', example: 1 })
 	@IsInt()

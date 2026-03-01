@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Location } from '../location/entities/location.entity';
 import { Team } from '../team/entities/team.entity';
 import { User } from '../user/entities/user.entity';
 import { Repository } from 'typeorm';
@@ -16,18 +17,25 @@ export class MatchService {
     private readonly teamRepository: Repository<Team>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Location)
+    private readonly locationRepository: Repository<Location>,
   ) {}
 
   async create(createMatchDto: CreateMatchDto) {
     this.validateHomeAway(createMatchDto.homeTeamId, createMatchDto.awayTeamId);
 
-    const [homeTeam, awayTeam] = await Promise.all([
+    const [homeTeam, awayTeam, location] = await Promise.all([
       this.teamRepository.findOne({ where: { id: createMatchDto.homeTeamId } }),
       this.teamRepository.findOne({ where: { id: createMatchDto.awayTeamId } }),
+      this.locationRepository.findOne({ where: { id: createMatchDto.locationId } }),
     ]);
 
     if (!homeTeam || !awayTeam) {
       throw new NotFoundException('Time mandante e/ou visitante não encontrado');
+    }
+
+    if (!location) {
+      throw new NotFoundException('Local da partida não encontrado');
     }
 
     let delegate: User | null = null;
@@ -40,7 +48,8 @@ export class MatchService {
 
     const match = this.matchRepository.create({
       date: createMatchDto.date,
-      location: createMatchDto.location,
+      location,
+      locationId: createMatchDto.locationId,
       status: createMatchDto.status,
       homeTeam,
       awayTeam,
@@ -53,7 +62,7 @@ export class MatchService {
 
   async findAll() {
     return this.matchRepository.find({
-      relations: ['homeTeam', 'awayTeam', 'delegate', 'report'],
+      relations: ['homeTeam', 'awayTeam', 'delegate', 'report', 'location'],
       order: { date: 'ASC' },
     });
   }
@@ -61,7 +70,7 @@ export class MatchService {
   async findOne(id: number) {
     const match = await this.matchRepository.findOne({
       where: { id },
-      relations: ['homeTeam', 'awayTeam', 'delegate', 'report'],
+      relations: ['homeTeam', 'awayTeam', 'delegate', 'report', 'location'],
     });
 
     if (!match) {
@@ -82,6 +91,7 @@ export class MatchService {
     let homeTeam = existingMatch.homeTeam;
     let awayTeam = existingMatch.awayTeam;
     let delegate = existingMatch.delegate;
+    let location = existingMatch.location;
 
     if (updateMatchDto.homeTeamId) {
       const foundHomeTeam = await this.teamRepository.findOne({ where: { id: updateMatchDto.homeTeamId } });
@@ -107,8 +117,18 @@ export class MatchService {
       delegate = foundDelegate;
     }
 
+    if (updateMatchDto.locationId !== undefined) {
+      const foundLocation = await this.locationRepository.findOne({ where: { id: updateMatchDto.locationId } });
+      if (!foundLocation) {
+        throw new NotFoundException('Local da partida não encontrado');
+      }
+      location = foundLocation;
+    }
+
     const matchToUpdate = this.matchRepository.merge(existingMatch, {
       ...updateMatchDto,
+      location,
+      locationId: updateMatchDto.locationId ?? existingMatch.locationId,
       homeTeam,
       awayTeam,
       delegate,
