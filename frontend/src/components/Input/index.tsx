@@ -30,7 +30,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className="flex flex-col gap-1 w-full font-roboto">
-        <label className="text-sm font-bold text-gray-700">{label}</label>
+        <label className="text-sm font-bold text-black-700">{label}</label>
         <input
           {...props}
           type={type}
