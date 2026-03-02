@@ -12,7 +12,7 @@ export class LocationController {
   @Post()
   @ApiOperation({ summary: 'Cria um local' })
   @ApiBody({ type: CreateLocationDto })
-  @ApiResponse({ status: 400, description: 'Dados inválidos.' })
+  @ApiResponse({ status: 400, description: 'Dados inválidos ou imageUrl acima do limite configurado.' })
   @ApiResponse({ status: 201, description: 'Local criado com sucesso.' })
   create(@Body() createLocationDto: CreateLocationDto) {
     return this.locationService.create(createLocationDto);
@@ -40,7 +40,7 @@ export class LocationController {
   @ApiOperation({ summary: 'Atualiza um local por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateLocationDto })
-  @ApiResponse({ status: 400, description: 'ID inválido.' })
+  @ApiResponse({ status: 400, description: 'ID inválido ou imageUrl acima do limite configurado.' })
   @ApiResponse({ status: 200, description: 'Local atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Local não encontrado.' })
   update(@Param('id', ParseIntPipe) id: number, @Body() updateLocationDto: UpdateLocationDto) {
