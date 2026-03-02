@@ -141,6 +141,28 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
+## Demo seed scripts (frontend support)
+
+Para facilitar testes integrados com o frontend, o backend possui 3 scripts de seed:
+
+- `npm run seed:demo`
+  - Popula dados de demonstração em tabelas relacionadas (users, clubs, teams, players, locations, matches, match-report, standings e tournament_knockout).
+
+- `npm run seed:cleanup`
+  - Remove somente os dados de demo criados para teste, sem afetar registros normais do projeto.
+
+- `npm run seed:refresh`
+  - Executa cleanup + demo em sequência, recriando um dataset limpo em um único comando.
+
+Fluxo recomendado para testes com frontend:
+
+```bash
+# recria base de demo do zero
+npm run seed:refresh
+```
+
+Observação: Esses scripts são voltados para ambiente de desenvolvimento/homologação e podem ser removidos depois da fase de validação.
+
 ## Migrations (TypeORM + Postgres)
 
 ## Request body limit

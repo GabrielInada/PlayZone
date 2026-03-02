@@ -9,6 +9,8 @@ import { Goal } from '../modules/goal/entities/goal.entity';
 import { Card } from '../modules/card/entities/card.entity';
 import { Club } from '../modules/club/entities/club.entity';
 import { Location } from '../modules/location/entities/location.entity';
+import { Standing } from '../modules/standings/entities/standing.entity';
+import { TournamentKnockout } from '../modules/tournament-knockout/entities/tournament-knockout.entity';
 import configuration from '../config/configuration';
 
 const { dbUrl } = configuration();
@@ -30,6 +32,8 @@ export default new DataSource({
     Card,
     Club,
     Location,
+    Standing,
+    TournamentKnockout,
   ],
   migrations: ['src/database/migrations/*.ts'],
   synchronize: false,
