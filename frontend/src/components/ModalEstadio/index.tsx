@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -23,6 +23,9 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
     resolver: zodResolver(estadioSchema),
   });
 
+  const DEFAULT_IMAGE =
+    "https://www.campograndenews.com.br/esportes/arena-maracaju-cada-vez-mais-na-mira-das-competicoes-nacionais";
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -40,23 +43,48 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
     }
   };
 
+  const API_URL = (process.env.NEXT_PUBLIC_API_URL || "https://play-zone-omega.vercel.app").replace(/\/$/, '');
+
   const onSubmit = async (data: EstadioFormData) => {
     setIsLoading(true);
-  
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success('Estádio salvo com sucesso!', {
-        position: 'bottom-right',
-        style: {
-          background: '#004a1b',
-          color: '#fff',
-          fontFamily: 'Roboto, sans-serif',
+
+    try {
+      const [city, state] = data.localizacao.split(",").map(s => s.trim());
+
+      const response = await fetch(`${API_URL}/location`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          name: data.nome,
+          address: data.localizacao,
+          city,
+          state,
+          imageUrl: imagePreview || DEFAULT_IMAGE,
+        }),
       });
-      setImagePreview(null);
+
+      if (!response.ok) {
+        throw new Error("Erro ao criar local");
+      }
+
+      toast.success("Local criado com sucesso!", {
+        position: "bottom-right",
+      });
+
       reset();
+      setImagePreview(null);
       onClose();
-    }, 1500);
+
+    } catch (error) {
+      console.error(error);
+      toast.error("Erro ao criar local", {
+        position: "bottom-right",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -77,7 +105,7 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 w-full max-w-md">
-          {/* 1. Campos de Texto Primeiro */}
+          
           <Input 
             {...register("nome")} 
             label="Nome do Ginásio" 
@@ -104,11 +132,11 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
             className="bg-white border-gray-300 font-normal"
           />
 
-          {/* 2. Foto do Ginásio agora na Parte de Baixo */}
           <div className="w-full">
             <label className="block text-sm font-bold mb-2 text-left">
-            Foto do Ginásio
+              Foto do Ginásio
             </label>
+
             <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center bg-white hover:bg-gray-100 transition-colors overflow-hidden group">
               {imagePreview ? (
                 <>
@@ -124,7 +152,9 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
               ) : (
                 <label className="flex flex-col items-center cursor-pointer w-full h-full justify-center">
                   <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Selecionar Imagem</span>
+                  <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                    Selecionar Imagem
+                  </span>
                   <input 
                     type="file" 
                     accept="image/*" 
@@ -144,6 +174,7 @@ export const ModalEstadio = ({ isOpen, onClose }: ModalEstadioProps) => {
             >
               Cancelar
             </button>
+
             <button 
               type="submit" 
               disabled={isLoading}

@@ -38,7 +38,7 @@ export default function DevSetupPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: "Computação FC",
+          name: "Futsal Club Test",
           badgeImage: "https://placehold.co/100x100/1b6928/white?text=CF",
           ownerUserId: parseInt(ownerUserId, 10),
         }),

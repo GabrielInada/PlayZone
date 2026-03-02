@@ -2,14 +2,10 @@
 import React, { useState, useEffect, useCallback, useMemo, ChangeEvent } from 'react';
 import { Trash2, Pencil, Plus, Check, X, PlusCircle, ShieldCheck, Loader2 } from 'lucide-react';
 import { SuccessModal, ErrorModal, DeleteModal } from '@/components/ModalCadastroTime';
+import { useAuth } from '@/context/AuthContext';
 
 // ── Constantes ────────────────────────────────────────────────────────────────
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://play-zone-omega.vercel.app";
-
-// TODO: em produção, substituir pelo clubId vindo da sessão do usuário logado.
-// O clube só pode ser criado por usuários com type: "clube" no banco de dados.
-// Use a página /dev/setup para criar um clube de teste e obter o ID.
-const CLUB_ID = 1;
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
 const POSITION_MAP: Record<string, string> = {
   Goleiro: 'goleiro', Fixo: 'fixo', Ala: 'ala', Pivo: 'pivô',
@@ -111,6 +107,7 @@ PlayerRow.displayName = 'PlayerRow';
 
 // ── Componente principal ──────────────────────────────────────────────────────
 const CadastroTime: React.FC = () => {
+  const { user, token } = useAuth();
   const [club, setClub] = useState<Club | null>(null);
   const [teams, setTeams] = useState<Team[]>([]);
   const [activeTeamId, setActiveTeamId] = useState<number | null>(null);
@@ -133,19 +130,26 @@ const CadastroTime: React.FC = () => {
   const playerCount = useMemo(() => players.length, [players]);
   const activeTeam  = useMemo(() => teams.find((t) => t.id === activeTeamId) ?? null, [teams, activeTeamId]);
 
-  // ── 1. GET /club/{id} — busca o clube pelo ID fixo (virá da sessão futuramente) ──
+  // ── 1. GET /club/user/{userId} — busca o clube pelo usuário logado ──
   const loadClub = useCallback(async (): Promise<Club | null> => {
+    if (!user?.id) return null;
     try {
-      const res = await fetch(`${API_URL}/club/${CLUB_ID}`);
+      const headers: Record<string, string> = token
+        ? { Authorization: `Bearer ${token}` }
+        : {};
+      const res = await fetch(`${API_URL}/club/user/${user.id}`, { headers });
       if (!res.ok) return null;
-      const club: Club = await res.json();
+      const data = await res.json();
+      // Endpoint pode retornar objeto ou array
+      const club: Club = Array.isArray(data) ? data[0] : data;
+      if (!club) return null;
       setClub(club);
       return club;
     } catch (err) {
       console.error("Erro ao carregar clube:", err);
       return null;
     }
-  }, []);
+  }, [user?.id, token]);
 
   // ── 2. GET /team — filtra por clubId ─────────────────────────────────────
   // Retorna os times do clube sem criar nada automaticamente.
@@ -213,7 +217,7 @@ const CadastroTime: React.FC = () => {
       }
       setLoadingData(false);
     })();
-  }, []);
+  }, [user?.id]);
 
   const handleTabChange = useCallback((teamId: number) => {
     if (teamId === activeTeamId) return;
@@ -410,8 +414,7 @@ const CadastroTime: React.FC = () => {
           <ShieldCheck size={48} className="mx-auto mb-4 text-gray-300" />
           <h2 className="text-lg font-bold text-gray-700 mb-1">Clube não encontrado</h2>
           <p className="text-sm text-gray-400">
-            Verifique se o <code className="font-mono bg-gray-100 px-1 rounded">CLUB_ID</code> está correto
-            ou acesse <code className="font-mono bg-gray-100 px-1 rounded">/dev/setup</code> para criar um clube de teste.
+            Nenhum clube foi encontrado para sua conta. Verifique se seu cadastro foi realizado corretamente.
           </p>
         </div>
       </div>

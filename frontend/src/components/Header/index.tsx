@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { ArrowRightFromLineIcon, CircleUserIcon, Menu, X } from "lucide-react";
 import { ContainerHeader } from "../ContainerHeader";
 import { Logo } from "../Logo";
-import {CAMPEONATOS_ROUTE, HOME_ROUTE,TABELAS_ROUTE,} from "@/constants/routes";
+import { CAMPEONATOS_ROUTE, HOME_ROUTE, TABELAS_ROUTE } from "@/constants/routes";
+import { useAuth } from "@/context/AuthContext";
 
 // ── Tipos ─────────────────────────────────────────────────────────────────────
 interface NavLink {
@@ -12,12 +13,19 @@ interface NavLink {
   href: string;
 }
 
+// ── Label de exibição por type ────────────────────────────────────────────────
+const TYPE_LABEL: Record<string, string> = {
+  clube:    "Clube",
+  delegado: "Delegado",
+  admin:    "Admin",
+};
+
 // ── Constantes estáticas ──────────────────────────────────────────────────────
 const NAV_LINKS: NavLink[] = [
-  { label: "Início",        href: HOME_ROUTE },
-  { label: "Campeonatos",   href: CAMPEONATOS_ROUTE},
-  { label: "Tabelas",       href: TABELAS_ROUTE },
-  { label: "Minha Conta",   href: "/conta" },
+  { label: "Início",      href: HOME_ROUTE },
+  { label: "Campeonatos", href: CAMPEONATOS_ROUTE },
+  { label: "Tabelas",     href: TABELAS_ROUTE },
+  { label: "Minha Conta", href: "/conta" },
 ];
 
 const linkClass =
@@ -62,13 +70,19 @@ function LogoutButton({ onClick, showLabel = false }: { onClick?: () => void; sh
 export function Header() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const { user, logout } = useAuth();
 
-  // Dados do usuário viriam de contexto/auth futuramente
-  const user = { name: "Gabriel Athayde Gabriel de Inada", role: "Admin" };
+  const displayName = user?.name ?? "Carregando...";
+  const displayRole = user?.type ? (TYPE_LABEL[user.type] ?? user.type) : "";
 
   const handleNav = (href: string) => {
     setOpen(false);
     router.push(href);
+  };
+
+  const handleLogout = () => {
+    setOpen(false);
+    logout();
   };
 
   return (
@@ -93,9 +107,9 @@ export function Header() {
           </div>
 
           {/* Usuário + Sair — desktop */}
-          <div className="hidden lg:flex items-center gap-4">
-            <UserInfo name={user.name} role={user.role} />
-            <LogoutButton />
+          <div className="hidden lg:flex items-center gap-15">
+            <UserInfo name={displayName} role={displayRole} />
+            <LogoutButton onClick={handleLogout} />
           </div>
 
           {/* Hambúrguer — mobile */}
@@ -116,7 +130,7 @@ export function Header() {
               aria-modal="true"
             >
               <div className="pb-4 border-b border-black/10">
-                <UserInfo name={user.name} role={user.role} iconSize={12} />
+                <UserInfo name={displayName} role={displayRole} iconSize={12} />
               </div>
 
               <div className="flex flex-col gap-3 pt-4">
@@ -128,7 +142,7 @@ export function Header() {
               </div>
 
               <div className="pt-4">
-                <LogoutButton showLabel onClick={() => setOpen(false)} />
+                <LogoutButton showLabel onClick={handleLogout} />
               </div>
             </div>
           )}

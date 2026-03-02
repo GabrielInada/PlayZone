@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Roboto, Geist, Geist_Mono } from "next/font/google";
 import "@/app/globals.css";
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider } from "@/context/AuthContext";
 
 const roboto = Roboto({
   weight: ['400', '500', '700'],
@@ -28,8 +29,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="pt-br" className={roboto.className}>
       <body>
-        {children}
-        {/* Posiciona as notificações no topo e centro por padrão */}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
         <Toaster position="top-center" reverseOrder={false} />
       </body>
     </html>

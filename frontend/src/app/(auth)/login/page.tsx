@@ -12,8 +12,6 @@ import toast from 'react-hot-toast';
 // ── Constantes ────────────────────────────────────────────────────────────────
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://play-zone-omega.vercel.app";
 
-// Mapa de redirecionamento por tipo de usuário
-// Ajuste as rotas conforme as roles do seu projeto
 const REDIRECT_BY_TYPE: Record<string, string> = {
   admin:    "/admin",
   delegado: "/delegado",
@@ -21,20 +19,19 @@ const REDIRECT_BY_TYPE: Record<string, string> = {
 };
 const DEFAULT_REDIRECT = "/home";
 
-// ── Campos do formulário ──────────────────────────────────────────────────────
-type LoginField = {
-  name: 'email' | 'password';
-  label: string;
-  type: string;
-  placeholder: string;
-};
+// ── Helper: salva cookie acessível pelo middleware ────────────────────────────
+function setCookie(name: string, value: string, days = 7) {
+  const expires = new Date(Date.now() + days * 864e5).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+type LoginField = { name: 'email' | 'password'; label: string; type: string; placeholder: string; };
 
 const LOGIN_FIELDS: LoginField[] = [
   { name: 'email',    label: 'Email:',  type: 'email',    placeholder: 'Digite seu email' },
   { name: 'password', label: 'Senha:',  type: 'password', placeholder: 'Digite sua senha' },
 ];
 
-// ── Página ────────────────────────────────────────────────────────────────────
 export default function LoginPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -47,7 +44,7 @@ export default function LoginPage() {
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     try {
-      // 1. POST /auth/login — autentica e recebe o JWT
+      // 1. POST /auth/login
       const loginRes = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -55,7 +52,6 @@ export default function LoginPage() {
       });
 
       if (!loginRes.ok) {
-        // 401 — Credenciais inválidas
         toast.error("Email ou senha incorretos.", {
           position: 'bottom-right',
           style: { borderRadius: '8px', fontFamily: 'Roboto, sans-serif' },
@@ -63,37 +59,43 @@ export default function LoginPage() {
         return;
       }
 
-      const { token } = await loginRes.json();
+      const body = await loginRes.json();
+      // NestJS retorna "access_token" por padrão — suporta ambos os formatos
+      const token = body.access_token ?? body.token;
 
-      // 2. Salva o JWT no localStorage para uso nas próximas requisições
-      localStorage.setItem("token", token);
+      if (!token) {
+        toast.error("Erro ao obter token. Contate o administrador.", {
+          position: 'bottom-right',
+          style: { borderRadius: '8px', fontFamily: 'Roboto, sans-serif' },
+        });
+        return;
+      }
 
-      // 3. GET /auth/profile — busca tipo do usuário para redirecionar corretamente
+      // 2. Persiste o token:
+      //    - localStorage → lido pelo AuthContext nos componentes
+      //    - cookie       → lido pelo middleware para proteger rotas no servidor
+      localStorage.setItem('token', token);
+      setCookie('auth-token', token);
+
+      // 3. GET /auth/profile → obtém o type para redirecionar e salvar no cookie
       const profileRes = await fetch(`${API_URL}/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!profileRes.ok) {
-        // Mesmo sem o perfil, o login foi válido — redireciona para home padrão
+      if (profileRes.ok) {
+        const profile = await profileRes.json();
+        // Salva type em cookie para o middleware controlar acesso por role
+        setCookie('user-type', profile.type);
+
+        toast.success("Login realizado com sucesso!", {
+          position: 'bottom-right',
+          style: { borderRadius: '8px', background: '#004a1b', color: '#fff', fontFamily: 'Roboto, sans-serif' },
+        });
+
+        router.push(REDIRECT_BY_TYPE[profile.type] ?? DEFAULT_REDIRECT);
+      } else {
         router.push(DEFAULT_REDIRECT);
-        return;
       }
-
-      const profile = await profileRes.json();
-
-      toast.success("Login realizado com sucesso!", {
-        position: 'bottom-right',
-        style: {
-          borderRadius: '8px',
-          background: '#004a1b',
-          color: '#fff',
-          fontFamily: 'Roboto, sans-serif',
-        },
-      });
-
-      // 4. Redireciona conforme o tipo do usuário (type vindo do perfil)
-      const destination = REDIRECT_BY_TYPE[profile.type] ?? DEFAULT_REDIRECT;
-      router.push(destination);
 
     } catch (err) {
       console.error("Erro no login:", err);
@@ -109,28 +111,12 @@ export default function LoginPage() {
   return (
     <main className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
       <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-300 w-full max-w-md">
-        <Image
-          src="/logo_ufraPlayZone.png"
-          alt="Logo UFRA PlayZone"
-          width={150}
-          height={150}
-          className="mx-auto mb-6"
-          priority
-        />
-
-        <p className="text-sm text-gray-600 mb-6 text-center">
-          Entre com suas credenciais para acessar o sistema
-        </p>
-
+        <Image src="/logo_ufraPlayZone.png" alt="Logo UFRA PlayZone" width={150} height={150} className="mx-auto mb-6" priority />
+        <p className="text-sm text-gray-600 mb-6 text-center">Entre com suas credenciais para acessar o sistema</p>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {LOGIN_FIELDS.map((field) => (
             <div key={field.name} className="flex flex-col">
-              <Input
-                {...register(field.name)}
-                label={field.label}
-                type={field.type}
-                placeholder={field.placeholder}
-              />
+              <Input {...register(field.name)} label={field.label} type={field.type} placeholder={field.placeholder} />
               {errors[field.name] && (
                 <span className="text-red-600 text-xs mt-1 font-bold uppercase">
                   {errors[field.name]?.message as string}
@@ -138,24 +124,16 @@ export default function LoginPage() {
               )}
             </div>
           ))}
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-[#004a1b] text-white py-2 rounded-md font-bold hover:bg-green-800 transition-all disabled:bg-gray-400 mt-2 cursor-pointer"
-          >
+          <button type="submit" disabled={isLoading}
+            className="w-full bg-[#004a1b] text-white py-2 rounded-md font-bold hover:bg-green-800 transition-all disabled:bg-gray-400 mt-2 cursor-pointer">
             {isLoading ? 'Autenticando...' : 'Login'}
           </button>
         </form>
-
         <p className="mt-6 text-sm text-gray-600 text-center italic">
           Não tem uma conta?{" "}
-          <Link href="/cadastro" className="text-blue-600 font-semibold hover:underline">
-            Inscreva-se
-          </Link>
+          <Link href="/cadastro" className="text-blue-600 font-semibold hover:underline">Inscreva-se</Link>
         </p>
       </div>
-
       <footer className="w-full h-10 bg-[#004a1b] fixed bottom-0 left-0" />
     </main>
   );

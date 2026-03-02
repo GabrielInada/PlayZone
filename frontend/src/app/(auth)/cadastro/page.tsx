@@ -10,7 +10,7 @@ import Link from "next/link";
 import toast from 'react-hot-toast';
 
 // ── Constantes ────────────────────────────────────────────────────────────────
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://play-zone-omega.vercel.app";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
 // ── Campos de texto ───────────────────────────────────────────────────────────
 const SIGNUP_FIELDS = [

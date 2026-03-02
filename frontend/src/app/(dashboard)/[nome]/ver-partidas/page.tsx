@@ -1,159 +1,109 @@
 "use client";
 
-import React, { useState } from "react";
-import { useParams } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { Trophy, Trash2 } from "lucide-react";
 import ModalExcluirPartida from "@/components/ModalExcluirPartida";
 
-const MOCK_PARTIDAS = [
-  {
-    id: 1,
-    mandante: "UFRA",
-    visitante: "UFPA",
-    placar: "2 - 1",
-    local: "Ginásio Mangueirinho",
-    fase: "Fase de Grupos",
-    data: "05/12/2025",
-    hora: "16h",
-    status: "finalizada",
-  },
-  {
-    id: 2,
-    mandante: "UFRA",
-    visitante: "UEPA",
-    placar: "3 - 0",
-    local: "Ginásio Mangueirinho",
-    fase: "Fase de Grupos",
-    data: "07/12/2025",
-    hora: "18h",
-    status: "finalizada",
-  },
-  {
-    id: 3,
-    mandante: "UFPA",
-    visitante: "UEPA",
-    placar: "Em breve",
-    local: "Ginásio Mangueirinho",
-    fase: "Semifinal",
-    data: "10/12/2025",
-    hora: "20h",
-    status: "agendada",
-  },
-  {
-    id: 4,
-    mandante: "UFRA",
-    visitante: "UNAMA",
-    placar: "Em breve",
-    local: "Ginásio Mangueirinho",
-    fase: "Final",
-    data: "15/12/2025",
-    hora: "19h",
-    status: "agendada",
-  },
-];
-
 export default function VerPartidasPage() {
-  const params = useParams();
-  const nomeCampeonato = params.nome
-    ? decodeURIComponent(params.nome as string)
-    : "Campeonato";
-
-  const [partidas, setPartidas] = useState(MOCK_PARTIDAS);
+  const [partidas, setPartidas] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [partidaParaExcluir, setPartidaParaExcluir] = useState<number | null>(null);
+
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+
+  const fetchMatches = async () => {
+    try {
+      const response = await fetch(`${API_URL}/match`);
+      const data = await response.json();
+      setPartidas(data);
+    } catch (error) {
+      console.error("Erro ao buscar partidas:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMatches();
+  }, []);
 
   const handleOpenExcluir = (id: number) => {
     setPartidaParaExcluir(id);
     setIsModalOpen(true);
   };
 
-  const handleConfirmExcluir = () => {
-    if (partidaParaExcluir !== null) {
-      setPartidas((prev) => prev.filter((p) => p.id !== partidaParaExcluir));
+  const handleConfirmExcluir = async () => {
+    if (!partidaParaExcluir) return;
+
+    try {
+      await fetch(`${API_URL}/match/${partidaParaExcluir}`, {
+        method: "DELETE",
+      });
+
+      fetchMatches();
+    } catch (error) {
+      console.error("Erro ao excluir partida:", error);
+    } finally {
       setIsModalOpen(false);
       setPartidaParaExcluir(null);
     }
   };
 
-  return (
-    <div className="bg-white flex flex-col font-bold">
-      <div className="w-full max-w-6xl mx-auto px-6 pt-2 pb-20 text-gray-900">
-        
-        <div className="mb-10">
-          <h1 className="text-3xl font-bold tracking-tight">
-            {nomeCampeonato}
-          </h1>
-          <p className="text-base text-gray-500 font-medium mt-1">
-            Gerencie seu campeonato
-          </p>
-        </div>
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p className="text-lg font-bold">Carregando partidas...</p>
+      </div>
+    );
+  }
 
-        <div className="flex flex-col gap-6 mb-12">
-          {partidas.map((partida) => (
+  return (
+    <div className="max-w-6xl mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-10">
+        Lista de Partidas
+      </h1>
+
+      <div className="space-y-6">
+        {partidas.map((partida) => {
+          const dateObj = new Date(partida.date);
+
+          return (
             <div
               key={partida.id}
-              className="w-full rounded-2xl px-6 py-4 border border-gray-200 shadow-md"
+              className="rounded-xl border p-6 shadow flex justify-between items-center"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                <Trophy size={22} />
 
-                <div className="flex items-center gap-6">
-                  <div className="text-[#007a33] bg-[#e6f4ea] p-3 rounded-full">
-                    <Trophy size={22} />
-                  </div>
-
-                  <div className="flex items-center gap-6">
-                    <span className="text-xl font-bold w-[80px] text-right">
-                      {partida.mandante}
-                    </span>
-
-                    <div className="w-[140px] py-2 rounded-full text-xl font-bold text-center bg-[#c6decb] text-gray-900">
-                      {partida.placar}
-                    </div>
-
-                    <span className="text-xl font-bold w-[80px]">
-                      {partida.visitante}
-                    </span>
-                  </div>
+                <div>
+                  <p className="font-bold">
+                    Time {partida.homeTeamId} x Time {partida.awayTeamId}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {dateObj.toLocaleDateString()} •{" "}
+                    {dateObj.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                  <p className="text-sm">Status: {partida.status}</p>
                 </div>
-
-                <div className="hidden lg:flex flex-col items-center text-sm text-gray-700 font-medium leading-tight text-center">
-                  <span>
-                    {partida.local} • {partida.fase}
-                  </span>
-                  <span>
-                    {partida.data} • {partida.hora}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-4">
-                  <button className="bg-[#007a33] hover:bg-[#005f27] text-white px-5 py-2 rounded-full text-sm font-bold transition cursor-pointer">
-                    Gerenciar
-                  </button>
-
-                  <button 
-                    onClick={() => handleOpenExcluir(partida.id)}
-                    className="p-1 text-gray-800 hover:text-red-600 transition cursor-pointer"
-                  >
-                    <Trash2 size={18} />
-                  </button>
-                </div>
-
               </div>
-            </div>
-          ))}
-        </div>
 
-        <div className="flex justify-center">
-          <button
-            onClick={() => window.history.back()}
-            className="bg-[#007a33] hover:bg-[#005f27] text-white px-12 py-2.5 rounded-lg font-bold shadow-md transition active:scale-95 cursor-pointer text-base"
-          >
-            Voltar
-          </button>
-        </div>
+              <button
+                onClick={() => handleOpenExcluir(partida.id)}
+                className="text-red-600"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
+          );
+        })}
       </div>
 
-      <ModalExcluirPartida 
+      <ModalExcluirPartida
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onConfirm={handleConfirmExcluir}
