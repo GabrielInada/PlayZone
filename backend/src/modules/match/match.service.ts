@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Location } from '../location/entities/location.entity';
 import { Team } from '../team/entities/team.entity';
@@ -27,11 +31,15 @@ export class MatchService {
     const [homeTeam, awayTeam, location] = await Promise.all([
       this.teamRepository.findOne({ where: { id: createMatchDto.homeTeamId } }),
       this.teamRepository.findOne({ where: { id: createMatchDto.awayTeamId } }),
-      this.locationRepository.findOne({ where: { id: createMatchDto.locationId } }),
+      this.locationRepository.findOne({
+        where: { id: createMatchDto.locationId },
+      }),
     ]);
 
     if (!homeTeam || !awayTeam) {
-      throw new NotFoundException('Time mandante e/ou visitante não encontrado');
+      throw new NotFoundException(
+        'Time mandante e/ou visitante não encontrado',
+      );
     }
 
     if (!location) {
@@ -40,7 +48,9 @@ export class MatchService {
 
     let delegate: User | null = null;
     if (createMatchDto.delegateId) {
-      delegate = await this.userRepository.findOne({ where: { id: createMatchDto.delegateId } });
+      delegate = await this.userRepository.findOne({
+        where: { id: createMatchDto.delegateId },
+      });
       if (!delegate) {
         throw new NotFoundException('Delegado não encontrado');
       }
@@ -83,8 +93,10 @@ export class MatchService {
   async update(id: number, updateMatchDto: UpdateMatchDto) {
     const existingMatch = await this.findOne(id);
 
-    const nextHomeTeamId = updateMatchDto.homeTeamId ?? existingMatch.homeTeam?.id;
-    const nextAwayTeamId = updateMatchDto.awayTeamId ?? existingMatch.awayTeam?.id;
+    const nextHomeTeamId =
+      updateMatchDto.homeTeamId ?? existingMatch.homeTeam?.id;
+    const nextAwayTeamId =
+      updateMatchDto.awayTeamId ?? existingMatch.awayTeam?.id;
 
     this.validateHomeAway(nextHomeTeamId, nextAwayTeamId);
 
@@ -94,7 +106,9 @@ export class MatchService {
     let location = existingMatch.location;
 
     if (updateMatchDto.homeTeamId) {
-      const foundHomeTeam = await this.teamRepository.findOne({ where: { id: updateMatchDto.homeTeamId } });
+      const foundHomeTeam = await this.teamRepository.findOne({
+        where: { id: updateMatchDto.homeTeamId },
+      });
       if (!foundHomeTeam) {
         throw new NotFoundException('Time mandante não encontrado');
       }
@@ -102,7 +116,9 @@ export class MatchService {
     }
 
     if (updateMatchDto.awayTeamId) {
-      const foundAwayTeam = await this.teamRepository.findOne({ where: { id: updateMatchDto.awayTeamId } });
+      const foundAwayTeam = await this.teamRepository.findOne({
+        where: { id: updateMatchDto.awayTeamId },
+      });
       if (!foundAwayTeam) {
         throw new NotFoundException('Time visitante não encontrado');
       }
@@ -110,7 +126,9 @@ export class MatchService {
     }
 
     if (updateMatchDto.delegateId !== undefined) {
-      const foundDelegate = await this.userRepository.findOne({ where: { id: updateMatchDto.delegateId } });
+      const foundDelegate = await this.userRepository.findOne({
+        where: { id: updateMatchDto.delegateId },
+      });
       if (!foundDelegate) {
         throw new NotFoundException('Delegado não encontrado');
       }
@@ -118,7 +136,9 @@ export class MatchService {
     }
 
     if (updateMatchDto.locationId !== undefined) {
-      const foundLocation = await this.locationRepository.findOne({ where: { id: updateMatchDto.locationId } });
+      const foundLocation = await this.locationRepository.findOne({
+        where: { id: updateMatchDto.locationId },
+      });
       if (!foundLocation) {
         throw new NotFoundException('Local da partida não encontrado');
       }
@@ -149,7 +169,9 @@ export class MatchService {
     }
 
     if (homeTeamId === awayTeamId) {
-      throw new BadRequestException('Time mandante e visitante devem ser diferentes');
+      throw new BadRequestException(
+        'Time mandante e visitante devem ser diferentes',
+      );
     }
   }
 }

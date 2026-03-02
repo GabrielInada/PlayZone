@@ -34,7 +34,10 @@ describe('UserController', () => {
   });
 
   it('uses default pagination when page and size are not provided', async () => {
-    userService.findAll.mockResolvedValue({ data: [], meta: { page: 1, size: 10 } });
+    userService.findAll.mockResolvedValue({
+      data: [],
+      meta: { page: 1, size: 10 },
+    });
 
     await controller.findAll(undefined, undefined);
 
@@ -51,7 +54,10 @@ describe('UserController', () => {
   });
 
   it('delegates getMe using req.user.userId', async () => {
-    userService.getUserProfile.mockResolvedValue({ id: 20, email: 'me@me.com' });
+    userService.getUserProfile.mockResolvedValue({
+      id: 20,
+      email: 'me@me.com',
+    });
 
     const result = await controller.getMe({ user: { userId: 20 } } as any);
 

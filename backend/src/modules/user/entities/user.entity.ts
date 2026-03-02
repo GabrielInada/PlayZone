@@ -1,38 +1,44 @@
-import { Match } from "../../match/entities/match.entity";
-import { Club } from "../../club/entities/club.entity";
-import { EnumUserRole, EnumUserType } from "../../../types/user";
-import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Match } from '../../match/entities/match.entity';
+import { Club } from '../../club/entities/club.entity';
+import { EnumUserRole, EnumUserType } from '../../../types/user';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
-    id: number;
-    
-    @Column()
-    name: string;
-    
-    @Column({ unique: true })
-    email: string;
-    
-    @Column()
-    password: string; // Lembre-se de hashear a senha antes de salvar
-    
-    @Column({ type: 'enum', enum: EnumUserRole })
-    role: EnumUserRole;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column({ type: 'enum', enum: EnumUserType })
-    type: EnumUserType;
+  @Column()
+  name: string;
 
-    // Relacionamento inverso: Um delegado pode ter várias partidas atribuídas
-    @OneToMany(() => Match, (match) => match.delegate)
-    assignedMatches: Match[];
+  @Column({ unique: true })
+  email: string;
 
-    @OneToOne(() => Club, (club) => club.owner)
-    clubProfile?: Club;
+  @Column()
+  password: string; // Lembre-se de hashear a senha antes de salvar
 
-    @Column()
-    createdAt: Date;
+  @Column({ type: 'enum', enum: EnumUserRole })
+  role: EnumUserRole;
 
-    @Column()
-    updatedAt: Date;
+  @Column({ type: 'enum', enum: EnumUserType })
+  type: EnumUserType;
+
+  // Relacionamento inverso: Um delegado pode ter várias partidas atribuídas
+  @OneToMany(() => Match, (match) => match.delegate)
+  assignedMatches: Match[];
+
+  @OneToOne(() => Club, (club) => club.owner)
+  clubProfile?: Club;
+
+  @Column()
+  createdAt: Date;
+
+  @Column()
+  updatedAt: Date;
 }

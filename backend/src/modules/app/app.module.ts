@@ -1,4 +1,4 @@
-import { Module, Logger } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -26,10 +26,15 @@ import { SelfConsultModule } from '../../tasks/self-consult/self-consult.module'
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from '../auth/auth.module';
 import { join } from 'path';
+import { Standing } from '../standings/entities/standing.entity';
+import { StandingsModule } from '../standings/standings.module';
+import { TournamentKnockout } from '../tournament-knockout/entities/tournament-knockout.entity';
+import { TournamentKnockoutModule } from '../tournament-knockout/tournament-knockout.module';
 
 @Module({
   imports: [
-    ScheduleModule.forRoot(), SelfConsultModule,
+    ScheduleModule.forRoot(),
+    SelfConsultModule,
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env',
@@ -41,7 +46,8 @@ import { join } from 'path';
         const dbUrl = configService.get<string>('dbUrl');
         const dbSynchronizeEnv = configService.get<string>('dbSynchronize');
         const dbMigrationsRunEnv = configService.get<string>('dbMigrationsRun');
-        const isProduction = configService.get<string>('nodeEnv') === 'production';
+        const isProduction =
+          configService.get<string>('nodeEnv') === 'production';
         const isVercel = Boolean(configService.get<boolean>('isVercel'));
 
         // Por padrão, synchronize é true em ambientes de desenvolvimento e false em produção/vercel, a menos que seja explicitamente configurado via DB_SYNCHRONIZE
@@ -56,14 +62,37 @@ import { join } from 'path';
         return {
           type: 'postgres',
           url: dbUrl,
-          entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club, Location],
+          entities: [
+            Player,
+            Team,
+            Match,
+            User,
+            MatchReport,
+            Goal,
+            Card,
+            Club,
+            Location,
+            Standing,
+            TournamentKnockout,
+          ],
           migrations: [join(__dirname, '../../database/migrations/*{.ts,.js}')],
           migrationsRun,
           synchronize,
         };
       },
     }),
-    PlayerModule, TeamModule, MatchModule, UserModule, MatchReportModule, GoalModule, CardModule, ClubModule, LocationModule, AuthModule
+    PlayerModule,
+    TeamModule,
+    MatchModule,
+    UserModule,
+    MatchReportModule,
+    GoalModule,
+    CardModule,
+    ClubModule,
+    LocationModule,
+    AuthModule,
+    StandingsModule,
+    TournamentKnockoutModule,
   ],
   controllers: [AppController],
   providers: [AppService],

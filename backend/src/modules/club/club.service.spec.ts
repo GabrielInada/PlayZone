@@ -50,7 +50,10 @@ describe('ClubService', () => {
   });
 
   it('throws 409 when user already has a club profile', async () => {
-    userRepository.findOne.mockResolvedValue({ id: 5, type: EnumUserType.CLUBE });
+    userRepository.findOne.mockResolvedValue({
+      id: 5,
+      type: EnumUserType.CLUBE,
+    });
     clubRepository.findOne.mockResolvedValue({ id: 99, ownerUserId: 5 });
 
     await expect(
@@ -67,7 +70,10 @@ describe('ClubService', () => {
     clubRepository.create.mockReturnValue(created);
     clubRepository.save.mockResolvedValue(created);
 
-    const result = await service.create({ name: 'Águias', ownerUserId: 7 } as any);
+    const result = await service.create({
+      name: 'Águias',
+      ownerUserId: 7,
+    } as any);
 
     expect(clubRepository.create).toHaveBeenCalled();
     expect(clubRepository.save).toHaveBeenCalledWith(created);

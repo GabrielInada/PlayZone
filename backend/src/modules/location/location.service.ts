@@ -8,7 +8,8 @@ import { Location } from './entities/location.entity';
 
 @Injectable()
 export class LocationService {
-  private readonly locationImageUrlMaxLength = configuration().locationImageUrlMaxLength;
+  private readonly locationImageUrlMaxLength =
+    configuration().locationImageUrlMaxLength;
 
   constructor(
     @InjectRepository(Location)
@@ -73,7 +74,10 @@ export class LocationService {
     const location = await this.findOne(id);
 
     if (location.matches && location.matches.length > 0) {
-      throw new HttpException('Cannot delete location with matches linked', 409);
+      throw new HttpException(
+        'Cannot delete location with matches linked',
+        409,
+      );
     }
 
     return this.locationRepository.remove(location);

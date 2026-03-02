@@ -38,9 +38,12 @@ export class AuthService {
 
   async signup(userPayload: SignupDto) {
     const hash = await bcrypt.hash(userPayload.password, 10);
-    return this.userService.createWithRole({
-      ...userPayload,
-      password: hash,
-    }, EnumUserRole.USER); // Por padrão no cadastro só pode ser criado usuários com a role "user"
+    return this.userService.createWithRole(
+      {
+        ...userPayload,
+        password: hash,
+      },
+      EnumUserRole.USER,
+    ); // Por padrão no cadastro só pode ser criado usuários com a role "user"
   }
 }

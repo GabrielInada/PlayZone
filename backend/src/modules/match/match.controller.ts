@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { MatchService } from './match.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
@@ -13,14 +28,20 @@ export class MatchController {
   @ApiOperation({ summary: 'Cria uma partida' })
   @ApiBody({ type: CreateMatchDto })
   @ApiResponse({ status: 201, description: 'Partida criada com sucesso.' })
-  @ApiResponse({ status: 404, description: 'Time, delegado ou local não encontrado.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Time, delegado ou local não encontrado.',
+  })
   create(@Body() createMatchDto: CreateMatchDto) {
     return this.matchService.create(createMatchDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Lista todas as partidas' })
-  @ApiResponse({ status: 200, description: 'Lista de partidas retornada com sucesso.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de partidas retornada com sucesso.',
+  })
   findAll() {
     return this.matchService.findAll();
   }
@@ -41,8 +62,14 @@ export class MatchController {
   @ApiBody({ type: UpdateMatchDto })
   @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Partida atualizada com sucesso.' })
-  @ApiResponse({ status: 404, description: 'Partida, time, delegado ou local não encontrado.' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateMatchDto: UpdateMatchDto) {
+  @ApiResponse({
+    status: 404,
+    description: 'Partida, time, delegado ou local não encontrado.',
+  })
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateMatchDto: UpdateMatchDto,
+  ) {
     return this.matchService.update(id, updateMatchDto);
   }
 

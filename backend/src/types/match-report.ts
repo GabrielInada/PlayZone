@@ -1,5 +1,5 @@
 export enum EnumMatchReportStatus {
-    PENDING = 'pending',
-    VALIDATED = 'validated',
-    REJECTED = 'rejected',
+  PENDING = 'pending',
+  VALIDATED = 'validated',
+  REJECTED = 'rejected',
 }

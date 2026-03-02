@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateMatchReportDto } from './dto/create-match-report.dto';
 import { UpdateMatchReportDto } from './dto/update-match-report.dto';
 import { DataSource, Repository } from 'typeorm';
@@ -74,8 +79,13 @@ export class MatchReportService {
       throw new BadRequestException('Súmula validada não pode ser alterada');
     }
 
-    if (updateMatchReportDto.matchId && updateMatchReportDto.matchId !== report.matchId) {
-      throw new BadRequestException('Não é permitido alterar a partida da súmula');
+    if (
+      updateMatchReportDto.matchId &&
+      updateMatchReportDto.matchId !== report.matchId
+    ) {
+      throw new BadRequestException(
+        'Não é permitido alterar a partida da súmula',
+      );
     }
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -85,12 +95,16 @@ export class MatchReportService {
     try {
       if (updateMatchReportDto.goals) {
         await queryRunner.manager.delete(Goal, { matchReportId: report.id });
-        report.goals = updateMatchReportDto.goals.map((goal) => ({ ...goal } as Goal));
+        report.goals = updateMatchReportDto.goals.map(
+          (goal) => ({ ...goal }) as Goal,
+        );
       }
 
       if (updateMatchReportDto.cards) {
         await queryRunner.manager.delete(Card, { matchReportId: report.id });
-        report.cards = updateMatchReportDto.cards.map((card) => ({ ...card } as Card));
+        report.cards = updateMatchReportDto.cards.map(
+          (card) => ({ ...card }) as Card,
+        );
       }
 
       if (updateMatchReportDto.homeScore !== undefined) {
@@ -127,7 +141,9 @@ export class MatchReportService {
     }
 
     await this.matchReportRepository.remove(report);
-    await this.matchRepository.update(report.matchId, { status: EnumMatchStatus.SCHEDULED });
+    await this.matchRepository.update(report.matchId, {
+      status: EnumMatchStatus.SCHEDULED,
+    });
 
     return { message: 'Súmula removida com sucesso' };
   }
@@ -151,11 +167,18 @@ export class MatchReportService {
     }
 
     if (match.delegateId !== delegateId) {
-      throw new ForbiddenException('Você não é o delegado designado para esta partida');
+      throw new ForbiddenException(
+        'Você não é o delegado designado para esta partida',
+      );
     }
 
-    if (match.report && match.report.status === EnumMatchReportStatus.VALIDATED) {
-      throw new BadRequestException('Súmula já validada pelo Admin, não pode ser alterada');
+    if (
+      match.report &&
+      match.report.status === EnumMatchReportStatus.VALIDATED
+    ) {
+      throw new BadRequestException(
+        'Súmula já validada pelo Admin, não pode ser alterada',
+      );
     }
 
     const queryRunner = this.dataSource.createQueryRunner();
@@ -164,8 +187,12 @@ export class MatchReportService {
 
     try {
       if (match.report) {
-        await queryRunner.manager.delete(Goal, { matchReportId: match.report.id });
-        await queryRunner.manager.delete(Card, { matchReportId: match.report.id });
+        await queryRunner.manager.delete(Goal, {
+          matchReportId: match.report.id,
+        });
+        await queryRunner.manager.delete(Card, {
+          matchReportId: match.report.id,
+        });
         await queryRunner.manager.delete(MatchReport, { id: match.report.id });
       }
 
@@ -181,7 +208,9 @@ export class MatchReportService {
 
       const savedReport = await queryRunner.manager.save(newReport);
 
-      await queryRunner.manager.update(Match, dto.matchId, { status: EnumMatchStatus.FINISHED });
+      await queryRunner.manager.update(Match, dto.matchId, {
+        status: EnumMatchStatus.FINISHED,
+      });
 
       await queryRunner.commitTransaction();
       return savedReport;
@@ -194,7 +223,9 @@ export class MatchReportService {
   }
 
   async review(reportId: number, dto: ReviewMatchReportDto) {
-    const report = await this.matchReportRepository.findOne({ where: { id: reportId } });
+    const report = await this.matchReportRepository.findOne({
+      where: { id: reportId },
+    });
     if (!report) {
       throw new NotFoundException('Súmula não encontrada');
     }

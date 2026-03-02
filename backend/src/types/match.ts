@@ -1,6 +1,6 @@
 export enum EnumMatchStatus {
-    SCHEDULED = 'scheduled',
-    ONGOING = 'ongoing',
-    FINISHED = 'finished',
-    CANCELED = 'canceled',
+  SCHEDULED = 'scheduled',
+  ONGOING = 'ongoing',
+  FINISHED = 'finished',
+  CANCELED = 'canceled',
 }

@@ -11,7 +11,10 @@ export class PlayerResponseDto {
   @ApiProperty({ example: 10 })
   shirtNumber: number;
 
-  @ApiProperty({ enum: EnumPlayerPosition, example: EnumPlayerPosition.GOLEIRO })
+  @ApiProperty({
+    enum: EnumPlayerPosition,
+    example: EnumPlayerPosition.GOLEIRO,
+  })
   position: EnumPlayerPosition;
 
   @ApiProperty({ example: 1 })

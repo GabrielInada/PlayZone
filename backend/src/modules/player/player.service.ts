@@ -8,7 +8,6 @@ import { Team } from '../team/entities/team.entity';
 
 @Injectable()
 export class PlayerService {
-
   constructor(
     @InjectRepository(Player)
     private playerRepository: Repository<Player>,
@@ -16,11 +15,11 @@ export class PlayerService {
     @InjectRepository(Team)
     private teamRepository: Repository<Team>,
   ) {}
-  
+
   async getPlayerDetails(id: number) {
     const player = await this.findOne(id);
     return {
-      player
+      player,
     };
   }
 
@@ -38,8 +37,8 @@ export class PlayerService {
   }
 
   async findAll() {
-    const findedPlayers = await this.playerRepository.find({ 
-      relations: ['team']
+    const findedPlayers = await this.playerRepository.find({
+      relations: ['team'],
     });
     if (!findedPlayers) {
       throw new HttpException('No players found', 404);

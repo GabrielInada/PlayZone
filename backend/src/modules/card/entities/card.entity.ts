@@ -1,7 +1,7 @@
-import { MatchReport } from "../../match-report/entities/match-report.entity";
-import { Player } from "../../player/entities/player.entity";
-import { EnumCardType } from "../../../types/card";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { MatchReport } from '../../match-report/entities/match-report.entity';
+import { Player } from '../../player/entities/player.entity';
+import { EnumCardType } from '../../../types/card';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Card {
@@ -12,7 +12,9 @@ export class Card {
   type: EnumCardType;
 
   // Relacionamento com a Súmula
-  @ManyToOne(() => MatchReport, (report) => report.cards, { onDelete: 'CASCADE' })
+  @ManyToOne(() => MatchReport, (report) => report.cards, {
+    onDelete: 'CASCADE',
+  })
   matchReport: MatchReport;
 
   @Column()

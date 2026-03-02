@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiParam, ApiBody, ApiOkResponse } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiParam,
+  ApiBody,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import { PlayerService } from './player.service';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
@@ -13,7 +29,11 @@ export class PlayerController {
   @Post()
   @ApiOperation({ summary: 'Create a new player' })
   @ApiBody({ type: CreatePlayerDto })
-  @ApiResponse({ status: 201, description: 'Player created successfully', type: PlayerResponseDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Player created successfully',
+    type: PlayerResponseDto,
+  })
   @ApiResponse({ status: 400, description: 'Bad request - validation error' })
   @ApiResponse({ status: 404, description: 'Team not found' })
   create(@Body() createPlayerDto: CreatePlayerDto) {
@@ -22,7 +42,11 @@ export class PlayerController {
 
   @Get()
   @ApiOperation({ summary: 'Get all players' })
-  @ApiResponse({ status: 200, description: 'List of all players', type: [PlayerResponseDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'List of all players',
+    type: [PlayerResponseDto],
+  })
   @ApiOkResponse({
     description: 'Example list of players',
     schema: {
@@ -48,7 +72,11 @@ export class PlayerController {
   @ApiOperation({ summary: 'Get a player by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Player ID' })
   @ApiResponse({ status: 400, description: 'Invalid player ID' })
-  @ApiResponse({ status: 200, description: 'Player found', type: PlayerResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Player found',
+    type: PlayerResponseDto,
+  })
   @ApiOkResponse({
     description: 'Example player response',
     schema: {
@@ -73,9 +101,16 @@ export class PlayerController {
   @ApiParam({ name: 'id', type: Number, description: 'Player ID' })
   @ApiBody({ type: UpdatePlayerDto })
   @ApiResponse({ status: 400, description: 'Invalid player ID' })
-  @ApiResponse({ status: 200, description: 'Player updated successfully', type: PlayerResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Player updated successfully',
+    type: PlayerResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Player or team not found' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updatePlayerDto: UpdatePlayerDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePlayerDto: UpdatePlayerDto,
+  ) {
     return this.playersService.update(id, updatePlayerDto);
   }
 
@@ -83,7 +118,11 @@ export class PlayerController {
   @ApiOperation({ summary: 'Delete a player by ID' })
   @ApiParam({ name: 'id', type: Number, description: 'Player ID' })
   @ApiResponse({ status: 400, description: 'Invalid player ID' })
-  @ApiResponse({ status: 200, description: 'Player deleted successfully', type: PlayerResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Player deleted successfully',
+    type: PlayerResponseDto,
+  })
   @ApiResponse({ status: 404, description: 'Player not found' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.playersService.remove(id);

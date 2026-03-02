@@ -23,6 +23,14 @@ import { UserService } from '../user/user.service';
 import { Serialize } from '../../interceptors/serialize.interceptor';
 import { UserResponseDto } from '../user/dto/user-response.dto';
 
+type AuthenticatedRequest = {
+  user: {
+    userId: number;
+    email: string;
+    role: string;
+  };
+};
+
 @ApiTags('Auth')
 @Controller('auth')
 export class AuthController {
@@ -68,7 +76,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 401, description: 'Não autorizado.' })
   @UseGuards(JwtAuthGuard)
-  getProfile(@Request() req) {
+  getProfile(@Request() req: AuthenticatedRequest) {
     return this.userService.findByEmail(req.user.email);
   }
 }

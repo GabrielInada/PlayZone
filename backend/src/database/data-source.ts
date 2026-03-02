@@ -20,7 +20,17 @@ if (!dbUrl) {
 export default new DataSource({
   type: 'postgres',
   url: dbUrl,
-  entities: [Player, Team, Match, User, MatchReport, Goal, Card, Club, Location],
+  entities: [
+    Player,
+    Team,
+    Match,
+    User,
+    MatchReport,
+    Goal,
+    Card,
+    Club,
+    Location,
+  ],
   migrations: ['src/database/migrations/*.ts'],
   synchronize: false,
 });

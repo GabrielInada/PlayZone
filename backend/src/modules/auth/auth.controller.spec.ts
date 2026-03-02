@@ -59,7 +59,9 @@ describe('AuthController', () => {
   it('delegates profile lookup by email', async () => {
     userService.findByEmail.mockResolvedValue({ id: 9, email: 'me@me.com' });
 
-    const result = await controller.getProfile({ user: { email: 'me@me.com' } } as any);
+    const result = await controller.getProfile({
+      user: { email: 'me@me.com' },
+    } as any);
 
     expect(userService.findByEmail).toHaveBeenCalledWith('me@me.com');
     expect(result).toEqual({ id: 9, email: 'me@me.com' });

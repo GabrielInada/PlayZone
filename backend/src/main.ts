@@ -37,7 +37,7 @@ async function bootstrap() {
   const { port } = configuration();
   const logger = new Logger('NestApplication');
   const app = await createApp();
-  
+
   await app.listen(port);
   logger.log(`Backend is alive on ${await app.getUrl()}`);
 }

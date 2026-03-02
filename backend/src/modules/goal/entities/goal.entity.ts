@@ -11,7 +11,9 @@ export class Goal {
   minute: number; // Minuto do gol
 
   // Relacionamento com a Súmula
-  @ManyToOne(() => MatchReport, (report) => report.goals, { onDelete: 'CASCADE' })
+  @ManyToOne(() => MatchReport, (report) => report.goals, {
+    onDelete: 'CASCADE',
+  })
   matchReport: MatchReport;
 
   @Column()

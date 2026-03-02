@@ -2,38 +2,44 @@ import { Card } from '../../card/entities/card.entity';
 import { Goal } from '../../goal/entities/goal.entity';
 import { Team } from '../../team/entities/team.entity';
 import { EnumPlayerPosition } from '../../../types/player';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('player')
 export class Player {
-    @PrimaryGeneratedColumn()
-    id: number;
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    name: string;
+  @Column()
+  name: string;
 
-    @Column()
-    shirtNumber: number;
+  @Column()
+  shirtNumber: number;
 
-    @Column()
-    position: EnumPlayerPosition;
+  @Column()
+  position: EnumPlayerPosition;
 
-    @ManyToOne(() => Team, (team) => team.players)
-    team: Team;
-    
-    @Column()
-    teamId: number;
+  @ManyToOne(() => Team, (team) => team.players)
+  team: Team;
 
-    // Relacionamentos inversos (opcional, útil para estatísticas do jogador)
-    @OneToMany(() => Goal, (goal) => goal.player)
-    goals: Goal[];
+  @Column()
+  teamId: number;
 
-    @OneToMany(() => Card, (card) => card.player)
-    cards: Card[];
+  // Relacionamentos inversos (opcional, útil para estatísticas do jogador)
+  @OneToMany(() => Goal, (goal) => goal.player)
+  goals: Goal[];
 
-    @Column({ type: 'timestamp' })
-    createdAt: Date;
+  @OneToMany(() => Card, (card) => card.player)
+  cards: Card[];
 
-    @Column({ type: 'timestamp', nullable: true })
-    updatedAt: Date | null;
+  @Column({ type: 'timestamp' })
+  createdAt: Date;
+
+  @Column({ type: 'timestamp', nullable: true })
+  updatedAt: Date | null;
 }

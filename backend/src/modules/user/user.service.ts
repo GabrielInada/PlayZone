@@ -43,7 +43,8 @@ export class UserService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
 
-    const { password, ...result } = user;
+    const { password: omittedPassword, ...result } = user;
+    void omittedPassword;
     return result;
   }
 
@@ -51,7 +52,10 @@ export class UserService {
     return this.createWithRole(createUserDto, EnumUserRole.USER);
   }
 
-  async createWithRole(createUserDto: CreateUserRequestDto, role: EnumUserRole) {
+  async createWithRole(
+    createUserDto: CreateUserRequestDto,
+    role: EnumUserRole,
+  ) {
     const user = this.userRepository.create({
       ...(createUserDto as Partial<User>),
       email: createUserDto.email.toLowerCase(),
@@ -121,7 +125,7 @@ export class UserService {
     return { id, deleted: true };
   }
 
-   async findByEmail(email: string) {
+  async findByEmail(email: string) {
     return this.userRepository.findOne({ where: { email } });
   }
 }

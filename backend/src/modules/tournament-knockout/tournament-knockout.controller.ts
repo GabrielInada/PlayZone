@@ -1,0 +1,185 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { TournamentKnockoutService } from './tournament-knockout.service';
+import { CreateTournamentKnockoutDto } from './dto/create-tournament-knockout.dto';
+import { UpdateTournamentKnockoutDto } from './dto/update-tournament-knockout.dto';
+
+@ApiTags('Tournament Knockout')
+@Controller('tournament-knockout')
+export class TournamentKnockoutController {
+  constructor(
+    private readonly tournamentKnockoutService: TournamentKnockoutService,
+  ) {}
+
+  @Post()
+  @ApiOperation({ summary: 'Cria um confronto do torneio mata-mata' })
+  @ApiBody({
+    type: CreateTournamentKnockoutDto,
+    examples: {
+      quarterFinalManualWinner: {
+        summary: 'Quartas com vencedor definido manualmente',
+        value: {
+          tournamentName: 'Copa PlayZone 2026',
+          stage: 'QUARTER_FINAL',
+          roundOrder: 1,
+          slot: 1,
+          matchId: 42,
+          winnerTeamId: 7,
+          notes: 'W.O. visitante',
+        },
+      },
+      semifinalInferWinner: {
+        summary: 'Semifinal sem winnerTeamId (inferência por súmula validada)',
+        value: {
+          tournamentName: 'Copa PlayZone 2026',
+          stage: 'SEMI_FINAL',
+          roundOrder: 2,
+          slot: 1,
+          matchId: 57,
+          notes: 'Aguardar revisão final da arbitragem',
+        },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Confronto criado com sucesso.' })
+  create(@Body() createTournamentKnockoutDto: CreateTournamentKnockoutDto) {
+    return this.tournamentKnockoutService.create(createTournamentKnockoutDto);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Lista confrontos do torneio mata-mata' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista retornada com sucesso.',
+    example: [
+      {
+        id: 1,
+        tournamentName: 'Copa PlayZone 2026',
+        stage: 'QUARTER_FINAL',
+        roundOrder: 1,
+        slot: 1,
+        matchId: 42,
+        winnerTeamId: 7,
+        isDecided: true,
+        notes: 'W.O. visitante',
+        createdAt: '2026-03-02T18:30:00.000Z',
+        updatedAt: '2026-03-02T18:30:00.000Z',
+        match: {
+          id: 42,
+          status: 'finished',
+          homeTeam: { id: 7, name: 'Time Azul' },
+          awayTeam: { id: 9, name: 'Time Branco' },
+          report: {
+            id: 15,
+            status: 'validated',
+            homeScore: 2,
+            awayScore: 1,
+          },
+        },
+        winnerTeam: { id: 7, name: 'Time Azul' },
+      },
+    ],
+  })
+  findAll() {
+    return this.tournamentKnockoutService.findAll();
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Busca confronto do mata-mata por ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'Confronto encontrado.',
+    example: {
+      id: 1,
+      tournamentName: 'Copa PlayZone 2026',
+      stage: 'SEMI_FINAL',
+      roundOrder: 2,
+      slot: 1,
+      matchId: 57,
+      winnerTeamId: 7,
+      isDecided: true,
+      notes: 'Vencedor confirmado após revisão administrativa',
+      createdAt: '2026-03-05T20:10:00.000Z',
+      updatedAt: '2026-03-05T20:45:00.000Z',
+      match: {
+        id: 57,
+        status: 'finished',
+        homeTeam: { id: 7, name: 'Time Azul' },
+        awayTeam: { id: 3, name: 'Time Preto' },
+        report: {
+          id: 21,
+          status: 'validated',
+          homeScore: 1,
+          awayScore: 0,
+        },
+      },
+      winnerTeam: { id: 7, name: 'Time Azul' },
+    },
+  })
+  @ApiResponse({ status: 404, description: 'Confronto não encontrado.' })
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.tournamentKnockoutService.findOne(id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Atualiza confronto do mata-mata por ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiBody({
+    type: UpdateTournamentKnockoutDto,
+    examples: {
+      setWinnerAfterReview: {
+        summary: 'Define vencedor após validação da súmula',
+        value: {
+          winnerTeamId: 7,
+          notes: 'Vencedor confirmado após revisão administrativa',
+        },
+      },
+      moveBracketSlot: {
+        summary: 'Ajusta fase/slot manualmente',
+        value: {
+          stage: 'FINAL',
+          roundOrder: 3,
+          slot: 1,
+          matchId: 63,
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Confronto atualizado com sucesso.',
+  })
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateTournamentKnockoutDto: UpdateTournamentKnockoutDto,
+  ) {
+    return this.tournamentKnockoutService.update(
+      id,
+      updateTournamentKnockoutDto,
+    );
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Remove confronto do mata-mata por ID' })
+  @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 200, description: 'Confronto removido com sucesso.' })
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.tournamentKnockoutService.remove(id);
+  }
+}

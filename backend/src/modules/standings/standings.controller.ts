@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { StandingsService } from './standings.service';
 import { CreateStandingDto } from './dto/create-standing.dto';
 import { UpdateStandingDto } from './dto/update-standing.dto';
@@ -19,7 +34,10 @@ export class StandingsController {
 
   @Get()
   @ApiOperation({ summary: 'Lista classificações' })
-  @ApiResponse({ status: 200, description: 'Lista de classificações retornada com sucesso.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de classificações retornada com sucesso.',
+  })
   findAll() {
     return this.standingsService.findAll();
   }
@@ -39,7 +57,10 @@ export class StandingsController {
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateStandingDto })
   @ApiResponse({ status: 400, description: 'Operação não suportada.' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateStandingDto: UpdateStandingDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateStandingDto: UpdateStandingDto,
+  ) {
     return this.standingsService.update(id, updateStandingDto);
   }
 

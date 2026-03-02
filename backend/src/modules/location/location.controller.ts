@@ -1,5 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiBadRequestResponse,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { LocationService } from './location.service';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
@@ -64,7 +80,10 @@ export class LocationController {
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'Dados inválidos ou imageUrl acima do limite configurado.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Dados inválidos ou imageUrl acima do limite configurado.',
+  })
   @ApiBadRequestResponse({
     description: 'Erro de validação (ex.: imageUrl acima do limite).',
     schema: { example: locationImageTooLargeErrorExample },
@@ -80,7 +99,10 @@ export class LocationController {
 
   @Get()
   @ApiOperation({ summary: 'Lista todos os locais' })
-  @ApiResponse({ status: 200, description: 'Lista de locais retornada com sucesso.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de locais retornada com sucesso.',
+  })
   @ApiResponse({ status: 404, description: 'Nenhum local encontrado.' })
   findAll() {
     return this.locationService.findAll();
@@ -108,7 +130,10 @@ export class LocationController {
       },
     },
   })
-  @ApiResponse({ status: 400, description: 'ID inválido ou imageUrl acima do limite configurado.' })
+  @ApiResponse({
+    status: 400,
+    description: 'ID inválido ou imageUrl acima do limite configurado.',
+  })
   @ApiBadRequestResponse({
     description: 'Erro de validação (ex.: imageUrl acima do limite).',
     schema: { example: locationImageTooLargeErrorExample },
@@ -119,7 +144,10 @@ export class LocationController {
     schema: { example: locationUpdateSuccessExample },
   })
   @ApiResponse({ status: 404, description: 'Local não encontrado.' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateLocationDto: UpdateLocationDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateLocationDto: UpdateLocationDto,
+  ) {
     return this.locationService.update(id, updateLocationDto);
   }
 
@@ -129,7 +157,10 @@ export class LocationController {
   @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Local removido com sucesso.' })
   @ApiResponse({ status: 404, description: 'Local não encontrado.' })
-  @ApiResponse({ status: 409, description: 'Não é possível remover local com partidas vinculadas.' })
+  @ApiResponse({
+    status: 409,
+    description: 'Não é possível remover local com partidas vinculadas.',
+  })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.locationService.remove(id);
   }

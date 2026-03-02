@@ -79,7 +79,9 @@ describe('MatchService', () => {
     const location = { id: 3 };
     const persisted = { id: 10 };
 
-    teamRepository.findOne.mockResolvedValueOnce(homeTeam).mockResolvedValueOnce(awayTeam);
+    teamRepository.findOne
+      .mockResolvedValueOnce(homeTeam)
+      .mockResolvedValueOnce(awayTeam);
     locationRepository.findOne.mockResolvedValue(location);
     matchRepository.create.mockReturnValue({
       homeTeam,

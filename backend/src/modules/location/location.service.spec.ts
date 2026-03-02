@@ -48,7 +48,10 @@ describe('LocationService', () => {
     locationRepository.create.mockReturnValue(created);
     locationRepository.save.mockResolvedValue(saved);
 
-    const result = await service.create({ name: 'Arena', city: 'Belém' } as any);
+    const result = await service.create({
+      name: 'Arena',
+      city: 'Belém',
+    } as any);
 
     expect(locationRepository.create).toHaveBeenCalled();
     expect(locationRepository.save).toHaveBeenCalledWith(created);
@@ -64,7 +67,10 @@ describe('LocationService', () => {
   });
 
   it('throws 409 when removing a location linked to matches', async () => {
-    locationRepository.findOne.mockResolvedValue({ id: 4, matches: [{ id: 11 }] });
+    locationRepository.findOne.mockResolvedValue({
+      id: 4,
+      matches: [{ id: 11 }],
+    });
 
     await expect(service.remove(4)).rejects.toBeInstanceOf(HttpException);
   });

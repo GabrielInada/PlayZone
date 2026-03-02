@@ -10,8 +10,17 @@ import { EnumReviewAction } from '../../types/reviewMatchReport';
 
 describe('MatchReportService', () => {
   let service: MatchReportService;
-  let matchRepository: { update: jest.Mock; findOne: jest.Mock; find: jest.Mock };
-  let matchReportRepository: { findOne: jest.Mock; remove: jest.Mock; save: jest.Mock; find: jest.Mock };
+  let matchRepository: {
+    update: jest.Mock;
+    findOne: jest.Mock;
+    find: jest.Mock;
+  };
+  let matchReportRepository: {
+    findOne: jest.Mock;
+    remove: jest.Mock;
+    save: jest.Mock;
+    find: jest.Mock;
+  };
 
   beforeEach(async () => {
     matchRepository = {
@@ -31,7 +40,10 @@ describe('MatchReportService', () => {
       providers: [
         MatchReportService,
         { provide: getRepositoryToken(Match), useValue: matchRepository },
-        { provide: getRepositoryToken(MatchReport), useValue: matchReportRepository },
+        {
+          provide: getRepositoryToken(MatchReport),
+          useValue: matchReportRepository,
+        },
         { provide: DataSource, useValue: { createQueryRunner: jest.fn() } },
       ],
     }).compile();
@@ -42,11 +54,16 @@ describe('MatchReportService', () => {
   it('throws 404 when findOne cannot find report', async () => {
     matchReportRepository.findOne.mockResolvedValue(null);
 
-    await expect(service.findOne(123)).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne(123)).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it('throws 400 when rejecting report without reason', async () => {
-    matchReportRepository.findOne.mockResolvedValue({ id: 1, status: 'pending' });
+    matchReportRepository.findOne.mockResolvedValue({
+      id: 1,
+      status: 'pending',
+    });
 
     await expect(
       service.review(1, {
@@ -62,8 +79,13 @@ describe('MatchReportService', () => {
 
     const result = await service.remove(7);
 
-    expect(matchReportRepository.remove).toHaveBeenCalledWith({ id: 7, matchId: 99 });
-    expect(matchRepository.update).toHaveBeenCalledWith(99, { status: EnumMatchStatus.SCHEDULED });
+    expect(matchReportRepository.remove).toHaveBeenCalledWith({
+      id: 7,
+      matchId: 99,
+    });
+    expect(matchRepository.update).toHaveBeenCalledWith(99, {
+      status: EnumMatchStatus.SCHEDULED,
+    });
     expect(result).toEqual({ message: 'Súmula removida com sucesso' });
   });
 });

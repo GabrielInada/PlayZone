@@ -1,9 +1,16 @@
-import { Card } from "../../card/entities/card.entity";
-import { Goal } from "../../goal/entities/goal.entity";
-import { Match } from "../../match/entities/match.entity";
-import { EnumMatchReportStatus } from "../../../types/match-report";
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToOne, JoinColumn, OneToMany } from "typeorm";
-
+import { Card } from '../../card/entities/card.entity';
+import { Goal } from '../../goal/entities/goal.entity';
+import { Match } from '../../match/entities/match.entity';
+import { EnumMatchReportStatus } from '../../../types/match-report';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  OneToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 
 @Entity()
 export class MatchReport {
@@ -19,12 +26,15 @@ export class MatchReport {
   @Column({ type: 'text', nullable: true })
   observations: string;
 
-  @Column({ type: 'enum', enum: EnumMatchReportStatus, default: EnumMatchReportStatus.PENDING })
+  @Column({
+    type: 'enum',
+    enum: EnumMatchReportStatus,
+    default: EnumMatchReportStatus.PENDING,
+  })
   status: EnumMatchReportStatus;
 
   @Column({ type: 'text', nullable: true })
   adminNote: string | null;
-  
 
   @CreateDateColumn()
   createdAt: Date;

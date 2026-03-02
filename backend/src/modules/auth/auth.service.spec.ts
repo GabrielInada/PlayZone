@@ -33,7 +33,9 @@ describe('AuthService', () => {
   it('throws unauthorized when user is not found', async () => {
     userService.findByEmail.mockResolvedValue(null);
 
-    await expect(service.validateUser('not@found.com', '123')).rejects.toBeInstanceOf(HttpException);
+    await expect(
+      service.validateUser('not@found.com', '123'),
+    ).rejects.toBeInstanceOf(HttpException);
   });
 
   it('returns token payload on login', () => {

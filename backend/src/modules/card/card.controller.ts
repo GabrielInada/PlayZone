@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
@@ -20,7 +35,10 @@ export class CardController {
 
   @Get()
   @ApiOperation({ summary: 'Lista todos os cartões' })
-  @ApiResponse({ status: 200, description: 'Lista de cartões retornada com sucesso.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de cartões retornada com sucesso.',
+  })
   findAll() {
     return this.cardService.findAll();
   }
@@ -42,7 +60,10 @@ export class CardController {
   @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Cartão atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Cartão não encontrado.' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateCardDto: UpdateCardDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateCardDto: UpdateCardDto,
+  ) {
     return this.cardService.update(id, updateCardDto);
   }
 

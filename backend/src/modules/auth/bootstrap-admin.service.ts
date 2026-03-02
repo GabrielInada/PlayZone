@@ -35,7 +35,9 @@ export class BootstrapAdminService implements OnApplicationBootstrap {
     const adminName =
       this.configService.get<string>('bootstrapAdminName') || 'Administrator';
     const adminEmail = this.configService.get<string>('bootstrapAdminEmail');
-    const adminPassword = this.configService.get<string>('bootstrapAdminPassword');
+    const adminPassword = this.configService.get<string>(
+      'bootstrapAdminPassword',
+    );
     const adminTypeRaw =
       this.configService.get<string>('bootstrapAdminType') ||
       EnumUserType.DELEGADO;
@@ -98,7 +100,8 @@ export class BootstrapAdminService implements OnApplicationBootstrap {
         throw error;
       }
 
-      const userAfterConflict = await this.userService.findByEmail(normalizedEmail);
+      const userAfterConflict =
+        await this.userService.findByEmail(normalizedEmail);
 
       if (userAfterConflict?.role === EnumUserRole.ADMIN) {
         this.logger.log(

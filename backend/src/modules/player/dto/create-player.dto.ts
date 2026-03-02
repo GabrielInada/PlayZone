@@ -3,23 +3,30 @@ import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { EnumPlayerPosition } from '../../../types/player';
 
 export class CreatePlayerDto {
-    @ApiProperty({ example: 'João Silva', description: 'Player name' })
-    @IsString()
-    name: string;
+  @ApiProperty({ example: 'João Silva', description: 'Player name' })
+  @IsString()
+  name: string;
 
-    @ApiProperty({ example: 10, description: 'Player shirt number' })
-    @IsNumber()
-    shirtNumber: number;
+  @ApiProperty({ example: 10, description: 'Player shirt number' })
+  @IsNumber()
+  shirtNumber: number;
 
-    @ApiProperty({ enum: EnumPlayerPosition, example: 'goleiro', description: 'Player position' })
-    @IsEnum(EnumPlayerPosition)
-    position: EnumPlayerPosition;
+  @ApiProperty({
+    enum: EnumPlayerPosition,
+    example: 'goleiro',
+    description: 'Player position',
+  })
+  @IsEnum(EnumPlayerPosition)
+  position: EnumPlayerPosition;
 
-    @ApiProperty({ example: 1, description: 'Team ID' })
-    @IsNumber()
-    teamId: number;
+  @ApiProperty({ example: 1, description: 'Team ID' })
+  @IsNumber()
+  teamId: number;
 
-    @ApiProperty({ required: false, description: 'Creation date (auto-generated if not provided)' })
-    @IsOptional()
-    createdAt?: Date;
+  @ApiProperty({
+    required: false,
+    description: 'Creation date (auto-generated if not provided)',
+  })
+  @IsOptional()
+  createdAt?: Date;
 }

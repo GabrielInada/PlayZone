@@ -74,7 +74,10 @@ export class ClubService {
     });
 
     if (!club) {
-      throw new HttpException(`Club profile for user ${ownerUserId} not found`, 404);
+      throw new HttpException(
+        `Club profile for user ${ownerUserId} not found`,
+        404,
+      );
     }
 
     return club;
@@ -83,7 +86,10 @@ export class ClubService {
   async update(id: number, updateClubDto: UpdateClubDto) {
     const existingClub = await this.findOne(id);
 
-    if (updateClubDto.ownerUserId !== undefined && updateClubDto.ownerUserId !== existingClub.ownerUserId) {
+    if (
+      updateClubDto.ownerUserId !== undefined &&
+      updateClubDto.ownerUserId !== existingClub.ownerUserId
+    ) {
       await this.validateClubOwner(updateClubDto.ownerUserId);
 
       const ownerAlreadyLinked = await this.clubRepository.findOne({
@@ -91,7 +97,10 @@ export class ClubService {
       });
 
       if (ownerAlreadyLinked) {
-        throw new HttpException(`User ${updateClubDto.ownerUserId} already has a club profile`, 409);
+        throw new HttpException(
+          `User ${updateClubDto.ownerUserId} already has a club profile`,
+          409,
+        );
       }
     }
 
@@ -112,21 +121,29 @@ export class ClubService {
     const club = await this.findOne(id);
 
     if (club.teams && club.teams.length > 0) {
-      throw new HttpException('Cannot delete club with teams linked. Remove or reassign teams first.', 409);
+      throw new HttpException(
+        'Cannot delete club with teams linked. Remove or reassign teams first.',
+        409,
+      );
     }
 
     return this.clubRepository.remove(club);
   }
 
   private async validateClubOwner(ownerUserId: number) {
-    const owner = await this.userRepository.findOne({ where: { id: ownerUserId } });
+    const owner = await this.userRepository.findOne({
+      where: { id: ownerUserId },
+    });
 
     if (!owner) {
       throw new HttpException(`User with ID ${ownerUserId} not found`, 404);
     }
 
     if (owner.type !== EnumUserType.CLUBE) {
-      throw new HttpException('Club profile can only be linked to users with type=clube', 400);
+      throw new HttpException(
+        'Club profile can only be linked to users with type=clube',
+        400,
+      );
     }
   }
 }

@@ -1,6 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UnauthorizedException, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Req,
+  UnauthorizedException,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { Request } from 'express';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { MatchReportService } from './match-report.service';
 import { CreateMatchReportDto } from './dto/create-match-report.dto';
 import { UpdateMatchReportDto } from './dto/update-match-report.dto';
@@ -17,20 +35,31 @@ export class MatchReportController {
   @ApiBody({ type: CreateMatchReportDto })
   @ApiResponse({ status: 400, description: 'Dados da súmula inválidos.' })
   @ApiResponse({ status: 401, description: 'Usuário não autenticado.' })
-  @ApiResponse({ status: 403, description: 'Usuário sem permissão para esta partida.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Usuário sem permissão para esta partida.',
+  })
   @ApiResponse({ status: 404, description: 'Partida não encontrada.' })
   @ApiResponse({ status: 201, description: 'Súmula criada com sucesso.' })
-  create(@Body() createMatchReportDto: CreateMatchReportDto, @Req() req: Request & { user?: { id?: number } }) {
+  create(
+    @Body() createMatchReportDto: CreateMatchReportDto,
+    @Req() req: Request & { user?: { id?: number } },
+  ) {
     const user = req.user;
     if (!user?.id) {
-      throw new UnauthorizedException('Usuário não autenticado para enviar súmula');
+      throw new UnauthorizedException(
+        'Usuário não autenticado para enviar súmula',
+      );
     }
     return this.matchReportService.create(user.id, createMatchReportDto);
   }
 
   @Get()
   @ApiOperation({ summary: 'Lista todas as súmulas' })
-  @ApiResponse({ status: 200, description: 'Lista de súmulas retornada com sucesso.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de súmulas retornada com sucesso.',
+  })
   findAll() {
     return this.matchReportService.findAll();
   }
@@ -49,10 +78,17 @@ export class MatchReportController {
   @ApiOperation({ summary: 'Atualiza uma súmula por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateMatchReportDto })
-  @ApiResponse({ status: 400, description: 'ID inválido, dados inválidos ou súmula validada não pode ser alterada.' })
+  @ApiResponse({
+    status: 400,
+    description:
+      'ID inválido, dados inválidos ou súmula validada não pode ser alterada.',
+  })
   @ApiResponse({ status: 200, description: 'Súmula atualizada com sucesso.' })
   @ApiResponse({ status: 404, description: 'Súmula não encontrada.' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateMatchReportDto: UpdateMatchReportDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateMatchReportDto: UpdateMatchReportDto,
+  ) {
     return this.matchReportService.update(id, updateMatchReportDto);
   }
 
@@ -70,7 +106,10 @@ export class MatchReportController {
   @ApiOperation({ summary: 'Lista partidas atribuídas ao delegado' })
   @ApiParam({ name: 'delegateId', type: Number })
   @ApiResponse({ status: 400, description: 'ID inválido.' })
-  @ApiResponse({ status: 200, description: 'Partidas atribuídas retornadas com sucesso.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Partidas atribuídas retornadas com sucesso.',
+  })
   getMyMatches(@Param('delegateId', ParseIntPipe) delegateId: number) {
     return this.matchReportService.getAssignedMatches(delegateId);
   }
@@ -82,7 +121,10 @@ export class MatchReportController {
   @ApiResponse({ status: 400, description: 'ID inválido ou body inválido.' })
   @ApiResponse({ status: 200, description: 'Súmula revisada com sucesso.' })
   @ApiResponse({ status: 404, description: 'Súmula não encontrada.' })
-  review(@Param('id', ParseIntPipe) id: number, @Body() dto: ReviewMatchReportDto) {
+  review(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ReviewMatchReportDto,
+  ) {
     return this.matchReportService.review(id, dto);
   }
 }

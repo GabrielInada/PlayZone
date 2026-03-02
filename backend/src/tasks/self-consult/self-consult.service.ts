@@ -14,8 +14,9 @@ export class SelfConsultService {
       const url = config.backendUrl;
       const res = await fetch(url); // O endpoint raiz (/) retorna 200 se o backend estiver vivo
       this.logger.log(`Keep-alive ping sent to ${url} - status: ${res.status}`);
-    } catch (err) {
-      this.logger.warn('Keep-alive ping failed: ' + err?.message);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.warn('Keep-alive ping failed: ' + message);
     }
   }
 }

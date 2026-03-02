@@ -28,18 +28,28 @@ describe('MatchReportController', () => {
 
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MatchReportController],
-      providers: [{ provide: MatchReportService, useValue: matchReportService }],
+      providers: [
+        { provide: MatchReportService, useValue: matchReportService },
+      ],
     }).compile();
 
     controller = module.get<MatchReportController>(MatchReportController);
   });
 
   it('throws unauthorized when create is called without user id', () => {
-    expect(() => controller.create({ matchId: 1 } as any, {} as any)).toThrow(UnauthorizedException);
+    expect(() => controller.create({ matchId: 1 } as any, {} as any)).toThrow(
+      UnauthorizedException,
+    );
   });
 
   it('delegates create with authenticated user id', async () => {
-    const dto: any = { matchId: 2, homeScore: 1, awayScore: 0, goals: [], cards: [] };
+    const dto: any = {
+      matchId: 2,
+      homeScore: 1,
+      awayScore: 0,
+      goals: [],
+      cards: [],
+    };
     const expected = { id: 1, ...dto };
     matchReportService.create.mockResolvedValue(expected);
 

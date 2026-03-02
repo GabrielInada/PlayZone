@@ -25,6 +25,90 @@
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
 
+## Fluxo de Partidas, Súmulas e Classificação
+
+Resumo prático de como os módulos se conectam no backend:
+
+1. Partida (match)
+  - Responsável por agendar e manter partidas.
+  - Cada partida referencia: local, time mandante, time visitante e (opcionalmente) delegado.
+  - Status da partida: `scheduled`, `ongoing`, `finished`, `canceled`.
+
+2. Súmula (match-report)
+  - Representa o resultado oficial informado para uma partida.
+  - Contém: placar mandante/visitante, observações, gols e cartões.
+  - Status da súmula: `pending`, `validated`, `rejected`.
+  - Regras principais:
+    - Delegado só envia súmula da partida atribuída a ele.
+    - Súmula validada não pode ser alterada.
+    - Ao criar súmula, a partida vai para `finished`.
+    - Ao remover súmula, a partida volta para `scheduled`.
+
+3. Classificação (standings)
+  - É persistida em tabela própria (`standing`).
+  - A tabela armazena: time, pontos, jogos, vitórias, empates, derrotas, gols pró/contra, saldo e posição.
+  - A classificação é recalculada automaticamente no GET de standings, usando apenas súmulas `validated`.
+  - Não existe CRUD manual de classificação (POST/PATCH/DELETE retornam operação não suportada).
+
+4. Regra de pontuação e ordenação
+  - Vitória = 3 pontos, empate = 1, derrota = 0.
+  - Ordem da tabela: pontos desc, vitórias desc, saldo de gols desc.
+
+5. Ciclo completo (visão rápida)
+  - Admin/gestão cria a partida.
+  - Delegado envia a súmula (`pending`).
+  - Revisão aceita (`validated`) ou rejeita (`rejected`).
+  - Apenas súmulas validadas entram na classificação persistida.
+
+## Formatos de competição (League x Knockout)
+
+Hoje o backend suporta dois formatos diferentes de competição:
+
+1. League (pontos corridos) — módulo `standings`
+  - Formato de tabela por pontos (3/1/0).
+  - Vence quem acumula mais pontos ao longo das partidas válidas.
+  - Desempate atual: vitórias e saldo de gols.
+  - Observação: este módulo poderá ser renomeado para `tournament-league` no futuro sem mudar o conceito.
+
+2. Knockout (mata-mata) — módulo `tournament-knockout`
+  - Formato eliminatório por fases (ex.: Oitavas, Quartas, Semi, Final).
+  - Cada confronto é um vínculo manual para uma partida já existente em `match`.
+  - O admin pode definir vencedor manualmente ou deixar o sistema inferir quando houver súmula validada sem empate.
+
+Em resumo: `standings` e `tournament-knockout` não competem entre si; são dois modelos de torneio diferentes que podem coexistir no mesmo sistema.
+
+## Tournament Knockout (manual)
+
+Endpoints principais:
+
+- `POST /tournament-knockout`
+- `GET /tournament-knockout`
+- `GET /tournament-knockout/:id`
+- `PATCH /tournament-knockout/:id`
+- `DELETE /tournament-knockout/:id`
+
+Payload base (create/update):
+
+```json
+{
+  "tournamentName": "Copa PlayZone 2026",
+  "stage": "QUARTER_FINAL",
+  "roundOrder": 1,
+  "slot": 1,
+  "matchId": 42,
+  "winnerTeamId": 7,
+  "notes": "W.O. visitante"
+}
+```
+
+Regras importantes do knockout:
+
+- `matchId` deve existir no módulo `match`.
+- Uma partida só pode estar em um único confronto knockout.
+- Não pode repetir `tournamentName + stage + slot`.
+- Se `winnerTeamId` for informado, deve ser um dos times da partida vinculada.
+- Se `winnerTeamId` não for informado, o sistema tenta inferir o vencedor via `match-report` validada (apenas quando não há empate).
+
 ## Project setup
 
 ```bash

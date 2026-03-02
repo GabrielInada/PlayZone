@@ -1,9 +1,16 @@
-import { MatchReport } from "../../match-report/entities/match-report.entity";
-import { Team } from "../../team/entities/team.entity";
-import { User } from "../../user/entities/user.entity";
-import { Location } from "../../location/entities/location.entity";
-import { EnumMatchStatus } from "../../../types/match";
-import { Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { MatchReport } from '../../match-report/entities/match-report.entity';
+import { Team } from '../../team/entities/team.entity';
+import { User } from '../../user/entities/user.entity';
+import { Location } from '../../location/entities/location.entity';
+import { EnumMatchStatus } from '../../../types/match';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Match {
@@ -20,7 +27,11 @@ export class Match {
   @JoinColumn({ name: 'locationId' })
   location: Location;
 
-  @Column({ type: 'enum', enum: EnumMatchStatus, default: EnumMatchStatus.SCHEDULED })
+  @Column({
+    type: 'enum',
+    enum: EnumMatchStatus,
+    default: EnumMatchStatus.SCHEDULED,
+  })
   status: EnumMatchStatus;
 
   @ManyToOne(() => Team, (team) => team.homeMatches)

@@ -1,5 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { GoalService } from './goal.service';
 import { CreateGoalDto } from './dto/create-goal.dto';
 import { UpdateGoalDto } from './dto/update-goal.dto';
@@ -20,7 +35,10 @@ export class GoalController {
 
   @Get()
   @ApiOperation({ summary: 'Lista todos os gols' })
-  @ApiResponse({ status: 200, description: 'Lista de gols retornada com sucesso.' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de gols retornada com sucesso.',
+  })
   findAll() {
     return this.goalService.findAll();
   }
@@ -42,7 +60,10 @@ export class GoalController {
   @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({ status: 200, description: 'Gol atualizado com sucesso.' })
   @ApiResponse({ status: 404, description: 'Gol não encontrado.' })
-  update(@Param('id', ParseIntPipe) id: number, @Body() updateGoalDto: UpdateGoalDto) {
+  update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateGoalDto: UpdateGoalDto,
+  ) {
     return this.goalService.update(id, updateGoalDto);
   }
 
