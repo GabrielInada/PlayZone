@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateLocationDto {
 	@ApiProperty({ example: 'Ginásio da UFRA', description: 'Nome do local da partida' })
@@ -20,6 +21,16 @@ export class CreateLocationDto {
 	@IsOptional()
 	@IsString()
 	state?: string;
+
+	@ApiPropertyOptional({
+		example: 1200,
+		description: 'Capacidade máxima de pessoas no local',
+	})
+	@IsOptional()
+	@Type(() => Number)
+	@IsInt()
+	@Min(1)
+	capacity?: number;
 
 	@ApiPropertyOptional({
 		example: 'https://cdn.example.com/locations/ginasio-ufra.jpg',

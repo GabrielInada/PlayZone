@@ -21,6 +21,9 @@ export class Location {
 	@Column({ type: 'text', nullable: true })
 	imageUrl?: string | null;
 
+	@Column({ type: 'int', nullable: true })
+	capacity?: number | null;
+
 	@OneToMany(() => Match, (match) => match.location)
 	matches: Match[];
 

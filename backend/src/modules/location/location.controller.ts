@@ -9,10 +9,12 @@ const locationCreateExample = {
   address: 'Av. Perimetral, 2501',
   city: 'Belém',
   state: 'PA',
+  capacity: 1200,
   imageUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...',
 };
 
 const locationUpdateExample = {
+  capacity: 1500,
   imageUrl: 'https://cdn.example.com/locations/ginasio-ufra.jpg',
 };
 
@@ -28,6 +30,7 @@ const locationCreateSuccessExample = {
   address: 'Av. Perimetral, 2501',
   city: 'Belém',
   state: 'PA',
+  capacity: 1200,
   imageUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...',
   createdAt: '2026-03-02T15:00:00.000Z',
   updatedAt: '2026-03-02T15:00:00.000Z',
@@ -39,6 +42,7 @@ const locationUpdateSuccessExample = {
   address: 'Av. Perimetral, 2501',
   city: 'Belém',
   state: 'PA',
+  capacity: 1500,
   imageUrl: 'https://cdn.example.com/locations/ginasio-ufra.jpg',
   createdAt: '2026-03-02T15:00:00.000Z',
   updatedAt: '2026-03-02T15:05:00.000Z',
