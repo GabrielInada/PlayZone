@@ -59,6 +59,24 @@ $ npm run test:cov
 
 ## Migrations (TypeORM + Postgres)
 
+## Request body limit
+
+Para payloads JSON maiores (ex.: `imageUrl` base64 no endpoint `POST /location`), configure:
+
+```env
+REQUEST_BODY_LIMIT=1mb
+```
+
+Se não definir, o backend usa `1mb` por padrão.
+
+Para controlar o tamanho do campo `imageUrl` no `POST/PATCH /location`, configure:
+
+```env
+LOCATION_IMAGE_URL_MAX_LENGTH=200000
+```
+
+Se não definir, o backend usa `200000` caracteres por padrão.
+
 Para usar migrations com segurança:
 
 1. Desative sincronização automática do schema:

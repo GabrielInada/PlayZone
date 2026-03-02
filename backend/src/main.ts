@@ -3,9 +3,14 @@ import { AppModule } from './modules/app/app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import configuration from './config/configuration';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { json, urlencoded } from 'express';
 
 async function createApp() {
+  const { requestBodyLimit } = configuration();
   const app = await NestFactory.create(AppModule);
+
+  app.use(json({ limit: requestBodyLimit }));
+  app.use(urlencoded({ extended: true, limit: requestBodyLimit }));
 
   app.useGlobalPipes(
     new ValidationPipe({

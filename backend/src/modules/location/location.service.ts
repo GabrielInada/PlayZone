@@ -1,18 +1,23 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import configuration from '../../config/configuration';
 import { CreateLocationDto } from './dto/create-location.dto';
 import { UpdateLocationDto } from './dto/update-location.dto';
 import { Location } from './entities/location.entity';
 
 @Injectable()
 export class LocationService {
+  private readonly locationImageUrlMaxLength = configuration().locationImageUrlMaxLength;
+
   constructor(
     @InjectRepository(Location)
     private readonly locationRepository: Repository<Location>,
   ) {}
 
   async create(createLocationDto: CreateLocationDto) {
+    this.validateImageUrlLength(createLocationDto.imageUrl);
+
     const location = this.locationRepository.create({
       ...createLocationDto,
       createdAt: new Date(),
@@ -49,6 +54,8 @@ export class LocationService {
   }
 
   async update(id: number, updateLocationDto: UpdateLocationDto) {
+    this.validateImageUrlLength(updateLocationDto.imageUrl);
+
     const location = await this.locationRepository.preload({
       id,
       ...updateLocationDto,
@@ -70,5 +77,17 @@ export class LocationService {
     }
 
     return this.locationRepository.remove(location);
+  }
+
+  private validateImageUrlLength(imageUrl?: string) {
+    if (!imageUrl) {
+      return;
+    }
+
+    if (imageUrl.length > this.locationImageUrlMaxLength) {
+      throw new BadRequestException(
+        `imageUrl deve ter no máximo ${this.locationImageUrlMaxLength} caracteres`,
+      );
+    }
   }
 }

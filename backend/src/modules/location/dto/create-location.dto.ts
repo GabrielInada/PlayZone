@@ -23,7 +23,7 @@ export class CreateLocationDto {
 
 	@ApiPropertyOptional({
 		example: 'https://cdn.example.com/locations/ginasio-ufra.jpg',
-		description: 'URL da imagem do local',
+		description: 'URL ou data URI da imagem do local',
 	})
 	@IsOptional()
 	@IsString()

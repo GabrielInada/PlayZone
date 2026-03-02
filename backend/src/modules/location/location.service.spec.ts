@@ -55,6 +55,14 @@ describe('LocationService', () => {
     expect(result).toEqual(saved);
   });
 
+  it('throws 400 when imageUrl exceeds configured max length', async () => {
+    const oversizedImageUrl = 'a'.repeat(200001);
+
+    await expect(
+      service.create({ name: 'Arena', imageUrl: oversizedImageUrl } as any),
+    ).rejects.toBeInstanceOf(HttpException);
+  });
+
   it('throws 409 when removing a location linked to matches', async () => {
     locationRepository.findOne.mockResolvedValue({ id: 4, matches: [{ id: 11 }] });
 
