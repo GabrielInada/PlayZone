@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEnum, IsString, ValidateIf } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, ValidateIf } from 'class-validator';
 import { EnumReviewAction } from '../../../types/reviewMatchReport';
 
 export class ReviewMatchReportDto {
@@ -19,5 +19,6 @@ export class ReviewMatchReportDto {
     (dto: ReviewMatchReportDto) => dto.action === EnumReviewAction.REJECT,
   )
   @IsString()
+  @IsNotEmpty({ message: 'reason é obrigatório quando action=REJECT' })
   reason?: string;
 }

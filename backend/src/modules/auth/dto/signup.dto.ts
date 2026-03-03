@@ -4,6 +4,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsString,
+  MaxLength,
   MinLength,
 } from 'class-validator';
 import { EnumUserType } from '../../../types/user';
@@ -12,6 +13,7 @@ export class SignupDto {
   @ApiProperty({ example: 'Gabriel Inada' })
   @IsString()
   @IsNotEmpty()
+  @MaxLength(120)
   name: string;
 
   @ApiProperty({ example: 'gabrielinada@email.com' })
@@ -21,6 +23,7 @@ export class SignupDto {
   @ApiProperty({ example: 'kjsupremacy2026' })
   @IsString()
   @MinLength(6)
+  @MaxLength(120)
   password: string;
 
   @ApiProperty({ enum: EnumUserType, example: EnumUserType.DELEGADO })

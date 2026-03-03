@@ -16,6 +16,7 @@ export class CreateMatchReportDto {
     example: 1,
     description: 'ID da partida relacionada à súmula',
   })
+  @Type(() => Number)
   @IsInt()
   matchId: number;
 

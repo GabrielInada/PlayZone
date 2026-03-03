@@ -13,22 +13,26 @@ export class CreateMatchDto {
   date: Date;
 
   @ApiProperty({ description: 'ID do local da partida', example: 1 })
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   locationId: number;
 
   @ApiProperty({ description: 'ID do time mandante', example: 1 })
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   homeTeamId: number;
 
   @ApiProperty({ description: 'ID do time visitante', example: 2 })
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   awayTeamId: number;
 
   @ApiPropertyOptional({ description: 'ID do delegado designado', example: 7 })
   @IsOptional()
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   delegateId?: number;

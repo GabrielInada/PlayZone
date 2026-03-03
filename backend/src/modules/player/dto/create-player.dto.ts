@@ -1,14 +1,26 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsEnum,
+  IsInt,
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
 import { EnumPlayerPosition } from '../../../types/player';
 
 export class CreatePlayerDto {
   @ApiProperty({ example: 'João Silva', description: 'Player name' })
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(120)
   name: string;
 
   @ApiProperty({ example: 10, description: 'Player shirt number' })
-  @IsNumber()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   shirtNumber: number;
 
   @ApiProperty({
@@ -20,13 +32,8 @@ export class CreatePlayerDto {
   position: EnumPlayerPosition;
 
   @ApiProperty({ example: 1, description: 'Team ID' })
-  @IsNumber()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   teamId: number;
-
-  @ApiProperty({
-    required: false,
-    description: 'Creation date (auto-generated if not provided)',
-  })
-  @IsOptional()
-  createdAt?: Date;
 }

@@ -1,6 +1,13 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsInt, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsInt,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Min,
+} from 'class-validator';
 
 export class CreateLocationDto {
   @ApiProperty({
@@ -8,6 +15,8 @@ export class CreateLocationDto {
     description: 'Nome do local da partida',
   })
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(120)
   name: string;
 
   @ApiPropertyOptional({
@@ -16,6 +25,7 @@ export class CreateLocationDto {
   })
   @IsOptional()
   @IsString()
+  @MaxLength(200)
   address?: string;
 
   @ApiPropertyOptional({

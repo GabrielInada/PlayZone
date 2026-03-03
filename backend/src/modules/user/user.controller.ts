@@ -28,6 +28,7 @@ import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { UserResponseDto } from './dto/user-response.dto';
 import { FindAllUsersResponseDto } from './dto/find-all-users-response.dto';
 import { DeleteUserResponseDto } from './dto/delete-user-response.dto';
+import { FindAllUsersQueryDto } from './dto/find-all-users-query.dto';
 
 type AuthenticatedRequest = {
   user: {
@@ -87,9 +88,9 @@ export class UserController {
       },
     },
   })
-  findAll(@Query('page') page?: number, @Query('size') size?: number) {
-    const pageNumber = page && page > 0 ? Number(page) : 1;
-    const sizeNumber = size && size > 0 ? Number(size) : 10;
+  findAll(@Query() query: FindAllUsersQueryDto = {}) {
+    const pageNumber = query.page ?? 1;
+    const sizeNumber = query.size ?? 10;
     return this.userService.findAll(pageNumber, sizeNumber);
   }
 

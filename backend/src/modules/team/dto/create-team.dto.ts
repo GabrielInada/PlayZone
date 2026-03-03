@@ -1,30 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, IsString, MaxLength, Min } from 'class-validator';
 
 export class CreateTeamDto {
   @ApiProperty({ example: 'Flamengo FC', description: 'Team name' })
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(120)
   name: string;
 
   @ApiProperty({ example: 1, description: 'Club ID' })
-  @IsNumber()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
   clubId: number;
 
   @ApiProperty({ example: 'Tite', description: 'Coach name' })
   @IsString()
+  @IsNotEmpty()
+  @MaxLength(120)
   coachName: string;
-
-  @ApiProperty({
-    required: false,
-    description: 'Creation date (auto-generated if not provided)',
-  })
-  @IsOptional()
-  createdAt?: Date;
-
-  @ApiProperty({
-    required: false,
-    description: 'Update date (auto-generated if not provided)',
-  })
-  @IsOptional()
-  updatedAt?: Date;
 }
