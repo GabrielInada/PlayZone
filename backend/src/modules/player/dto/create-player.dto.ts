@@ -11,13 +11,13 @@ import {
 import { EnumPlayerPosition } from '../../../types/player';
 
 export class CreatePlayerDto {
-  @ApiProperty({ example: 'João Silva', description: 'Player name' })
+  @ApiProperty({ example: 'John Silva', description: 'Nome do jogador' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(120)
   name: string;
 
-  @ApiProperty({ example: 10, description: 'Player shirt number' })
+  @ApiProperty({ example: 10, description: 'Número da camisa do jogador' })
   @Type(() => Number)
   @IsInt()
   @Min(1)
@@ -26,12 +26,12 @@ export class CreatePlayerDto {
   @ApiProperty({
     enum: EnumPlayerPosition,
     example: 'goleiro',
-    description: 'Player position',
+    description: 'Posição do jogador',
   })
   @IsEnum(EnumPlayerPosition)
   position: EnumPlayerPosition;
 
-  @ApiProperty({ example: 1, description: 'Team ID' })
+  @ApiProperty({ example: 1, description: 'ID do time' })
   @Type(() => Number)
   @IsInt()
   @Min(1)

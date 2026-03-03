@@ -21,34 +21,34 @@ import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayerResponseDto } from './dto/player-response.dto';
 
-@ApiTags('Player')
+@ApiTags('Jogador')
 @Controller('player')
 export class PlayerController {
   constructor(private readonly playersService: PlayerService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new player' })
+  @ApiOperation({ summary: 'Cria um novo jogador' })
   @ApiBody({ type: CreatePlayerDto })
   @ApiResponse({
     status: 201,
-    description: 'Player created successfully',
+    description: 'Jogador criado com sucesso',
     type: PlayerResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Bad request - validation error' })
-  @ApiResponse({ status: 404, description: 'Team not found' })
+  @ApiResponse({ status: 400, description: 'Requisição inválida - erro de validação' })
+  @ApiResponse({ status: 404, description: 'Time não encontrado' })
   create(@Body() createPlayerDto: CreatePlayerDto) {
     return this.playersService.create(createPlayerDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all players' })
+  @ApiOperation({ summary: 'Lista todos os jogadores' })
   @ApiResponse({
     status: 200,
-    description: 'List of all players',
+    description: 'Lista de todos os jogadores',
     type: [PlayerResponseDto],
   })
   @ApiOkResponse({
-    description: 'Example list of players',
+    description: 'Exemplo de lista de jogadores',
     schema: {
       example: [
         {
@@ -63,22 +63,22 @@ export class PlayerController {
       ],
     },
   })
-  @ApiResponse({ status: 404, description: 'No players found' })
+  @ApiResponse({ status: 404, description: 'Nenhum jogador encontrado' })
   findAll() {
     return this.playersService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a player by ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'Player ID' })
-  @ApiResponse({ status: 400, description: 'Invalid player ID' })
+  @ApiOperation({ summary: 'Busca um jogador por ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID do jogador' })
+  @ApiResponse({ status: 400, description: 'ID de jogador inválido' })
   @ApiResponse({
     status: 200,
-    description: 'Player found',
+    description: 'Jogador encontrado',
     type: PlayerResponseDto,
   })
   @ApiOkResponse({
-    description: 'Example player response',
+    description: 'Exemplo de resposta de jogador',
     schema: {
       example: {
         id: 1,
@@ -91,22 +91,22 @@ export class PlayerController {
       },
     },
   })
-  @ApiResponse({ status: 404, description: 'Player not found' })
+  @ApiResponse({ status: 404, description: 'Jogador não encontrado' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.playersService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a player by ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'Player ID' })
+  @ApiOperation({ summary: 'Atualiza um jogador por ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID do jogador' })
   @ApiBody({ type: UpdatePlayerDto })
-  @ApiResponse({ status: 400, description: 'Invalid player ID' })
+  @ApiResponse({ status: 400, description: 'ID de jogador inválido' })
   @ApiResponse({
     status: 200,
-    description: 'Player updated successfully',
+    description: 'Jogador atualizado com sucesso',
     type: PlayerResponseDto,
   })
-  @ApiResponse({ status: 404, description: 'Player or team not found' })
+  @ApiResponse({ status: 404, description: 'Jogador ou time não encontrado' })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePlayerDto: UpdatePlayerDto,
@@ -115,15 +115,15 @@ export class PlayerController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a player by ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'Player ID' })
-  @ApiResponse({ status: 400, description: 'Invalid player ID' })
+  @ApiOperation({ summary: 'Remove um jogador por ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID do jogador' })
+  @ApiResponse({ status: 400, description: 'ID de jogador inválido' })
   @ApiResponse({
     status: 200,
-    description: 'Player deleted successfully',
+    description: 'Jogador removido com sucesso',
     type: PlayerResponseDto,
   })
-  @ApiResponse({ status: 404, description: 'Player not found' })
+  @ApiResponse({ status: 404, description: 'Jogador não encontrado' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.playersService.remove(id);
   }

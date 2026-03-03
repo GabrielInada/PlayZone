@@ -21,34 +21,34 @@ import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
 import { TeamResponseDto } from './dto/team-response.dto';
 
-@ApiTags('Team')
+@ApiTags('Time')
 @Controller('team')
 export class TeamController {
   constructor(private readonly teamService: TeamService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new team' })
+  @ApiOperation({ summary: 'Cria um novo time' })
   @ApiBody({ type: CreateTeamDto })
   @ApiResponse({
     status: 201,
-    description: 'Team created successfully',
+    description: 'Time criado com sucesso',
     type: TeamResponseDto,
   })
-  @ApiResponse({ status: 400, description: 'Bad request - validation error' })
-  @ApiResponse({ status: 404, description: 'Club not found' })
+  @ApiResponse({ status: 400, description: 'Requisição inválida - erro de validação' })
+  @ApiResponse({ status: 404, description: 'Clube não encontrado' })
   create(@Body() createTeamDto: CreateTeamDto) {
     return this.teamService.create(createTeamDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all teams' })
+  @ApiOperation({ summary: 'Lista todos os times' })
   @ApiResponse({
     status: 200,
-    description: 'List of all teams',
+    description: 'Lista de todos os times',
     type: [TeamResponseDto],
   })
   @ApiOkResponse({
-    description: 'Example list of teams',
+    description: 'Exemplo de lista de times',
     schema: {
       example: [
         {
@@ -62,22 +62,22 @@ export class TeamController {
       ],
     },
   })
-  @ApiResponse({ status: 404, description: 'No teams found' })
+  @ApiResponse({ status: 404, description: 'Nenhum time encontrado' })
   findAll() {
     return this.teamService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get a team by ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'Team ID' })
-  @ApiResponse({ status: 400, description: 'Invalid team ID' })
+  @ApiOperation({ summary: 'Busca um time por ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID do time' })
+  @ApiResponse({ status: 400, description: 'ID de time inválido' })
   @ApiResponse({
     status: 200,
-    description: 'Team found',
+    description: 'Time encontrado',
     type: TeamResponseDto,
   })
   @ApiOkResponse({
-    description: 'Example team response',
+    description: 'Exemplo de resposta de time',
     schema: {
       example: {
         id: 1,
@@ -89,22 +89,22 @@ export class TeamController {
       },
     },
   })
-  @ApiResponse({ status: 404, description: 'Team not found' })
+  @ApiResponse({ status: 404, description: 'Time não encontrado' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.teamService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update a team by ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'Team ID' })
+  @ApiOperation({ summary: 'Atualiza um time por ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID do time' })
   @ApiBody({ type: UpdateTeamDto })
-  @ApiResponse({ status: 400, description: 'Invalid team ID' })
+  @ApiResponse({ status: 400, description: 'ID de time inválido' })
   @ApiResponse({
     status: 200,
-    description: 'Team updated successfully',
+    description: 'Time atualizado com sucesso',
     type: TeamResponseDto,
   })
-  @ApiResponse({ status: 404, description: 'Team or club not found' })
+  @ApiResponse({ status: 404, description: 'Time ou clube não encontrado' })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateTeamDto: UpdateTeamDto,
@@ -113,16 +113,16 @@ export class TeamController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete a team by ID' })
-  @ApiParam({ name: 'id', type: Number, description: 'Team ID' })
-  @ApiResponse({ status: 400, description: 'Invalid team ID' })
+  @ApiOperation({ summary: 'Remove um time por ID' })
+  @ApiParam({ name: 'id', type: Number, description: 'ID do time' })
+  @ApiResponse({ status: 400, description: 'ID de time inválido' })
   @ApiResponse({
     status: 200,
-    description: 'Team deleted successfully',
+    description: 'Time removido com sucesso',
     type: TeamResponseDto,
   })
-  @ApiResponse({ status: 404, description: 'Team not found' })
-  @ApiResponse({ status: 409, description: 'Cannot delete team with players' })
+  @ApiResponse({ status: 404, description: 'Time não encontrado' })
+  @ApiResponse({ status: 409, description: 'Não é possível remover time com jogadores' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.teamService.remove(id);
   }

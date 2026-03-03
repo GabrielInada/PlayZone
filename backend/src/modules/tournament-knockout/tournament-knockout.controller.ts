@@ -19,7 +19,7 @@ import { TournamentKnockoutService } from './tournament-knockout.service';
 import { CreateTournamentKnockoutDto } from './dto/create-tournament-knockout.dto';
 import { UpdateTournamentKnockoutDto } from './dto/update-tournament-knockout.dto';
 
-@ApiTags('Tournament Knockout')
+@ApiTags('Mata-mata do Campeonato')
 @Controller('tournament-knockout')
 export class TournamentKnockoutController {
   constructor(
@@ -27,12 +27,12 @@ export class TournamentKnockoutController {
   ) {}
 
   @Post()
-  @ApiOperation({ summary: 'Cria um confronto do torneio mata-mata' })
+  @ApiOperation({ summary: 'Criar confronto do mata-mata de um campeonato' })
   @ApiBody({
     type: CreateTournamentKnockoutDto,
     examples: {
       quarterFinalManualWinner: {
-        summary: 'Quartas com vencedor definido manualmente',
+        summary: 'Quartas de final com vencedor definido manualmente',
         value: {
           tournamentName: 'Copa PlayZone 2026',
           stage: 'QUARTER_FINAL',
@@ -44,28 +44,34 @@ export class TournamentKnockoutController {
         },
       },
       semifinalInferWinner: {
-        summary: 'Semifinal sem winnerTeamId (inferência por súmula validada)',
+        summary: 'Semifinal sem winnerTeamId (inferido de súmula validada)',
         value: {
           tournamentName: 'Copa PlayZone 2026',
           stage: 'SEMI_FINAL',
           roundOrder: 2,
           slot: 1,
           matchId: 57,
-          notes: 'Aguardar revisão final da arbitragem',
+          notes: 'Aguardando revisão final da arbitragem',
         },
       },
     },
   })
-  @ApiResponse({ status: 201, description: 'Confronto criado com sucesso.' })
+  @ApiResponse({ status: 400, description: 'Dados de entrada inválidos.' })
+  @ApiResponse({ status: 404, description: 'Partida não encontrada.' })
+  @ApiResponse({
+    status: 409,
+    description: 'Conflito em matchId ou combinação de campeonato/fase/slot.',
+  })
+  @ApiResponse({ status: 201, description: 'Confronto de mata-mata criado com sucesso.' })
   create(@Body() createTournamentKnockoutDto: CreateTournamentKnockoutDto) {
     return this.tournamentKnockoutService.create(createTournamentKnockoutDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Lista confrontos do torneio mata-mata' })
+  @ApiOperation({ summary: 'Listar confrontos de mata-mata do campeonato' })
   @ApiResponse({
     status: 200,
-    description: 'Lista retornada com sucesso.',
+    description: 'Lista de confrontos retornada com sucesso.',
     example: [
       {
         id: 1,
@@ -100,11 +106,12 @@ export class TournamentKnockoutController {
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Busca confronto do mata-mata por ID' })
+  @ApiOperation({ summary: 'Buscar confronto de mata-mata por ID' })
   @ApiParam({ name: 'id', type: Number })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
   @ApiResponse({
     status: 200,
-    description: 'Confronto encontrado.',
+    description: 'Confronto de mata-mata encontrado.',
     example: {
       id: 1,
       tournamentName: 'Copa PlayZone 2026',
@@ -132,26 +139,26 @@ export class TournamentKnockoutController {
       winnerTeam: { id: 7, name: 'Time Azul' },
     },
   })
-  @ApiResponse({ status: 404, description: 'Confronto não encontrado.' })
+  @ApiResponse({ status: 404, description: 'Confronto de mata-mata não encontrado.' })
   findOne(@Param('id', ParseIntPipe) id: number) {
     return this.tournamentKnockoutService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Atualiza confronto do mata-mata por ID' })
+  @ApiOperation({ summary: 'Atualizar confronto de mata-mata por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({
     type: UpdateTournamentKnockoutDto,
     examples: {
       setWinnerAfterReview: {
-        summary: 'Define vencedor após validação da súmula',
+        summary: 'Definir vencedor após validação da súmula',
         value: {
           winnerTeamId: 7,
           notes: 'Vencedor confirmado após revisão administrativa',
         },
       },
       moveBracketSlot: {
-        summary: 'Ajusta fase/slot manualmente',
+        summary: 'Ajustar fase/slot manualmente',
         value: {
           stage: 'FINAL',
           roundOrder: 3,
@@ -162,8 +169,18 @@ export class TournamentKnockoutController {
     },
   })
   @ApiResponse({
+    status: 400,
+    description:
+      'ID inválido ou dados inválidos (ex.: winnerTeamId não pertence à partida).',
+  })
+  @ApiResponse({ status: 404, description: 'Confronto de mata-mata ou partida não encontrada.' })
+  @ApiResponse({
+    status: 409,
+    description: 'Conflito em matchId ou combinação de campeonato/fase/slot.',
+  })
+  @ApiResponse({
     status: 200,
-    description: 'Confronto atualizado com sucesso.',
+    description: 'Confronto de mata-mata atualizado com sucesso.',
   })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -176,9 +193,11 @@ export class TournamentKnockoutController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Remove confronto do mata-mata por ID' })
+  @ApiOperation({ summary: 'Remover confronto de mata-mata por ID' })
   @ApiParam({ name: 'id', type: Number })
-  @ApiResponse({ status: 200, description: 'Confronto removido com sucesso.' })
+  @ApiResponse({ status: 400, description: 'ID inválido.' })
+  @ApiResponse({ status: 200, description: 'Confronto de mata-mata removido com sucesso.' })
+  @ApiResponse({ status: 404, description: 'Confronto de mata-mata não encontrado.' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.tournamentKnockoutService.remove(id);
   }

@@ -11,7 +11,7 @@ import {
 
 export class CreateLocationDto {
   @ApiProperty({
-    example: 'Ginásio da UFRA',
+    example: 'UFRA Gymnasium',
     description: 'Nome do local da partida',
   })
   @IsString()
@@ -30,7 +30,7 @@ export class CreateLocationDto {
 
   @ApiPropertyOptional({
     example: 1200,
-    description: 'Capacidade máxima de pessoas no local',
+    description: 'Capacidade máxima do local',
   })
   @IsOptional()
   @Type(() => Number)
@@ -41,7 +41,7 @@ export class CreateLocationDto {
   @ApiPropertyOptional({
     example: 'https://cdn.example.com/locations/ginasio-ufra.jpg',
     description:
-      'URL ou data URI da imagem do local (limite configurável por LOCATION_IMAGE_URL_MAX_LENGTH; padrão: 200000 caracteres)',
+      'Venue image URL or data URI (configurable limit via LOCATION_IMAGE_URL_MAX_LENGTH; default: 200000 characters)',
   })
   @IsOptional()
   @IsString()

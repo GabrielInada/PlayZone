@@ -16,7 +16,7 @@ export class CreateCardDto {
   @ApiProperty({
     enum: EnumCardType,
     example: EnumCardType.YELLOW,
-    description: 'Tipo do cartão',
+    description: 'Tipo de cartão',
   })
   @IsEnum(EnumCardType)
   type: EnumCardType;

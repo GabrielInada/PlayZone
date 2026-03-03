@@ -19,7 +19,7 @@ import { ClubService } from './club.service';
 import { CreateClubDto } from './dto/create-club.dto';
 import { UpdateClubDto } from './dto/update-club.dto';
 
-@ApiTags('Club')
+@ApiTags('Clube')
 @Controller('club')
 export class ClubController {
   constructor(private readonly clubService: ClubService) {}

@@ -4,7 +4,7 @@ import { IsInt, IsOptional, Min } from 'class-validator';
 
 export class FindAllUsersQueryDto {
   @ApiPropertyOptional({
-    description: 'Número da página (inicia em 1)',
+    description: 'Número da página (começa em 1)',
     example: 1,
     minimum: 1,
   })

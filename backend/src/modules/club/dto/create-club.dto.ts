@@ -11,14 +11,14 @@ import {
 } from 'class-validator';
 
 export class CreateClubDto {
-  @ApiProperty({ example: 'Clube Atlético UFRA', description: 'Nome do clube' })
+  @ApiProperty({ example: 'UFRA Athletic Club', description: 'Nome do clube' })
   @IsString()
   @IsNotEmpty()
   @MaxLength(120)
   name: string;
 
   @ApiPropertyOptional({
-    example: 'https://cdn.example.com/badges/clube-atletico-ufra.png',
+    example: 'https://cdn.example.com/badges/ufra-athletic-club.png',
     description: 'URL da imagem do escudo do clube',
   })
   @IsOptional()
@@ -27,7 +27,7 @@ export class CreateClubDto {
 
   @ApiProperty({
     example: 7,
-    description: 'ID do usuário dono do perfil do clube',
+    description: 'ID do usuário dono deste perfil de clube',
   })
   @Type(() => Number)
   @IsInt()

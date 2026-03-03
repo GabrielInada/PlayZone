@@ -2,21 +2,21 @@ import { Controller, Get } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AppService } from './app.service';
 
-@ApiTags('Health')
+@ApiTags('Saúde')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Root endpoint' })
-  @ApiResponse({ status: 200, description: 'API root is reachable' })
+  @ApiOperation({ summary: 'Endpoint raiz' })
+  @ApiResponse({ status: 200, description: 'Raiz da API está acessível' })
   getRoot() {
     return this.appService.getHealthStatus();
   }
 
   @Get('health')
-  @ApiOperation({ summary: 'Check API health status' })
-  @ApiResponse({ status: 200, description: 'API is healthy' })
+  @ApiOperation({ summary: 'Verifica status de saúde da API' })
+  @ApiResponse({ status: 200, description: 'API está saudável' })
   getHealth() {
     return this.appService.getHealthStatus();
   }

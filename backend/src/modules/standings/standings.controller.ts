@@ -19,7 +19,7 @@ import { StandingsService } from './standings.service';
 import { CreateStandingDto } from './dto/create-standing.dto';
 import { UpdateStandingDto } from './dto/update-standing.dto';
 
-@ApiTags('Standings')
+@ApiTags('Classificação')
 @Controller('standings')
 export class StandingsController {
   constructor(private readonly standingsService: StandingsService) {}

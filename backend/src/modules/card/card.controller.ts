@@ -19,7 +19,7 @@ import { CardService } from './card.service';
 import { CreateCardDto } from './dto/create-card.dto';
 import { UpdateCardDto } from './dto/update-card.dto';
 
-@ApiTags('Card')
+@ApiTags('Cartão')
 @Controller('card')
 export class CardController {
   constructor(private readonly cardService: CardService) {}

@@ -30,7 +30,7 @@ export class CreateMatchDto {
   @Min(1)
   awayTeamId: number;
 
-  @ApiPropertyOptional({ description: 'ID do delegado designado', example: 7 })
+  @ApiPropertyOptional({ description: 'ID do delegado atribuído', example: 7 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()

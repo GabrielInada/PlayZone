@@ -8,7 +8,7 @@ export class PlayerResponseDto {
   @Type(() => Number)
   id: number;
 
-  @ApiProperty({ example: 'João Silva' })
+  @ApiProperty({ example: 'John Silva' })
   @Expose()
   name: string;
 

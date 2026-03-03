@@ -38,7 +38,7 @@ type AuthenticatedRequest = {
   };
 };
 
-@ApiTags('User')
+@ApiTags('Usuário')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}

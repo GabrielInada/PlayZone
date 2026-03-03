@@ -19,7 +19,7 @@ import { MatchService } from './match.service';
 import { CreateMatchDto } from './dto/create-match.dto';
 import { UpdateMatchDto } from './dto/update-match.dto';
 
-@ApiTags('Match')
+@ApiTags('Partida')
 @Controller('match')
 export class MatchController {
   constructor(private readonly matchService: MatchService) {}
@@ -27,6 +27,7 @@ export class MatchController {
   @Post()
   @ApiOperation({ summary: 'Cria uma partida' })
   @ApiBody({ type: CreateMatchDto })
+  @ApiResponse({ status: 400, description: 'Dados inválidos para criação.' })
   @ApiResponse({ status: 201, description: 'Partida criada com sucesso.' })
   @ApiResponse({
     status: 404,
@@ -60,7 +61,11 @@ export class MatchController {
   @ApiOperation({ summary: 'Atualiza uma partida por ID' })
   @ApiParam({ name: 'id', type: Number })
   @ApiBody({ type: UpdateMatchDto })
-  @ApiResponse({ status: 400, description: 'ID inválido.' })
+  @ApiResponse({
+    status: 400,
+    description:
+      'ID inválido ou dados inválidos para atualização (ex.: mandante e visitante iguais).',
+  })
   @ApiResponse({ status: 200, description: 'Partida atualizada com sucesso.' })
   @ApiResponse({
     status: 404,

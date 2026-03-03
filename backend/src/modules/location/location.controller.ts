@@ -58,7 +58,7 @@ const locationUpdateSuccessExample = {
   updatedAt: '2026-03-02T15:05:00.000Z',
 };
 
-@ApiTags('Location')
+@ApiTags('Local')
 @Controller('location')
 export class LocationController {
   constructor(private readonly locationService: LocationService) {}

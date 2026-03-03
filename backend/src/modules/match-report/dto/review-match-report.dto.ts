@@ -6,14 +6,14 @@ export class ReviewMatchReportDto {
   @ApiProperty({
     enum: EnumReviewAction,
     example: EnumReviewAction.ACCEPT,
-    description: 'Ação da revisão da súmula',
+    description: 'Ação de revisão da súmula',
   })
   @IsEnum(EnumReviewAction, { message: 'A ação deve ser ACCEPT ou REJECT' })
   action: EnumReviewAction;
 
   @ApiPropertyOptional({
-    example: 'Erro no placar informado',
-    description: 'Motivo obrigatório quando action=REJECT',
+    example: 'Incorrect score informed in the report',
+    description: 'Motivo é obrigatório quando action=REJECT',
   })
   @ValidateIf(
     (dto: ReviewMatchReportDto) => dto.action === EnumReviewAction.REJECT,

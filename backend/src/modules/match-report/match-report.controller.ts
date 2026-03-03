@@ -24,7 +24,7 @@ import { CreateMatchReportDto } from './dto/create-match-report.dto';
 import { UpdateMatchReportDto } from './dto/update-match-report.dto';
 import { ReviewMatchReportDto } from './dto/review-match-report.dto';
 
-@ApiTags('Match Report')
+@ApiTags('Súmula')
 @Controller('match-report')
 export class MatchReportController {
   constructor(private readonly matchReportService: MatchReportService) {}

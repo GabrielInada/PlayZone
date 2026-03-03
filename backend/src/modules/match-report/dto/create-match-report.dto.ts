@@ -14,7 +14,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 export class CreateMatchReportDto {
   @ApiProperty({
     example: 1,
-    description: 'ID da partida relacionada à súmula',
+    description: 'ID da partida associada à súmula',
   })
   @Type(() => Number)
   @IsInt()
@@ -31,7 +31,7 @@ export class CreateMatchReportDto {
   awayScore: number;
 
   @ApiPropertyOptional({
-    example: 'Partida sem incidentes graves',
+    example: 'Match finished without major incidents',
     description: 'Observações gerais da partida',
   })
   @IsString()

@@ -31,7 +31,7 @@ type AuthenticatedRequest = {
   };
 };
 
-@ApiTags('Auth')
+@ApiTags('Autenticação')
 @Controller('auth')
 export class AuthController {
   constructor(

@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 import { IsInt, Min } from 'class-validator';
 
 export class CreateGoalDto {
-  @ApiProperty({ example: 10, description: 'ID do jogador autor do gol' })
+  @ApiProperty({ example: 10, description: 'ID do jogador que marcou o gol' })
   @Type(() => Number)
   @IsInt()
   @Min(1)
