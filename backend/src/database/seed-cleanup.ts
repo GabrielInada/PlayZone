@@ -79,7 +79,7 @@ async function run() {
     await clubRepo.delete({ id: In(demoClubIds) });
   }
 
-  await locationRepo
+  const locationsDeleteResult = await locationRepo
     .createQueryBuilder()
     .delete()
     .from(Location)
@@ -103,6 +103,7 @@ async function run() {
       matches: matchIds.length,
       teams: demoTeamIds.length,
       clubs: demoClubIds.length,
+      locations: locationsDeleteResult.affected ?? 0,
     },
   });
 

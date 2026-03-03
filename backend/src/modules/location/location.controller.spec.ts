@@ -30,7 +30,7 @@ describe('LocationController', () => {
   });
 
   it('delegates create to service', async () => {
-    const dto: any = { name: 'Arena', city: 'Belém' };
+    const dto: any = { name: 'Arena', address: 'Av. Perimetral, 2501' };
     const expected = { id: 1, ...dto };
     locationService.create.mockResolvedValue(expected);
 

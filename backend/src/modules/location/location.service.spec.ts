@@ -43,14 +43,14 @@ describe('LocationService', () => {
 
   it('creates and saves a location', async () => {
     const created = { id: 1, name: 'Arena' };
-    const saved = { id: 1, name: 'Arena', city: 'Belém' };
+    const saved = { id: 1, name: 'Arena', address: 'Av. Perimetral, 2501' };
 
     locationRepository.create.mockReturnValue(created);
     locationRepository.save.mockResolvedValue(saved);
 
     const result = await service.create({
       name: 'Arena',
-      city: 'Belém',
+      address: 'Av. Perimetral, 2501',
     } as any);
 
     expect(locationRepository.create).toHaveBeenCalled();

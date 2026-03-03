@@ -154,8 +154,7 @@ async function run() {
     locationRepo.save(
       locationRepo.create({
         name: `Arena Norte (${runId})`,
-        city: 'Belém',
-        state: 'PA',
+        address: 'Av. Norte, 1000 - Belém/PA',
         capacity: 800,
         createdAt: now,
         updatedAt: now,
@@ -164,8 +163,7 @@ async function run() {
     locationRepo.save(
       locationRepo.create({
         name: `Arena Sul (${runId})`,
-        city: 'Belém',
-        state: 'PA',
+        address: 'Av. Sul, 2000 - Belém/PA',
         capacity: 600,
         createdAt: now,
         updatedAt: now,

@@ -12,12 +12,6 @@ export class Location {
   @Column({ type: 'text', nullable: true })
   address?: string | null;
 
-  @Column({ type: 'varchar', nullable: true })
-  city?: string | null;
-
-  @Column({ type: 'varchar', nullable: true })
-  state?: string | null;
-
   @Column({ type: 'text', nullable: true })
   imageUrl?: string | null;
 

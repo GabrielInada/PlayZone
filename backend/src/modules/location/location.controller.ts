@@ -23,8 +23,6 @@ import { UpdateLocationDto } from './dto/update-location.dto';
 const locationCreateExample = {
   name: 'Ginásio da UFRA',
   address: 'Av. Perimetral, 2501',
-  city: 'Belém',
-  state: 'PA',
   capacity: 1200,
   imageUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...',
 };
@@ -44,8 +42,6 @@ const locationCreateSuccessExample = {
   id: 1,
   name: 'Ginásio da UFRA',
   address: 'Av. Perimetral, 2501',
-  city: 'Belém',
-  state: 'PA',
   capacity: 1200,
   imageUrl: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...',
   createdAt: '2026-03-02T15:00:00.000Z',
@@ -56,8 +52,6 @@ const locationUpdateSuccessExample = {
   id: 1,
   name: 'Ginásio da UFRA',
   address: 'Av. Perimetral, 2501',
-  city: 'Belém',
-  state: 'PA',
   capacity: 1500,
   imageUrl: 'https://cdn.example.com/locations/ginasio-ufra.jpg',
   createdAt: '2026-03-02T15:00:00.000Z',

@@ -18,16 +18,6 @@ export class CreateLocationDto {
   @IsString()
   address?: string;
 
-  @ApiPropertyOptional({ example: 'Belém', description: 'Cidade do local' })
-  @IsOptional()
-  @IsString()
-  city?: string;
-
-  @ApiPropertyOptional({ example: 'PA', description: 'Estado do local' })
-  @IsOptional()
-  @IsString()
-  state?: string;
-
   @ApiPropertyOptional({
     example: 1200,
     description: 'Capacidade máxima de pessoas no local',
