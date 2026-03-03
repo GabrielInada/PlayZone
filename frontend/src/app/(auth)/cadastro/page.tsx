@@ -8,11 +8,10 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import toast from 'react-hot-toast';
+import { useAuth } from "@/context/AuthContext";
 
-// ── Constantes ────────────────────────────────────────────────────────────────
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
-// ── Campos de texto ───────────────────────────────────────────────────────────
 const SIGNUP_FIELDS = [
   { name: 'name',            label: 'Nome Completo:', type: 'text',     placeholder: 'Seu nome' },
   { name: 'email',           label: 'Email:',          type: 'email',    placeholder: 'seu@email.com' },
@@ -20,18 +19,18 @@ const SIGNUP_FIELDS = [
   { name: 'confirmPassword', label: 'Confirmar Senha:',type: 'password', placeholder: 'Repita a senha' },
 ] as const;
 
-// ── Tipos de usuário (campo "type" da API) ────────────────────────────────────
-// POST /auth/signup espera: { name, email, password, type }
 const USER_TYPES = [
   { value: "clube",    label: "Clube" },
   { value: "delegado", label: "Delegado da Partida" },
   { value: "admin",    label: "Administrador" },
 ];
 
-// ── Página ────────────────────────────────────────────────────────────────────
 export default function SignupPage() {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
+  const router  = useRouter();
+  const { user } = useAuth();
+  const isAdmin = user?.type === "admin";
+
+  const [isLoading,       setIsLoading]       = useState(false);
   const [typeSelecionado, setTypeSelecionado] = useState("");
 
   const { register, handleSubmit, formState: { errors } } = useForm({
@@ -41,8 +40,9 @@ export default function SignupPage() {
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     try {
-      // POST /auth/signup — cria novo usuário
-      // O campo "type" é enviado diretamente (nome correto da API)
+      // Admin escolhe o tipo; demais usuários são cadastrados como "clube"
+      const type = isAdmin ? data.type : "clube";
+
       const res = await fetch(`${API_URL}/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -50,7 +50,7 @@ export default function SignupPage() {
           name:     data.name.trim(),
           email:    data.email.trim(),
           password: data.password,
-          type:     data.type, // "clube" | "delegado" | "admin"
+          type,
         }),
       });
 
@@ -68,7 +68,6 @@ export default function SignupPage() {
         return;
       }
 
-      // Trata erros conhecidos da API
       const errData = await res.json().catch(() => ({}));
 
       if (res.status === 409) {
@@ -111,7 +110,6 @@ export default function SignupPage() {
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-          {/* Campos de texto */}
           {SIGNUP_FIELDS.map((field) => (
             <div key={field.name}>
               <Input
@@ -128,28 +126,30 @@ export default function SignupPage() {
             </div>
           ))}
 
-          {/* Seleção de tipo — campo "type" enviado à API */}
-          <div className="flex flex-col gap-1 w-full">
-            <label className="text-sm font-bold text-gray-700">Selecione Seu Perfil:</label>
-            <select
-              {...register("type", {
-                onChange: (e) => setTypeSelecionado(e.target.value),
-              })}
-              className={`p-2 border border-[#004a1b] rounded-md bg-[#E8E8E8] outline-none focus:ring-2 focus:ring-green-600 transition-all ${
-                typeSelecionado === "" ? "text-gray-500" : "text-black"
-              }`}
-            >
-              <option value="">Escolha uma opção</option>
-              {USER_TYPES.map(({ value, label }) => (
-                <option key={value} value={value}>{label}</option>
-              ))}
-            </select>
-            {errors.type && (
-              <span className="text-red-600 text-[10px] font-bold uppercase mt-1">
-                {errors.type?.message as string}
-              </span>
-            )}
-          </div>
+          {/* Seleção de tipo — visível apenas para admin */}
+          {isAdmin && (
+            <div className="flex flex-col gap-1 w-full">
+              <label className="text-sm font-bold text-gray-700">Selecione Seu Perfil:</label>
+              <select
+                {...register("type", {
+                  onChange: (e) => setTypeSelecionado(e.target.value),
+                })}
+                className={`p-2 border border-[#004a1b] rounded-md bg-[#E8E8E8] outline-none focus:ring-2 focus:ring-green-600 transition-all ${
+                  typeSelecionado === "" ? "text-gray-500" : "text-black"
+                }`}
+              >
+                <option value="">Escolha uma opção</option>
+                {USER_TYPES.map(({ value, label }) => (
+                  <option key={value} value={value}>{label}</option>
+                ))}
+              </select>
+              {errors.type && (
+                <span className="text-red-600 text-[10px] font-bold uppercase mt-1">
+                  {errors.type?.message as string}
+                </span>
+              )}
+            </div>
+          )}
 
           <button
             type="submit"

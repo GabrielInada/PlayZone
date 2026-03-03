@@ -65,6 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const profile: User = await res.json();
         setUser(profile);
         localStorage.setItem('user', JSON.stringify(profile));
+        // Grava cookie para o middleware e Server Components lerem o tipo
+        setCookie('user-type', profile.type);
       })
       .catch(() => {
         localStorage.removeItem('token');

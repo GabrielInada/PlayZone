@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import { X } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
 interface ModalCriarCampeonatoProps {
   isOpen: boolean;
@@ -8,32 +11,59 @@ interface ModalCriarCampeonatoProps {
 }
 
 export default function ModalCriarCampeonato({ isOpen, onClose }: ModalCriarCampeonatoProps) {
-  const [ano, setAno] = useState("");
+  const { token } = useAuth();
+
+  const [nome,       setNome]       = useState("");
+  const [ano,        setAno]        = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error,      setError]      = useState<string | null>(null);
 
   if (!isOpen) return null;
 
-  // Função para permitir apenas números no campo de Ano
   const handleAnoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^\d*$/.test(value)) {
-      setAno(value);
-    }
+    if (/^\d*$/.test(value)) setAno(value);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Formulário enviado com sucesso!");
-    // Aqui viria a lógica de salvar no backend
+    setError(null);
+    setSubmitting(true);
+    try {
+      const res = await fetch(`${API_URL}/tournament`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({ name: nome.trim() }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        const msg  = Array.isArray(body?.message)
+          ? body.message.join(", ")
+          : (body?.message ?? `Erro ${res.status}`);
+        throw new Error(msg);
+      }
+
+      setNome(""); setAno(""); setError(null);
+      onClose();
+    } catch (err: any) {
+      setError(err.message ?? "Erro ao criar campeonato.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <div 
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-      onClick={onClose} // Fecha ao clicar fora
+      onClick={onClose}
     >
       <form 
         onSubmit={handleSubmit}
-        onClick={(e) => e.stopPropagation()} // Impede que o modal feche ao clicar nos inputs
+        onClick={(e) => e.stopPropagation()}
         data-testid="modal-criar-campeonato"
         className="bg-white w-full max-w-lg rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in duration-300"
       >
@@ -52,6 +82,13 @@ export default function ModalCriarCampeonato({ isOpen, onClose }: ModalCriarCamp
           </button>
         </div>
 
+        {/* Erro */}
+        {error && (
+          <div className="mx-6 mt-4 px-4 py-2.5 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 font-medium">
+            {error}
+          </div>
+        )}
+
         {/* Formulário */}
         <div className="p-6 space-y-5 text-gray-900">
           <div className="space-y-4">
@@ -60,7 +97,9 @@ export default function ModalCriarCampeonato({ isOpen, onClose }: ModalCriarCamp
               <input 
                 required
                 data-testid="input-nome-campeonato"
-                type="text" 
+                type="text"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
                 placeholder="Escreva o nome do campeonato"
                 className="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#007a33] outline-none font-medium"
               />
@@ -130,10 +169,11 @@ export default function ModalCriarCampeonato({ isOpen, onClose }: ModalCriarCamp
           </button>
           <button 
             type="submit"
+            disabled={submitting}
             data-testid="btn-confirmar-criacao"
-            className="px-8 py-2.5 bg-[#007a33] hover:bg-[#005f27] text-white rounded-lg font-bold shadow-sm transition-all active:scale-95 cursor-pointer text-sm"
+            className="px-8 py-2.5 bg-[#007a33] hover:bg-[#005f27] text-white rounded-lg font-bold shadow-sm transition-all active:scale-95 cursor-pointer text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Criar
+            {submitting ? "Criando..." : "Criar"}
           </button>
         </div>
       </form>

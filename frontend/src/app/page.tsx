@@ -1,3 +1,4 @@
+import { HOME_ROUTE, LOGIN_ROUTE } from "@/constants/routes";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -7,13 +8,9 @@ export default async function RootPage() {
   const userType = cookieStore.get("user-type")?.value;
 
   // Não autenticado → login
-  if (!token) redirect("/login");
+  if (!token) redirect(LOGIN_ROUTE);
 
   // Redireciona conforme o type do usuário
-  switch (userType) {
-    case "clube":    redirect("/home");
-    case "delegado": redirect("/home");
-    case "admin":    redirect("/home");
-    default:         redirect("/home");
-  }
+  redirect(HOME_ROUTE);
+  
 }

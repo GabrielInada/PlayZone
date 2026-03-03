@@ -1,8 +1,8 @@
-import AdminHeader from "@/app/(dashboard)/admin/AdminHeader";
-import AlertBanner from "@/app/(dashboard)/admin/AlertBanner";
-import StatCard from "@/app/(dashboard)/admin/StatCard";
-import ActionCard from "@/app/(dashboard)/admin/ActionCard";
-import RecentGames from "@/app/(dashboard)/admin/RecentGames";
+import AdminHeader from "@/app/(dashboard)/admin/components-admin/AdminHeader";
+import AlertBanner from "@/app/(dashboard)/admin/components-admin/AlertBanner";
+import StatCard from "@/app/(dashboard)/admin/components-admin/StatCard";
+import ActionCard from "@/app/(dashboard)/admin/components-admin/ActionCard";
+import RecentGames from "@/app/(dashboard)/admin/components-admin/RecentGames";
 import {
   ESTADIOS_ROUTE,
   SIGNUP_ROUTE,

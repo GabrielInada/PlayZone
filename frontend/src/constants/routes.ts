@@ -4,7 +4,7 @@ export const SIGNUP_ROUTE = "/cadastro";
 
 // ── Dashboard ─────────────────────────────────────────────────────────────────
 export const HOME_ROUTE     = "/home";
-export const ADMIN_ROUTE    = "/admin";
+export const ADMIN_ROUTE    = "/admin/home-admin";
 export const DELEGADO_ROUTE = "/delegado";
 export const CLUBE_ROUTE    = "/clube";
 
