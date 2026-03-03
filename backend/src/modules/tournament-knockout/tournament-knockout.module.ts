@@ -4,9 +4,10 @@ import { TournamentKnockoutService } from './tournament-knockout.service';
 import { TournamentKnockoutController } from './tournament-knockout.controller';
 import { TournamentKnockout } from './entities/tournament-knockout.entity';
 import { Match } from '../match/entities/match.entity';
+import { Tournament } from '../tournament/entities/tournament.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([TournamentKnockout, Match])],
+  imports: [TypeOrmModule.forFeature([TournamentKnockout, Match, Tournament])],
   controllers: [TournamentKnockoutController],
   providers: [TournamentKnockoutService],
 })

@@ -30,6 +30,8 @@ import { Standing } from '../standings/entities/standing.entity';
 import { StandingsModule } from '../standings/standings.module';
 import { TournamentKnockout } from '../tournament-knockout/entities/tournament-knockout.entity';
 import { TournamentKnockoutModule } from '../tournament-knockout/tournament-knockout.module';
+import { Tournament } from '../tournament/entities/tournament.entity';
+import { TournamentModule } from '../tournament/tournament.module';
 
 @Module({
   imports: [
@@ -74,6 +76,7 @@ import { TournamentKnockoutModule } from '../tournament-knockout/tournament-knoc
             Location,
             Standing,
             TournamentKnockout,
+            Tournament,
           ],
           migrations: [join(__dirname, '../../database/migrations/*{.ts,.js}')],
           migrationsRun,
@@ -92,6 +95,7 @@ import { TournamentKnockoutModule } from '../tournament-knockout/tournament-knoc
     LocationModule,
     AuthModule,
     StandingsModule,
+    TournamentModule,
     TournamentKnockoutModule,
   ],
   controllers: [AppController],

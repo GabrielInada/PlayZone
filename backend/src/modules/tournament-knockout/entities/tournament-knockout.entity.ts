@@ -1,5 +1,6 @@
 import { Match } from '../../match/entities/match.entity';
 import { Team } from '../../team/entities/team.entity';
+import { Tournament } from '../../tournament/entities/tournament.entity';
 import {
   Column,
   CreateDateColumn,
@@ -13,8 +14,8 @@ import {
 
 @Entity({ name: 'tournament_knockout' })
 @Index(
-  'IDX_tournament_knockout_stage_slot',
-  ['tournamentName', 'stage', 'slot'],
+  'IDX_tournament_knockout_tournament_stage_slot',
+  ['tournamentId', 'stage', 'slot'],
   { unique: true },
 )
 export class TournamentKnockout {
@@ -22,7 +23,13 @@ export class TournamentKnockout {
   id: number;
 
   @Column()
-  tournamentName: string;
+  tournamentId: number;
+
+  @ManyToOne(() => Tournament, (tournament) => tournament.knockouts, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'tournamentId' })
+  tournament: Tournament;
 
   @Column()
   stage: string;
@@ -30,8 +37,8 @@ export class TournamentKnockout {
   @Column({ default: 1 })
   roundOrder: number;
 
-  @Column()
-  slot: number;
+  @Column({ type: 'integer', nullable: true })
+  slot: number | null;
 
   @Column()
   @Index({ unique: true })
@@ -41,7 +48,7 @@ export class TournamentKnockout {
   @JoinColumn({ name: 'matchId' })
   match: Match;
 
-  @Column({ nullable: true })
+  @Column({ type: 'integer', nullable: true })
   winnerTeamId: number | null;
 
   @ManyToOne(() => Team, { nullable: true, onDelete: 'SET NULL' })

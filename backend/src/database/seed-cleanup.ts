@@ -11,6 +11,7 @@ import { Goal } from '../modules/goal/entities/goal.entity';
 import { Card } from '../modules/card/entities/card.entity';
 import { Standing } from '../modules/standings/entities/standing.entity';
 import { TournamentKnockout } from '../modules/tournament-knockout/entities/tournament-knockout.entity';
+import { Tournament } from '../modules/tournament/entities/tournament.entity';
 import { In, Like } from 'typeorm';
 
 async function run() {
@@ -27,6 +28,7 @@ async function run() {
   const cardRepo = dataSource.getRepository(Card);
   const standingRepo = dataSource.getRepository(Standing);
   const knockoutRepo = dataSource.getRepository(TournamentKnockout);
+  const tournamentRepo = dataSource.getRepository(Tournament);
 
   const demoTeams = await teamRepo.find({ where: { name: Like('Time Demo %') } });
   const demoTeamIds = demoTeams.map((team) => team.id);
@@ -49,12 +51,17 @@ async function run() {
       : [];
   const reportIds = reportsToDelete.map((report) => report.id);
 
-  const demoKnockoutRows = await knockoutRepo.find({
-    where: { tournamentName: Like('Demo Knockout %') },
+  const demoTournaments = await tournamentRepo.find({
+    where: { name: Like('Demo Knockout %') },
   });
+  const demoTournamentIds = demoTournaments.map((tournament) => tournament.id);
+  const demoKnockoutRows =
+    demoTournamentIds.length > 0
+      ? await knockoutRepo.find({ where: { tournamentId: In(demoTournamentIds) } })
+      : [];
 
-  if (demoKnockoutRows.length > 0) {
-    await knockoutRepo.remove(demoKnockoutRows);
+  if (demoTournaments.length > 0) {
+    await tournamentRepo.remove(demoTournaments);
   }
 
   if (reportIds.length > 0) {

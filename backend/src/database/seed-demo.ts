@@ -12,6 +12,7 @@ import { Goal } from '../modules/goal/entities/goal.entity';
 import { Card } from '../modules/card/entities/card.entity';
 import { Standing } from '../modules/standings/entities/standing.entity';
 import { TournamentKnockout } from '../modules/tournament-knockout/entities/tournament-knockout.entity';
+import { Tournament } from '../modules/tournament/entities/tournament.entity';
 import { EnumUserRole, EnumUserType } from '../types/user';
 import { EnumPlayerPosition } from '../types/player';
 import { EnumMatchStatus } from '../types/match';
@@ -45,11 +46,19 @@ async function run() {
   const cardRepo = dataSource.getRepository(Card);
   const standingRepo = dataSource.getRepository(Standing);
   const knockoutRepo = dataSource.getRepository(TournamentKnockout);
+  const tournamentRepo = dataSource.getRepository(Tournament);
 
   const runId = Date.now();
   const tournamentName = `Demo Knockout ${runId}`;
   const now = new Date();
   const hash = await bcrypt.hash('123456', 10);
+  const tournament = await tournamentRepo.save(
+    tournamentRepo.create({
+      name: tournamentName,
+      createdAt: now,
+      updatedAt: now,
+    }),
+  );
 
   const delegate = await userRepo.save(
     userRepo.create({
@@ -310,7 +319,7 @@ async function run() {
 
   await knockoutRepo.save([
     knockoutRepo.create({
-      tournamentName,
+      tournamentId: tournament.id,
       stage: 'SEMI_FINAL',
       roundOrder: 1,
       slot: 1,
@@ -320,7 +329,7 @@ async function run() {
       notes: 'Classificado via súmula validada',
     }),
     knockoutRepo.create({
-      tournamentName,
+      tournamentId: tournament.id,
       stage: 'SEMI_FINAL',
       roundOrder: 1,
       slot: 2,
@@ -330,7 +339,7 @@ async function run() {
       notes: 'Classificado via súmula validada',
     }),
     knockoutRepo.create({
-      tournamentName,
+      tournamentId: tournament.id,
       stage: 'FINAL',
       roundOrder: 2,
       slot: 1,

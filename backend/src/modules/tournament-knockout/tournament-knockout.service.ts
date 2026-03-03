@@ -11,6 +11,7 @@ import { TournamentKnockout } from './entities/tournament-knockout.entity';
 import { Repository } from 'typeorm';
 import { Match } from '../match/entities/match.entity';
 import { EnumMatchReportStatus } from '../../types/match-report';
+import { Tournament } from '../tournament/entities/tournament.entity';
 
 @Injectable()
 export class TournamentKnockoutService {
@@ -19,19 +20,24 @@ export class TournamentKnockoutService {
     private readonly tournamentKnockoutRepository: Repository<TournamentKnockout>,
     @InjectRepository(Match)
     private readonly matchRepository: Repository<Match>,
+    @InjectRepository(Tournament)
+    private readonly tournamentRepository: Repository<Tournament>,
   ) {}
 
   async create(createTournamentKnockoutDto: CreateTournamentKnockoutDto) {
+    await this.getTournamentOrThrow(createTournamentKnockoutDto.tournamentId);
     const match = await this.getMatchOrThrow(
       createTournamentKnockoutDto.matchId,
     );
 
     await this.ensureNoDuplicateMatch(createTournamentKnockoutDto.matchId);
-    await this.ensureNoDuplicateSlot(
-      createTournamentKnockoutDto.tournamentName,
-      createTournamentKnockoutDto.stage,
-      createTournamentKnockoutDto.slot,
-    );
+    if (createTournamentKnockoutDto.slot !== undefined) {
+      await this.ensureNoDuplicateSlot(
+        createTournamentKnockoutDto.tournamentId,
+        createTournamentKnockoutDto.stage,
+        createTournamentKnockoutDto.slot,
+      );
+    }
 
     const resolvedWinnerTeamId = this.resolveWinnerTeamId(
       match,
@@ -39,10 +45,10 @@ export class TournamentKnockoutService {
     );
 
     const row = this.tournamentKnockoutRepository.create({
-      tournamentName: createTournamentKnockoutDto.tournamentName,
+      tournamentId: createTournamentKnockoutDto.tournamentId,
       stage: createTournamentKnockoutDto.stage,
       roundOrder: createTournamentKnockoutDto.roundOrder ?? 1,
-      slot: createTournamentKnockoutDto.slot,
+      slot: createTournamentKnockoutDto.slot ?? null,
       matchId: createTournamentKnockoutDto.matchId,
       winnerTeamId: resolvedWinnerTeamId,
       isDecided: Boolean(resolvedWinnerTeamId),
@@ -55,6 +61,7 @@ export class TournamentKnockoutService {
   async findAll() {
     return this.tournamentKnockoutRepository.find({
       relations: [
+        'tournament',
         'match',
         'match.homeTeam',
         'match.awayTeam',
@@ -62,7 +69,7 @@ export class TournamentKnockoutService {
         'winnerTeam',
       ],
       order: {
-        tournamentName: 'ASC',
+        tournamentId: 'ASC',
         roundOrder: 'ASC',
         slot: 'ASC',
       },
@@ -73,6 +80,7 @@ export class TournamentKnockoutService {
     const row = await this.tournamentKnockoutRepository.findOne({
       where: { id },
       relations: [
+        'tournament',
         'match',
         'match.homeTeam',
         'match.awayTeam',
@@ -96,22 +104,24 @@ export class TournamentKnockoutService {
   ) {
     const existing = await this.findOne(id);
 
-    const nextTournamentName =
-      updateTournamentKnockoutDto.tournamentName ?? existing.tournamentName;
+    const nextTournamentId =
+      updateTournamentKnockoutDto.tournamentId ?? existing.tournamentId;
     const nextStage = updateTournamentKnockoutDto.stage ?? existing.stage;
-    const nextSlot = updateTournamentKnockoutDto.slot ?? existing.slot;
+    const nextSlot =
+      updateTournamentKnockoutDto.slot !== undefined
+        ? updateTournamentKnockoutDto.slot
+        : existing.slot;
     const nextMatchId = updateTournamentKnockoutDto.matchId ?? existing.matchId;
+
+    await this.getTournamentOrThrow(nextTournamentId);
 
     if (nextMatchId !== existing.matchId) {
       await this.ensureNoDuplicateMatch(nextMatchId, id);
     }
 
-    await this.ensureNoDuplicateSlot(
-      nextTournamentName,
-      nextStage,
-      nextSlot,
-      id,
-    );
+    if (nextSlot !== null) {
+      await this.ensureNoDuplicateSlot(nextTournamentId, nextStage, nextSlot, id);
+    }
 
     const match = await this.getMatchOrThrow(nextMatchId);
     const providedWinnerTeamId = updateTournamentKnockoutDto.winnerTeamId;
@@ -122,7 +132,7 @@ export class TournamentKnockoutService {
 
     const rowToUpdate = this.tournamentKnockoutRepository.merge(existing, {
       ...updateTournamentKnockoutDto,
-      tournamentName: nextTournamentName,
+      tournamentId: nextTournamentId,
       stage: nextStage,
       slot: nextSlot,
       matchId: nextMatchId,
@@ -150,6 +160,20 @@ export class TournamentKnockoutService {
     }
 
     return match;
+  }
+
+  private async getTournamentOrThrow(tournamentId: number) {
+    const tournament = await this.tournamentRepository.findOne({
+      where: { id: tournamentId },
+    });
+
+    if (!tournament) {
+      throw new NotFoundException(
+        `Campeonato com ID ${tournamentId} não encontrado`,
+      );
+    }
+
+    return tournament;
   }
 
   private resolveWinnerTeamId(match: Match, winnerTeamId?: number | null) {
@@ -196,13 +220,13 @@ export class TournamentKnockoutService {
   }
 
   private async ensureNoDuplicateSlot(
-    tournamentName: string,
+    tournamentId: number,
     stage: string,
     slot: number,
     excludeId?: number,
   ) {
     const existing = await this.tournamentKnockoutRepository.findOne({
-      where: { tournamentName, stage, slot },
+      where: { tournamentId, stage, slot },
     });
 
     if (existing && existing.id !== excludeId) {

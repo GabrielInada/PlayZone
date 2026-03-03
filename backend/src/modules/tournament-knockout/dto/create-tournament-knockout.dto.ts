@@ -10,11 +10,11 @@ import {
 } from 'class-validator';
 
 export class CreateTournamentKnockoutDto {
-  @ApiProperty({ example: 'PlayZone Cup 2026' })
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(120)
-  tournamentName: string;
+  @ApiProperty({ example: 1, description: 'ID do campeonato' })
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  tournamentId: number;
 
   @ApiProperty({ example: 'QUARTER_FINAL' })
   @IsString()
@@ -29,14 +29,15 @@ export class CreateTournamentKnockoutDto {
   @Min(1)
   roundOrder?: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 1,
-    description: 'Posição do confronto dentro da fase',
+    description: 'Posição do confronto dentro da fase (opcional)',
   })
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  slot: number;
+  slot?: number;
 
   @ApiProperty({
     example: 42,
@@ -57,7 +58,7 @@ export class CreateTournamentKnockoutDto {
   @Min(1)
   winnerTeamId?: number;
 
-  @ApiPropertyOptional({ example: 'Away team no-show (W.O.)' })
+  @ApiPropertyOptional({ example: 'W.O. do time visitante' })
   @IsOptional()
   @IsString()
   @MaxLength(500)

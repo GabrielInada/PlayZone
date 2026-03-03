@@ -11,6 +11,7 @@ import { Club } from '../modules/club/entities/club.entity';
 import { Location } from '../modules/location/entities/location.entity';
 import { Standing } from '../modules/standings/entities/standing.entity';
 import { TournamentKnockout } from '../modules/tournament-knockout/entities/tournament-knockout.entity';
+import { Tournament } from '../modules/tournament/entities/tournament.entity';
 import configuration from '../config/configuration';
 
 const { dbUrl } = configuration();
@@ -34,6 +35,7 @@ export default new DataSource({
     Location,
     Standing,
     TournamentKnockout,
+    Tournament,
   ],
   migrations: ['src/database/migrations/*.ts'],
   synchronize: false,

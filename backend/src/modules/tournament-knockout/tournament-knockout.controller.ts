@@ -34,7 +34,7 @@ export class TournamentKnockoutController {
       quarterFinalManualWinner: {
         summary: 'Quartas de final com vencedor definido manualmente',
         value: {
-          tournamentName: 'Copa PlayZone 2026',
+          tournamentId: 1,
           stage: 'QUARTER_FINAL',
           roundOrder: 1,
           slot: 1,
@@ -46,10 +46,9 @@ export class TournamentKnockoutController {
       semifinalInferWinner: {
         summary: 'Semifinal sem winnerTeamId (inferido de súmula validada)',
         value: {
-          tournamentName: 'Copa PlayZone 2026',
+          tournamentId: 1,
           stage: 'SEMI_FINAL',
           roundOrder: 2,
-          slot: 1,
           matchId: 57,
           notes: 'Aguardando revisão final da arbitragem',
         },
@@ -60,7 +59,7 @@ export class TournamentKnockoutController {
   @ApiResponse({ status: 404, description: 'Partida não encontrada.' })
   @ApiResponse({
     status: 409,
-    description: 'Conflito em matchId ou combinação de campeonato/fase/slot.',
+    description: 'Conflito em matchId ou combinação de campeonato/fase/slot quando informado.',
   })
   @ApiResponse({ status: 201, description: 'Confronto de mata-mata criado com sucesso.' })
   create(@Body() createTournamentKnockoutDto: CreateTournamentKnockoutDto) {
@@ -75,7 +74,7 @@ export class TournamentKnockoutController {
     example: [
       {
         id: 1,
-        tournamentName: 'Copa PlayZone 2026',
+        tournamentId: 1,
         stage: 'QUARTER_FINAL',
         roundOrder: 1,
         slot: 1,
@@ -114,7 +113,7 @@ export class TournamentKnockoutController {
     description: 'Confronto de mata-mata encontrado.',
     example: {
       id: 1,
-      tournamentName: 'Copa PlayZone 2026',
+          tournamentId: 1,
       stage: 'SEMI_FINAL',
       roundOrder: 2,
       slot: 1,
@@ -176,7 +175,7 @@ export class TournamentKnockoutController {
   @ApiResponse({ status: 404, description: 'Confronto de mata-mata ou partida não encontrada.' })
   @ApiResponse({
     status: 409,
-    description: 'Conflito em matchId ou combinação de campeonato/fase/slot.',
+    description: 'Conflito em matchId ou combinação de campeonato/fase/slot quando informado.',
   })
   @ApiResponse({
     status: 200,
