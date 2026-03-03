@@ -11,12 +11,17 @@ import { useAuth } from '@/context/AuthContext';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
-// ── Tipos ─────────────────────────────────────────────────────────────────────
 interface Tournament {
   id: number;
   name: string;
   createdAt: string;
   updatedAt: string;
+}
+
+interface KnockoutEntry {
+  id: number;
+  tournamentId: number;
+  isDecided: boolean;
 }
 
 interface Campeonato {
@@ -25,23 +30,21 @@ interface Campeonato {
   ano: string;
   status: string;
   formato: string;
+  totalPartidas: number;
 }
 
-// ── Página ────────────────────────────────────────────────────────────────────
 export default function CampeonatosPage() {
   const router          = useRouter();
   const { user, token } = useAuth();
   const isAdmin         = user?.type === "admin";
 
-  const [campeonatos,          setCampeonatos]          = useState<Campeonato[]>([]);
-  const [loading,              setLoading]              = useState(true);
-  const [searchTerm,           setSearchTerm]           = useState("");
-
-  const [isModalOpen,          setIsModalOpen]          = useState(false);
-  const [isExcluirModalOpen,   setIsExcluirModalOpen]   = useState(false);
-  const [isErroModalOpen,      setIsErroModalOpen]      = useState(false);
-  const [isEditarModalOpen,    setIsEditarModalOpen]    = useState(false);
-
+  const [campeonatos,           setCampeonatos]           = useState<Campeonato[]>([]);
+  const [loading,               setLoading]               = useState(true);
+  const [searchTerm,            setSearchTerm]            = useState("");
+  const [isModalOpen,           setIsModalOpen]           = useState(false);
+  const [isExcluirModalOpen,    setIsExcluirModalOpen]    = useState(false);
+  const [isErroModalOpen,       setIsErroModalOpen]       = useState(false);
+  const [isEditarModalOpen,     setIsEditarModalOpen]     = useState(false);
   const [campeonatoParaExcluir, setCampeonatoParaExcluir] = useState<Campeonato | null>(null);
   const [campeonatoParaEditar,  setCampeonatoParaEditar]  = useState<Campeonato | null>(null);
 
@@ -51,19 +54,37 @@ export default function CampeonatosPage() {
       const headers: Record<string, string> = token
         ? { Authorization: `Bearer ${token}` } : {};
 
-      const res  = await fetch(`${API_URL}/tournament`, { headers });
-      if (!res.ok) throw new Error(`Erro ${res.status}`);
-      const data: Tournament[] = await res.json();
+      // Busca torneios e confrontos em paralelo
+      const [tourRes, koRes] = await Promise.all([
+        fetch(`${API_URL}/tournament`,         { headers }),
+        fetch(`${API_URL}/tournament-knockout`, { headers }),
+      ]);
 
-      setCampeonatos(
-        (Array.isArray(data) ? data : []).map((t) => ({
-          id:      t.id,
-          nome:    t.name,
-          ano:     new Date(t.createdAt).getFullYear().toString(),
-          status:  "Em Andamento", // sem endpoint de status ainda — padrão
-          formato: "Mata-Mata",
-        }))
-      );
+      const tourData: Tournament[]    = tourRes.ok ? await tourRes.json() : [];
+      const koData:   KnockoutEntry[] = koRes.ok  ? await koRes.json()   : [];
+
+      const tournaments = Array.isArray(tourData) ? tourData : [];
+      const knockouts   = Array.isArray(koData)   ? koData   : [];
+
+      // Cruza cada torneio com seus confrontos pelo tournamentId
+      const mapped: Campeonato[] = tournaments.map((t) => {
+        const entries      = knockouts.filter((e) => e.tournamentId === t.id);
+        const finalizadas  = entries.filter((e) => e.isDecided).length;
+        const total        = entries.length;
+        const status       = total > 0 && finalizadas === total
+          ? "Finalizado" : "Em Andamento";
+
+        return {
+          id:            t.id,
+          nome:          t.name,
+          ano:           new Date(t.createdAt).getFullYear().toString(),
+          status,
+          formato:       "Mata-Mata",
+          totalPartidas: total,
+        };
+      });
+
+      setCampeonatos(mapped);
     } catch (err) {
       console.error("Erro ao carregar campeonatos:", err);
       setCampeonatos([]);
@@ -90,12 +111,9 @@ export default function CampeonatosPage() {
   const handleConfirmExcluir = async () => {
     if (!campeonatoParaExcluir) return;
     try {
-      const headers: Record<string, string> = {
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      };
       await fetch(`${API_URL}/tournament/${campeonatoParaExcluir.id}`, {
         method: "DELETE",
-        headers,
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       await loadCampeonatos();
     } catch (err) {
@@ -104,10 +122,6 @@ export default function CampeonatosPage() {
       setIsExcluirModalOpen(false);
       setCampeonatoParaExcluir(null);
     }
-  };
-
-  const handleGerenciar = (id: number, nome: string) => {
-    router.push(`/${encodeURIComponent(nome)}`);
   };
 
   return (
@@ -162,11 +176,11 @@ export default function CampeonatosPage() {
                   ano={camp.ano}
                   status={camp.status}
                   formato={camp.formato}
-                  totalPartidas={0}
+                  totalPartidas={camp.totalPartidas}
                   isAdmin={isAdmin}
                   onEdit={() => { setCampeonatoParaEditar(camp); setIsEditarModalOpen(true); }}
                   onDelete={() => handleOpenExcluir(camp)}
-                  onGerenciar={() => handleGerenciar(camp.id, camp.nome)}
+                  onGerenciar={() => router.push(`/${encodeURIComponent(camp.nome)}?id=${camp.id}`)}
                 />
               ))}
             </div>

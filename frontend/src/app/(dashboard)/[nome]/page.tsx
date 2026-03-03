@@ -9,14 +9,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
 interface KnockoutEntry {
   id: number;
-  tournamentName: string;
+  tournamentId: number;
   stage: string;
   isDecided: boolean;
   createdAt: string;
-  match?: { status: string };
 }
 
 interface TournamentInfo {
+  id: number;
   nome: string;
   totalPartidas: number;
   partidasFinalizadas: number;
@@ -25,8 +25,8 @@ interface TournamentInfo {
 }
 
 export default function GerenciarCampeonatoPage() {
-  const params  = useParams();
-  const router  = useRouter();
+  const params    = useParams();
+  const router    = useRouter();
   const { token } = useAuth();
 
   const [isAgendarModalOpen, setIsAgendarModalOpen] = useState(false);
@@ -46,25 +46,33 @@ export default function GerenciarCampeonatoPage() {
       try {
         const headers: Record<string, string> = token
           ? { Authorization: `Bearer ${token}` } : {};
-        const res  = await fetch(`${API_URL}/tournament-knockout`, { headers });
-        if (!res.ok) throw new Error();
-        const all: KnockoutEntry[] = await res.json();
 
-        const entries = all.filter(
-          (e) => e.tournamentName.toLowerCase() === nomeParam.toLowerCase()
-        );
+        // 1. Acha o torneio pelo nome da URL
+        const tourRes  = await fetch(`${API_URL}/tournament`, { headers });
+        if (!tourRes.ok) throw new Error();
+        const tourData = await tourRes.json();
+        const found = (Array.isArray(tourData) ? tourData : [])
+          .find((t: any) => t.name?.toLowerCase() === nomeParam.toLowerCase());
 
-        if (entries.length === 0) { setNotFound(true); return; }
+        if (!found) { setNotFound(true); return; }
+
+        // 2. Filtra knockouts pelo tournamentId
+        const koRes  = await fetch(`${API_URL}/tournament-knockout`, { headers });
+        if (!koRes.ok) throw new Error();
+        const koData: KnockoutEntry[] = await koRes.json();
+        const entries = (Array.isArray(koData) ? koData : [])
+          .filter((e) => e.tournamentId === found.id);
 
         const finalizadas = entries.filter((e) => e.isDecided).length;
-        const allDecided  = finalizadas === entries.length;
 
         setTournament({
-          nome:               entries[0].tournamentName,
-          totalPartidas:      entries.length,
+          id:                  found.id,
+          nome:                found.name,
+          totalPartidas:       entries.length,
           partidasFinalizadas: finalizadas,
-          status:             allDecided ? "Finalizado" : "Em Andamento",
-          ano:                new Date(entries[0].createdAt).getFullYear().toString(),
+          status:              entries.length > 0 && finalizadas === entries.length
+            ? "Finalizado" : "Em Andamento",
+          ano: new Date(found.createdAt).getFullYear().toString(),
         });
       } catch {
         setNotFound(true);
@@ -105,7 +113,6 @@ export default function GerenciarCampeonatoPage() {
     <div className="flex flex-col font-bold" data-testid="page-gerenciar-campeonato">
       <div className="w-full max-w-6xl mx-auto px-6 pt-10 pb-20 text-gray-900">
 
-        {/* Cabeçalho com dados reais */}
         <div className="mb-10 text-left">
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-3xl font-bold tracking-tight text-gray-900">
@@ -126,8 +133,6 @@ export default function GerenciarCampeonatoPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-
-          {/* Agendar nova partida — desabilitado se finalizado */}
           <button
             onClick={() => !isFinished && setIsAgendarModalOpen(true)}
             disabled={isFinished}
@@ -148,7 +153,6 @@ export default function GerenciarCampeonatoPage() {
             </div>
           </button>
 
-          {/* Importar Times — em desenvolvimento */}
           <button disabled className="flex items-center gap-5 p-6 bg-white border-2 border-gray-100 rounded-xl text-left opacity-50 cursor-not-allowed">
             <div className="p-4 bg-gray-100 rounded-xl">
               <Users size={36} className="text-gray-300" />
@@ -160,7 +164,6 @@ export default function GerenciarCampeonatoPage() {
           </button>
         </div>
 
-        {/* Ver Partidas */}
         <button
           onClick={() => router.push(`/${encodeURIComponent(tournament.nome)}/ver-partidas`)}
           className="w-full mb-12 flex items-center gap-5 p-6 bg-white border-2 border-gray-100 rounded-xl shadow-md hover:border-emerald-200 hover:shadow-md transition-all text-left group cursor-pointer"
