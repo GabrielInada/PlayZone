@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { Users } from 'lucide-react';
-import { CADASTRAR_TIME_ROUTE } from '@/constants/routes';
+import { CADASTRAR_TIME_ROUTE, VER_PARTIDAS } from '@/constants/routes';
 
 export default function HomeClubePage() {
   const router = useRouter();
@@ -36,7 +36,7 @@ export default function HomeClubePage() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
 
-        <div className="bg-white border border-gray-100 rounded-xl p-4 shadow-md flex justify-between items-center group hover:border-emerald-200 transition-colors">
+        <div  onClick={() => router.push(VER_PARTIDAS)} className="bg-white border border-gray-100 rounded-xl p-4 shadow-md flex justify-between items-center group hover:border-emerald-200 transition-colors">
           <div className="flex-1">
             <p className="text-[9px] font-bold text-gray-500 uppercase">Próxima Partida</p>
             <div className="text-lg md:text-xl font-bold text-gray-800 mt-0.5">Domingo, 18:00</div>

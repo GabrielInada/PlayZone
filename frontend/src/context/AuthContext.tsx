@@ -2,7 +2,6 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 
-// ── Tipos ─────────────────────────────────────────────────────────────────────
 interface User {
   id: number;
   name: string;
@@ -17,18 +16,12 @@ interface AuthContextValue {
   logout: () => void;
 }
 
-// ── Constantes ────────────────────────────────────────────────────────────────
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://play-zone-omega.vercel.app';
 
-// ── Context ───────────────────────────────────────────────────────────────────
 const AuthContext = createContext<AuthContextValue>({
-  user: null,
-  token: null,
-  isLoading: true,
-  logout: () => {},
+  user: null, token: null, isLoading: true, logout: () => {},
 });
 
-// ── Helpers de cookie ─────────────────────────────────────────────────────────
 function setCookie(name: string, value: string, days = 7) {
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
   document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
@@ -38,24 +31,32 @@ function deleteCookie(name: string) {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
 }
 
-// ── Provider ──────────────────────────────────────────────────────────────────
 export function AuthProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [user, setUser]       = useState<User | null>(null);
-  const [token, setToken]     = useState<string | null>(null);
+
+  // Inicializa direto do cache — sem esperar fetch
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const cached = localStorage.getItem('user');
+      return cached ? JSON.parse(cached) : null;
+    } catch { return null; }
+  });
+
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('token') ?? localStorage.getItem('access_token');
+  });
+
   const [isLoading, setIsLoading] = useState(true);
 
-  // Ao montar: lê token do localStorage e busca perfil
   useEffect(() => {
-    // Suporta tanto "token" quanto "access_token" (padrão NestJS)
     const savedToken = localStorage.getItem('token') ?? localStorage.getItem('access_token');
-    if (!savedToken) {
-      setIsLoading(false);
-      return;
-    }
+    if (!savedToken) { setIsLoading(false); return; }
 
     setToken(savedToken);
 
+    // Valida token em background e atualiza cache
     fetch(`${API_URL}/auth/profile`, {
       headers: { Authorization: `Bearer ${savedToken}` },
     })
@@ -63,10 +64,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!res.ok) throw new Error('Token inválido');
         const profile: User = await res.json();
         setUser(profile);
+        localStorage.setItem('user', JSON.stringify(profile));
       })
       .catch(() => {
-        // Token expirado ou inválido — limpa sessão
         localStorage.removeItem('token');
+        localStorage.removeItem('user');
         deleteCookie('auth-token');
         deleteCookie('user-type');
         setToken(null);
@@ -77,6 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     deleteCookie('auth-token');
     deleteCookie('user-type');
     setToken(null);
@@ -91,7 +94,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-// ── Hook ──────────────────────────────────────────────────────────────────────
 export function useAuth() {
   return useContext(AuthContext);
 }

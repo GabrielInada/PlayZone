@@ -14,6 +14,7 @@ export const CADASTRAR_TIME_ROUTE = "/cadastrar-time";
 // ── Campeonatos ───────────────────────────────────────────────────────────────
 export const CAMPEONATOS_ROUTE = "/campeonatos";
 export const CAMPEONATO_ROUTE = (nome: string) => `/${nome}`;
+export const VER_PARTIDAS = "/ver-partidas";
 
 // ── Estádios ──────────────────────────────────────────────────────────────────
 export const ESTADIOS_ROUTE          = "/estadios";

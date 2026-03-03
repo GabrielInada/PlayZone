@@ -7,21 +7,35 @@ import { Logo } from "../Logo";
 import { CAMPEONATOS_ROUTE, HOME_ROUTE, TABELAS_ROUTE } from "@/constants/routes";
 import { useAuth } from "@/context/AuthContext";
 
-// ── Tipos ─────────────────────────────────────────────────────────────────────
-interface NavLink {
-  label: string;
-  href: string;
-}
+interface NavLink { label: string; href: string; }
 
-// ── Label de exibição por type ────────────────────────────────────────────────
 const TYPE_LABEL: Record<string, string> = {
-  clube:    "Clube",
-  delegado: "Delegado",
-  admin:    "Admin",
+  clube: "Clube", delegado: "Delegado", admin: "Admin",
 };
 
-// ── Constantes estáticas ──────────────────────────────────────────────────────
-const NAV_LINKS: NavLink[] = [
+// Links visíveis por type — baseado na tabela de permissões
+const NAV_BY_TYPE: Record<string, NavLink[]> = {
+  clube: [
+    { label: "Início",      href: HOME_ROUTE },
+    { label: "Campeonatos", href: CAMPEONATOS_ROUTE },
+    { label: "Tabelas",     href: TABELAS_ROUTE },
+    { label: "Minha Conta", href: "#/conta" },
+  ],
+  delegado: [
+    { label: "Início",         href: HOME_ROUTE },
+    { label: "Campeonatos",    href: CAMPEONATOS_ROUTE },
+    { label: "Tabelas",        href: TABELAS_ROUTE },
+    { label: "Convocações",    href: "/convocacoes" },
+  ],
+  admin: [
+    { label: "Início",      href: HOME_ROUTE },
+    { label: "Campeonatos", href: CAMPEONATOS_ROUTE },
+    { label: "Tabelas",     href: TABELAS_ROUTE },
+    { label: "Estádios",    href: "/estadios" },
+  ],
+};
+
+const DEFAULT_LINKS: NavLink[] = [
   { label: "Início",      href: HOME_ROUTE },
   { label: "Campeonatos", href: CAMPEONATOS_ROUTE },
   { label: "Tabelas",     href: TABELAS_ROUTE },
@@ -31,12 +45,7 @@ const NAV_LINKS: NavLink[] = [
 const linkClass =
   "text-[#0a0f1a] font-semibold opacity-90 hover:opacity-100 hover:underline cursor-pointer transition-opacity";
 
-// ── Sub-componentes ───────────────────────────────────────────────────────────
-interface UserInfoProps {
-  name: string;
-  role: string;
-  iconSize?: number;
-}
+interface UserInfoProps { name: string; role: string; iconSize?: number; }
 
 function UserInfo({ name, role, iconSize = 10 }: UserInfoProps) {
   return (
@@ -66,53 +75,42 @@ function LogoutButton({ onClick, showLabel = false }: { onClick?: () => void; sh
   );
 }
 
-// ── Componente principal ──────────────────────────────────────────────────────
 export function Header() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
 
-  const displayName = user?.name ?? "Carregando...";
+  const displayName = user?.name ?? "";
   const displayRole = user?.type ? (TYPE_LABEL[user.type] ?? user.type) : "";
+  const navLinks    = user?.type ? (NAV_BY_TYPE[user.type] ?? DEFAULT_LINKS) : DEFAULT_LINKS;
 
-  const handleNav = (href: string) => {
-    setOpen(false);
-    router.push(href);
-  };
-
-  const handleLogout = () => {
-    setOpen(false);
-    logout();
-  };
+  const handleNav = (href: string) => { setOpen(false); router.push(href); };
+  const handleLogout = () => { setOpen(false); logout(); };
 
   return (
     <header className="bg-white">
       <ContainerHeader>
         <nav className="flex flex-col items-center gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
 
-          {/* Logo */}
           <div className="shrink-0 lg:flex lg:items-center">
             <div className="scale-[0.85] origin-center lg:scale-[0.75] lg:origin-left">
               <Logo />
             </div>
           </div>
 
-          {/* Links — desktop */}
           <div className="hidden lg:flex flex-1 items-center justify-center gap-10">
-            {NAV_LINKS.map(({ label, href }) => (
+            {navLinks.map(({ label, href }) => (
               <a key={href} onClick={() => handleNav(href)} className={linkClass}>
                 {label}
               </a>
             ))}
           </div>
 
-          {/* Usuário + Sair — desktop */}
           <div className="hidden lg:flex items-center gap-15">
-            <UserInfo name={displayName} role={displayRole} />
+            {displayName && <UserInfo name={displayName} role={displayRole} />}
             <LogoutButton onClick={handleLogout} />
           </div>
 
-          {/* Hambúrguer — mobile */}
           <button
             type="button"
             className="inline-flex lg:hidden items-center justify-center rounded-lg border border-black/10 p-2 cursor-pointer"
@@ -122,25 +120,18 @@ export function Header() {
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
 
-          {/* Dropdown — mobile */}
           {open && (
-            <div
-              className="w-full rounded-xl border border-black/10 bg-white shadow-lg lg:hidden p-4 mt-2"
-              role="dialog"
-              aria-modal="true"
-            >
+            <div className="w-full rounded-xl border border-black/10 bg-white shadow-lg lg:hidden p-4 mt-2" role="dialog" aria-modal="true">
               <div className="pb-4 border-b border-black/10">
-                <UserInfo name={displayName} role={displayRole} iconSize={12} />
+                {displayName && <UserInfo name={displayName} role={displayRole} iconSize={12} />}
               </div>
-
               <div className="flex flex-col gap-3 pt-4">
-                {NAV_LINKS.map(({ label, href }) => (
+                {navLinks.map(({ label, href }) => (
                   <a key={href} onClick={() => handleNav(href)} className={linkClass}>
                     {label}
                   </a>
                 ))}
               </div>
-
               <div className="pt-4">
                 <LogoutButton showLabel onClick={handleLogout} />
               </div>
@@ -148,7 +139,6 @@ export function Header() {
           )}
         </nav>
 
-        {/* Divider — desktop */}
         <hr className="hidden lg:block border-t-2 border-black/30" />
       </ContainerHeader>
     </header>
