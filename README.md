@@ -9,6 +9,8 @@ O **PlayZone** é um **sistema web desenvolvido para o gerenciamento de campeona
 
 O projeto foi desenvolvido como parte de atividades acadêmicas, aplicando conceitos de **engenharia de software, desenvolvimento web e integração frontend/backend**.
 
+link do youtube: https://youtu.be/Yme7WqIITl8
+
 🌐 **Demo online:**  
 https://play-zone-omega.vercel.app
 
