@@ -28,4 +28,5 @@ export default () => ({
   bootstrapAdminEmail: process.env.BOOTSTRAP_ADMIN_EMAIL,
   bootstrapAdminPassword: process.env.BOOTSTRAP_ADMIN_PASSWORD,
   bootstrapAdminType: process.env.BOOTSTRAP_ADMIN_TYPE,
+  bootstrapAdminCreateAllTypes: process.env.BOOTSTRAP_ADMIN_CREATE_ALL_TYPES,
 });

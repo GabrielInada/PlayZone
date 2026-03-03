@@ -4,6 +4,13 @@ import * as bcrypt from 'bcryptjs';
 import { UserService } from '../user/user.service';
 import { EnumUserRole, EnumUserType } from '../../types/user';
 
+const ALL_ADMIN_TYPES: EnumUserType[] = [
+  EnumUserType.ADMIN,
+  EnumUserType.JOGADOR,
+  EnumUserType.CLUBE,
+  EnumUserType.DELEGADO,
+];
+
 @Injectable()
 export class BootstrapAdminService implements OnApplicationBootstrap {
   private readonly logger = new Logger(BootstrapAdminService.name);
@@ -41,6 +48,9 @@ export class BootstrapAdminService implements OnApplicationBootstrap {
     const adminTypeRaw =
       this.configService.get<string>('bootstrapAdminType') ||
       EnumUserType.DELEGADO;
+    const createAllTypes = this.readBoolean(
+      this.configService.get<string>('bootstrapAdminCreateAllTypes'),
+    );
 
     if (!adminEmail || !adminPassword) {
       throw new Error(
@@ -60,35 +70,67 @@ export class BootstrapAdminService implements OnApplicationBootstrap {
       );
     }
 
-    const normalizedEmail = adminEmail.toLowerCase();
-    const foundUser = await this.userService.findByEmail(normalizedEmail);
+    const passwordHash = await bcrypt.hash(adminPassword, 10);
+    const normalizedBaseEmail = adminEmail.toLowerCase();
+
+    if (createAllTypes) {
+      for (const type of ALL_ADMIN_TYPES) {
+        const emailForType = this.buildEmailForType(normalizedBaseEmail, type);
+        const nameForType = `${adminName} (${type})`;
+
+        await this.createOrSkipAdmin({
+          email: emailForType,
+          name: nameForType,
+          type,
+          passwordHash,
+        });
+      }
+
+      return;
+    }
+
+    await this.createOrSkipAdmin({
+      email: normalizedBaseEmail,
+      name: adminName,
+      type: adminTypeRaw as EnumUserType,
+      passwordHash,
+    });
+  }
+
+  private async createOrSkipAdmin(params: {
+    email: string;
+    name: string;
+    type: EnumUserType;
+    passwordHash: string;
+  }) {
+    const { email, name, type, passwordHash } = params;
+
+    const foundUser = await this.userService.findByEmail(email);
 
     if (foundUser) {
       if (foundUser.role === EnumUserRole.ADMIN) {
-        this.logger.log('Bootstrap admin already exists. Skipping creation.');
+        this.logger.log(`Bootstrap admin already exists (${email}). Skipping.`);
         return;
       }
 
       this.logger.warn(
-        `Bootstrap admin email already belongs to a non-admin user (${normalizedEmail}). Skipping creation.`,
+        `Bootstrap admin email already belongs to a non-admin user (${email}). Skipping creation.`,
       );
       return;
     }
 
-    const passwordHash = await bcrypt.hash(adminPassword, 10);
-
     try {
       await this.userService.createWithRole(
         {
-          name: adminName,
-          email: normalizedEmail,
+          name,
+          email,
           password: passwordHash,
-          type: adminTypeRaw as EnumUserType,
+          type,
         },
         EnumUserRole.ADMIN,
       );
 
-      this.logger.log(`Bootstrap admin created: ${normalizedEmail}`);
+      this.logger.log(`Bootstrap admin created: ${email} (${type})`);
     } catch (error) {
       const conflictByUniqueEmail =
         typeof error === 'object' &&
@@ -100,20 +142,36 @@ export class BootstrapAdminService implements OnApplicationBootstrap {
         throw error;
       }
 
-      const userAfterConflict =
-        await this.userService.findByEmail(normalizedEmail);
+      const userAfterConflict = await this.userService.findByEmail(email);
 
       if (userAfterConflict?.role === EnumUserRole.ADMIN) {
         this.logger.log(
-          'Bootstrap admin already created by another instance. Skipping.',
+          `Bootstrap admin already created by another instance (${email}). Skipping.`,
         );
         return;
       }
 
       this.logger.warn(
-        `Bootstrap admin email already exists with non-admin role (${normalizedEmail}). Skipping creation.`,
+        `Bootstrap admin email already exists with non-admin role (${email}). Skipping creation.`,
       );
     }
+  }
+
+  private buildEmailForType(baseEmail: string, type: EnumUserType): string {
+    if (type === EnumUserType.ADMIN) {
+      return baseEmail;
+    }
+
+    const atIndex = baseEmail.indexOf('@');
+    if (atIndex <= 0 || atIndex === baseEmail.length - 1) {
+      throw new Error(
+        `BOOTSTRAP_ADMIN_EMAIL must be a valid email to generate all types. Received: ${baseEmail}`,
+      );
+    }
+
+    const local = baseEmail.slice(0, atIndex);
+    const domain = baseEmail.slice(atIndex + 1);
+    return `${local}+${type}@${domain}`;
   }
 
   private readBoolean(value: string | undefined): boolean {

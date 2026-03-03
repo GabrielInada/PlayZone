@@ -4,6 +4,7 @@ export enum EnumUserRole {
 }
 
 export enum EnumUserType {
+  ADMIN = 'admin',
   DELEGADO = 'delegado',
   CLUBE = 'clube',
   JOGADOR = 'jogador',

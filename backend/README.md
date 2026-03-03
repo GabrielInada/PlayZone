@@ -234,12 +234,19 @@ BOOTSTRAP_ADMIN_NAME=PlayZone Admin
 BOOTSTRAP_ADMIN_EMAIL=admin@playzone.com
 BOOTSTRAP_ADMIN_PASSWORD=troque-por-uma-senha-forte
 BOOTSTRAP_ADMIN_TYPE=delegado
+BOOTSTRAP_ADMIN_CREATE_ALL_TYPES=true
 ```
 
 Regras importantes:
 
 - Se já existir usuário com esse email e role `admin`, nada é criado.
 - Se existir usuário com esse email mas role diferente, a criação é ignorada e um warning é emitido.
+- Com `BOOTSTRAP_ADMIN_CREATE_ALL_TYPES=true`, o bootstrap cria 4 combinações de admin (sempre com role `admin`):
+  - `admin` + `admin` com email base (`admin@playzone.com`)
+  - `admin` + `jogador` com alias (`admin+jogador@playzone.com`)
+  - `admin` + `clube` com alias (`admin+clube@playzone.com`)
+  - `admin` + `delegado` com alias (`admin+delegado@playzone.com`)
+- Se `BOOTSTRAP_ADMIN_CREATE_ALL_TYPES=false`, o bootstrap cria apenas um admin usando `BOOTSTRAP_ADMIN_TYPE`.
 - Em produção, o bootstrap só roda se também definir:
 
 ```env
