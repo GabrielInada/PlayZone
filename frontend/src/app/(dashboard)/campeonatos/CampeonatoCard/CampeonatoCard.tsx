@@ -17,7 +17,9 @@ export function CampeonatoCard({
   nome, ano, status, formato, totalPartidas,
   isAdmin, onDelete, onEdit, onGerenciar,
 }: CampeonatoCardProps) {
-  const isEmAndamento = status === "Em Andamento";
+  // Finalizado se: sem partidas vinculadas OU todas as partidas com status "Finalizado"
+  const displayStatus  = totalPartidas === 0 || status === "Finalizado" ? "Finalizado" : "Em Andamento";
+  const isEmAndamento  = displayStatus === "Em Andamento";
 
   return (
     <div
@@ -47,7 +49,7 @@ export function CampeonatoCard({
                 ? "bg-[#dcfce7] text-[#166534] border-[#bbf7d0]"
                 : "bg-gray-100 text-gray-500 border-gray-200"
             }`}>
-              {status}
+              {displayStatus}
             </span>
           </div>
         </div>
@@ -60,7 +62,7 @@ export function CampeonatoCard({
               ? "bg-[#dcfce7] text-[#166534] border-[#bbf7d0]"
               : "bg-gray-100 text-gray-500 border-gray-200"
           }`}>
-            {status}
+            {displayStatus}
           </span>
           <p className="text-sm font-bold text-gray-900 whitespace-nowrap">
             Formato: <span className="font-medium text-gray-800 ml-1">{formato}</span>
@@ -79,7 +81,6 @@ export function CampeonatoCard({
             Gerenciar
           </button>
 
-          {/* Editar e Excluir — apenas admin */}
           {isAdmin && (
             <div className="flex items-center border-l border-gray-200 ml-1 pl-3 gap-2">
               <button

@@ -11,11 +11,11 @@ import { useAuth } from '@/context/AuthContext';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
+// ── Tipos ─────────────────────────────────────────────────────────────────────
 interface Tournament {
   id: number;
   name: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 interface KnockoutEntry {
@@ -31,8 +31,28 @@ interface Campeonato {
   status: string;
   formato: string;
   totalPartidas: number;
+  entries: KnockoutEntry[];
 }
 
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function buildCampeonatos(tournaments: Tournament[], knockouts: KnockoutEntry[]): Campeonato[] {
+  return tournaments.map((t) => {
+    const entries = knockouts.filter((e) => e.tournamentId === t.id);
+    const status  = entries.length === 0 || entries.every((e) => e.isDecided)
+      ? "Finalizado" : "Em Andamento";
+    return {
+      id:            t.id,
+      nome:          t.name,
+      ano:           new Date(t.createdAt).getFullYear().toString(),
+      status,
+      formato:       "Mata-Mata",
+      totalPartidas: entries.length,
+      entries,
+    };
+  });
+}
+
+// ── Página ────────────────────────────────────────────────────────────────────
 export default function CampeonatosPage() {
   const router          = useRouter();
   const { user, token } = useAuth();
@@ -45,7 +65,7 @@ export default function CampeonatosPage() {
   const [isExcluirModalOpen,    setIsExcluirModalOpen]    = useState(false);
   const [isErroModalOpen,       setIsErroModalOpen]       = useState(false);
   const [isEditarModalOpen,     setIsEditarModalOpen]     = useState(false);
-  const [campeonatoParaExcluir, setCampeonatoParaExcluir] = useState<Campeonato | null>(null);
+  const [campeonatoParaExcluir, setCampeonatoParaExcluir] = useState<string | null>(null); // nome usado como key de display
   const [campeonatoParaEditar,  setCampeonatoParaEditar]  = useState<Campeonato | null>(null);
 
   const loadCampeonatos = useCallback(async () => {
@@ -53,38 +73,16 @@ export default function CampeonatosPage() {
     try {
       const headers: Record<string, string> = token
         ? { Authorization: `Bearer ${token}` } : {};
-
-      // Busca torneios e confrontos em paralelo
       const [tourRes, koRes] = await Promise.all([
         fetch(`${API_URL}/tournament`,         { headers }),
         fetch(`${API_URL}/tournament-knockout`, { headers }),
       ]);
-
-      const tourData: Tournament[]    = tourRes.ok ? await tourRes.json() : [];
-      const koData:   KnockoutEntry[] = koRes.ok  ? await koRes.json()   : [];
-
-      const tournaments = Array.isArray(tourData) ? tourData : [];
-      const knockouts   = Array.isArray(koData)   ? koData   : [];
-
-      // Cruza cada torneio com seus confrontos pelo tournamentId
-      const mapped: Campeonato[] = tournaments.map((t) => {
-        const entries      = knockouts.filter((e) => e.tournamentId === t.id);
-        const finalizadas  = entries.filter((e) => e.isDecided).length;
-        const total        = entries.length;
-        const status       = total > 0 && finalizadas === total
-          ? "Finalizado" : "Em Andamento";
-
-        return {
-          id:            t.id,
-          nome:          t.name,
-          ano:           new Date(t.createdAt).getFullYear().toString(),
-          status,
-          formato:       "Mata-Mata",
-          totalPartidas: total,
-        };
-      });
-
-      setCampeonatos(mapped);
+      const tournaments: Tournament[]    = tourRes.ok ? await tourRes.json() : [];
+      const knockouts:   KnockoutEntry[] = koRes.ok   ? await koRes.json()   : [];
+      setCampeonatos(buildCampeonatos(
+        Array.isArray(tournaments) ? tournaments : [],
+        Array.isArray(knockouts)   ? knockouts   : [],
+      ));
     } catch (err) {
       console.error("Erro ao carregar campeonatos:", err);
       setCampeonatos([]);
@@ -100,21 +98,24 @@ export default function CampeonatosPage() {
   );
 
   const handleOpenExcluir = (camp: Campeonato) => {
-    if (camp.status === "Em Andamento") {
+    // Bloqueia apenas se tiver partidas E alguma ainda não finalizada
+    const temPartidasEmAndamento = camp.totalPartidas > 0 && camp.status !== "Finalizado";
+    if (temPartidasEmAndamento) {
       setIsErroModalOpen(true);
     } else {
-      setCampeonatoParaExcluir(camp);
+      setCampeonatoParaExcluir(camp.nome);
       setIsExcluirModalOpen(true);
     }
   };
 
   const handleConfirmExcluir = async () => {
     if (!campeonatoParaExcluir) return;
+    const camp = campeonatos.find((c) => c.nome === campeonatoParaExcluir);
+    if (!camp) return;
     try {
-      await fetch(`${API_URL}/tournament/${campeonatoParaExcluir.id}`, {
-        method: "DELETE",
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      const headers: Record<string, string> = token
+        ? { Authorization: `Bearer ${token}` } : {};
+      await fetch(`${API_URL}/tournament/${camp.id}`, { method: "DELETE", headers });
       await loadCampeonatos();
     } catch (err) {
       console.error("Erro ao excluir campeonato:", err);
@@ -171,7 +172,7 @@ export default function CampeonatosPage() {
             <div className="flex flex-col gap-4" data-testid="lista-campeonatos">
               {filtrados.map((camp) => (
                 <CampeonatoCard
-                  key={camp.id}
+                  key={camp.nome}
                   nome={camp.nome}
                   ano={camp.ano}
                   status={camp.status}
@@ -180,7 +181,7 @@ export default function CampeonatosPage() {
                   isAdmin={isAdmin}
                   onEdit={() => { setCampeonatoParaEditar(camp); setIsEditarModalOpen(true); }}
                   onDelete={() => handleOpenExcluir(camp)}
-                  onGerenciar={() => router.push(`/${encodeURIComponent(camp.nome)}?id=${camp.id}`)}
+                  onGerenciar={() => router.push(`/${encodeURIComponent(camp.nome)}`)}
                 />
               ))}
             </div>

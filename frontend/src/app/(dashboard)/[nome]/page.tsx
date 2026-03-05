@@ -1,9 +1,10 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CalendarPlus, Users, Clock, Loader2, Trophy } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import ModalAgendarPartida from '@/components/ModalAgendarPartida';
 import { useAuth } from '@/context/AuthContext';
+import toast from 'react-hot-toast';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
@@ -38,10 +39,7 @@ export default function GerenciarCampeonatoPage() {
     ? decodeURIComponent(params.nome as string)
     : null;
 
-  useEffect(() => {
-    if (!nomeParam) { setNotFound(true); setLoading(false); return; }
-
-    const load = async () => {
+  const load = useCallback(async () => {
       setLoading(true);
       try {
         const headers: Record<string, string> = token
@@ -79,10 +77,12 @@ export default function GerenciarCampeonatoPage() {
       } finally {
         setLoading(false);
       }
-    };
-
-    load();
   }, [nomeParam, token]);
+
+  useEffect(() => {
+    if (!nomeParam) { setNotFound(true); setLoading(false); return; }
+    load();
+  }, [load, nomeParam]);
 
   if (loading) {
     return (
@@ -165,7 +165,16 @@ export default function GerenciarCampeonatoPage() {
         </div>
 
         <button
-          onClick={() => router.push(`/${encodeURIComponent(tournament.nome)}/ver-partidas`)}
+          onClick={() => {
+            if (tournament.totalPartidas === 0) {
+              toast.error("Nenhuma partida cadastrada neste campeonato.", {
+                position: "bottom-right",
+                style: { borderRadius: "8px", fontFamily: "Roboto, sans-serif" },
+              });
+              return;
+            }
+            router.push(`/${encodeURIComponent(tournament.nome)}/ver-partidas`);
+          }}
           className="w-full mb-12 flex items-center gap-5 p-6 bg-white border-2 border-gray-100 rounded-xl shadow-md hover:border-emerald-200 hover:shadow-md transition-all text-left group cursor-pointer"
         >
           <div className="p-4 bg-gray-100 rounded-xl group-hover:bg-green-50 transition-colors">
@@ -189,7 +198,7 @@ export default function GerenciarCampeonatoPage() {
 
       <ModalAgendarPartida
         isOpen={isAgendarModalOpen}
-        onClose={() => setIsAgendarModalOpen(false)}
+        onClose={() => { setIsAgendarModalOpen(false); setTimeout(() => load(), 800); }}
         nomeCampeonato={tournament.nome}
       />
     </div>

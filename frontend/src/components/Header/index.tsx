@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRightFromLineIcon, CircleUserIcon, Menu, X } from "lucide-react";
 import { ContainerHeader } from "../ContainerHeader";
@@ -13,7 +13,6 @@ const TYPE_LABEL: Record<string, string> = {
   clube: "Clube", delegado: "Delegado", admin: "Admin",
 };
 
-// Links visíveis por type — baseado na tabela de permissões
 const NAV_BY_TYPE: Record<string, NavLink[]> = {
   clube: [
     { label: "Início",      href: HOME_ROUTE },
@@ -22,10 +21,10 @@ const NAV_BY_TYPE: Record<string, NavLink[]> = {
     { label: "Minha Conta", href: "#/conta" },
   ],
   delegado: [
-    { label: "Início",         href: HOME_ROUTE },
-    { label: "Campeonatos",    href: CAMPEONATOS_ROUTE },
-    { label: "Tabelas",        href: TABELAS_ROUTE },
-    { label: "Convocações",    href: "/convocacoes" },
+    { label: "Início",      href: HOME_ROUTE },
+    { label: "Campeonatos", href: CAMPEONATOS_ROUTE },
+    { label: "Tabelas",     href: TABELAS_ROUTE },
+    { label: "Convocações", href: "/convocacoes" },
   ],
   admin: [
     { label: "Início",      href: HOME_ROUTE },
@@ -45,9 +44,7 @@ const DEFAULT_LINKS: NavLink[] = [
 const linkClass =
   "text-[#0a0f1a] font-semibold opacity-90 hover:opacity-100 hover:underline cursor-pointer transition-opacity";
 
-interface UserInfoProps { name: string; role: string; iconSize?: number; }
-
-function UserInfo({ name, role, iconSize = 10 }: UserInfoProps) {
+function UserInfo({ name, role, iconSize = 10 }: { name: string; role: string; iconSize?: number }) {
   return (
     <div className="flex items-center gap-3">
       <CircleUserIcon className={`h-${iconSize} w-${iconSize} text-[#044710]`} />
@@ -78,13 +75,28 @@ function LogoutButton({ onClick, showLabel = false }: { onClick?: () => void; sh
 export function Header() {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const { user, logout } = useAuth();
+  const { user: ctxUser, logout } = useAuth();
+
+  // Lê do localStorage imediatamente — sem esperar o contexto resolver
+  // Isso elimina o flicker: o Header já renderiza com os dados certos no primeiro frame
+  const cachedUser = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = localStorage.getItem("user");
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }, []);
+
+  // Usa o contexto se disponível, senão usa o cache local imediato
+  const user = ctxUser ?? cachedUser;
 
   const displayName = user?.name ?? "";
   const displayRole = user?.type ? (TYPE_LABEL[user.type] ?? user.type) : "";
   const navLinks    = user?.type ? (NAV_BY_TYPE[user.type] ?? DEFAULT_LINKS) : DEFAULT_LINKS;
 
-  const handleNav = (href: string) => { setOpen(false); router.push(href); };
+  const handleNav    = (href: string) => { setOpen(false); router.push(href); };
   const handleLogout = () => { setOpen(false); logout(); };
 
   return (

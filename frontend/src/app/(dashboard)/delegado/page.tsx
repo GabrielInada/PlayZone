@@ -1,49 +1,31 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DelegateHeader from "@/components/delegado/DelegateHeader";
 import ResponsibilityBanner from "@/components/delegado/ResponsibilityBanner";
 import StatCard from "@/components/delegado/StatCard";
 import CurrentMatchCard from "@/components/delegado/CurrentMatchCard";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Loader2, ChevronRight } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 import {
   DELEGADO_ROUTE,
   SUMULA_ROUTE,
+  CONVOCACOES_ROUTE,
 } from "@/constants/routes";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+
 // ── Tipos ─────────────────────────────────────────────────────────────────────
-type DelegateStats = {
-  assignedMatches: number;
-  approvedReports: number;
-  upcomingMatches: number;
-};
-
-type CurrentMatch = {
-  id: string;
-  stadiumName: string;
-  address: string;
-  city: string;
-  spectators: number;
-  teams: string;
-  imageUrl: string;
-};
-
-// ── Mock ──────────────────────────────────────────────────────────────────────
-const mockStats: DelegateStats = {
-  assignedMatches: 3,
-  approvedReports: 5,
-  upcomingMatches: 3,
-};
-
-const mockCurrentMatch: CurrentMatch = {
-  id:          "match-001",
-  stadiumName: "Estádio da UFPA",
-  address:     "Rod. Augusto Montenegro, 524",
-  city:        "Castanheira, Belém",
-  spectators:  11970,
-  teams:       "Remo x Paysandu",
-  imageUrl:    "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=1200&q=80",
-};
+interface Match {
+  id: number;
+  date: string;
+  status: string;
+  homeTeam:  { id: number; name: string };
+  awayTeam:  { id: number; name: string };
+  location?: { id: number; name: string; address?: string; capacity?: number; imageUrl?: string };
+  delegate?: { id: number; name: string };
+  report?:   { id: number; status: string; homeScore: number; awayScore: number } | null;
+}
 
 // ── Ícones SVG ────────────────────────────────────────────────────────────────
 const IconCalendar = (
@@ -69,7 +51,6 @@ const IconTrophy = (
   </svg>
 );
 
-// ── Motivos de cancelamento ───────────────────────────────────────────────────
 const MOTIVOS_CANCELAMENTO = [
   { id: "chuva",  label: "Chuva Forte" },
   { id: "calor",  label: "Calor Excessivo" },
@@ -79,10 +60,47 @@ const MOTIVOS_CANCELAMENTO = [
 
 // ── Página ────────────────────────────────────────────────────────────────────
 export default function DelegatePage() {
-  const router = useRouter();
-  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const router          = useRouter();
+  const { user, token } = useAuth();
+
+  const [matches,             setMatches]             = useState<Match[]>([]);
+  const [loading,             setLoading]             = useState(true);
+  const [cancelModalOpen,     setCancelModalOpen]     = useState(false);
   const [motivosSelecionados, setMotivosSelecionados] = useState<string[]>([]);
-  const [detalheMotivo, setDetalheMotivo] = useState("");
+  const [detalheMotivo,       setDetalheMotivo]       = useState("");
+
+  // Carrega partidas do delegado logado
+  useEffect(() => {
+    if (!user || !token) return;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const res  = await fetch(`${API_URL}/match`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = await res.json();
+        const all: Match[] = Array.isArray(data) ? data : [];
+        // Filtra apenas partidas onde delegate.id bate com o user logado
+        setMatches(all.filter((m) => m.delegate?.id === user.id));
+      } catch {
+        setMatches([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [user, token]);
+
+  // Stats derivados das partidas reais
+  const approvedReports = matches.filter((m) => m.report?.status === "validated").length;
+  const upcomingMatches = matches.filter(
+    (m) => m.status === "scheduled" && new Date(m.date) > new Date()
+  ).length;
+
+  // Próxima partida agendada no futuro
+  const currentMatch = matches
+    .filter((m) => m.status === "scheduled" && new Date(m.date) > new Date())
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())[0] ?? null;
 
   const toggleMotivo = (id: string) =>
     setMotivosSelecionados((prev) =>
@@ -91,7 +109,6 @@ export default function DelegatePage() {
 
   const handleFinalizarCancelamento = async () => {
     if (motivosSelecionados.length === 0) return;
-    const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
     console.log("Cancelando partida:", { motivos: motivosSelecionados, detalhe: detalheMotivo });
     setCancelModalOpen(false);
     setMotivosSelecionados([]);
@@ -104,35 +121,53 @@ export default function DelegatePage() {
 
         <DelegateHeader title="Painel do Delegado" />
 
-        <div className="mt-3 shadow-md">
+        <div onClick={() => router.push(CONVOCACOES_ROUTE)} className="mt-3 shadow-md">
           <ResponsibilityBanner
             eyebrow="SUAS RESPONSABILIDADES"
-            highlight={`${mockStats.assignedMatches} Partidas Designadas`}
+            highlight={`${matches.length} Partidas Designadas`}
             description="Gerencie suas partidas e relatórios"
             icon={<CalendarDays className="h-5 w-5" />}
             href={DELEGADO_ROUTE}
           />
         </div>
 
-        <section className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <StatCard title="Relatórios Aprovados" value={mockStats.approvedReports} icon={IconCalendar} iconTone="success" />
-          <StatCard title="Próximas Partidas"    value={mockStats.upcomingMatches}  icon={IconTrophy}   iconTone="success" />
-        </section>
+        {/* Stats */}
+        {loading ? (
+          <div className="flex justify-center py-6">
+            <Loader2 size={28} className="animate-spin text-[#007a33]" />
+          </div>
+        ) : (
+          <section className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <StatCard title="Relatórios Aprovados" value={approvedReports} icon={IconCalendar} iconTone="success" />
+            <StatCard title="Próximas Partidas"    value={upcomingMatches} icon={IconTrophy}   iconTone="success" />
+          </section>
+        )}
 
+        {/* Partida atual */}
         <section className="mt-5">
           <h2 className="text-center text-lg font-semibold text-gray-900">Partida Atual</h2>
-
           <div className="mt-2">
-            <CurrentMatchCard
-              matchId={mockCurrentMatch.id}
-              stadiumName={mockCurrentMatch.stadiumName}
-              address={`${mockCurrentMatch.address}, ${mockCurrentMatch.city}`}
-              spectators={mockCurrentMatch.spectators}
-              teams={mockCurrentMatch.teams}
-              imageUrl={mockCurrentMatch.imageUrl}
-              registerHref={`${SUMULA_ROUTE}?match=${mockCurrentMatch.id}`}
-              onCancel={() => setCancelModalOpen(true)}
-            />
+            {loading ? (
+              <div className="flex justify-center py-10">
+                <Loader2 size={28} className="animate-spin text-[#007a33]" />
+              </div>
+            ) : currentMatch ? (
+              <CurrentMatchCard
+                matchId={String(currentMatch.id)}
+                stadiumName={currentMatch.location?.name ?? "Local não informado"}
+                address={currentMatch.location?.address ?? ""}
+                spectators={currentMatch.location?.capacity ?? 0}
+                teams={`${currentMatch.homeTeam.name} x ${currentMatch.awayTeam.name}`}
+                imageUrl={currentMatch.location?.imageUrl ?? ""}
+                registerHref={`${SUMULA_ROUTE}?match=${currentMatch.id}`}
+                onCancel={() => setCancelModalOpen(true)}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-gray-400 border border-dashed border-gray-200 rounded-xl">
+                <CalendarDays size={32} className="mb-2 opacity-30" />
+                <p className="text-sm font-medium">Nenhuma partida agendada</p>
+              </div>
+            )}
           </div>
         </section>
 
@@ -148,22 +183,15 @@ export default function DelegatePage() {
             className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <h2 className="text-lg font-bold text-gray-800">Cancelar Partida</h2>
             <p className="text-sm text-red-500 font-medium mt-0.5">
               Informe o motivo para o cancelamento da partida
             </p>
 
-            {/* Motivos — label em cima, checkbox embaixo, 4 colunas */}
             <div className="grid grid-cols-4 gap-2 mt-5">
               {MOTIVOS_CANCELAMENTO.map(({ id, label }) => (
-                <label
-                  key={id}
-                  className="flex flex-col items-center gap-2 cursor-pointer"
-                >
-                  <span className="text-xs text-gray-700 text-center leading-tight">
-                    {label}
-                  </span>
+                <label key={id} className="flex flex-col items-center gap-2 cursor-pointer">
+                  <span className="text-xs text-gray-700 text-center leading-tight">{label}</span>
                   <input
                     type="checkbox"
                     checked={motivosSelecionados.includes(id)}
@@ -174,11 +202,8 @@ export default function DelegatePage() {
               ))}
             </div>
 
-            {/* Detalhe */}
             <div className="mt-5">
-              <label className="text-sm font-semibold text-gray-700 block mb-1">
-                Detalhar Motivo
-              </label>
+              <label className="text-sm font-semibold text-gray-700 block mb-1">Detalhar Motivo</label>
               <textarea
                 value={detalheMotivo}
                 onChange={(e) => setDetalheMotivo(e.target.value)}
@@ -188,7 +213,6 @@ export default function DelegatePage() {
               />
             </div>
 
-            {/* Ações — alinhados à direita */}
             <div className="flex justify-end gap-3 mt-5">
               <button
                 onClick={() => setCancelModalOpen(false)}
@@ -207,7 +231,6 @@ export default function DelegatePage() {
           </div>
         </div>
       )}
-
     </main>
   );
 }

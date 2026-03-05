@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { AlertTriangle } from "lucide-react";
 
 interface ModalExcluirCampeonatoProps {
   isOpen: boolean;
@@ -24,19 +25,19 @@ export default function ModalExcluirCampeonato({
         className="bg-white w-full max-w-xl rounded-2xl shadow-xl p-6 animate-in fade-in zoom-in duration-300"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold text-gray-900 mb-4">
-          Excluir Campeonato
-        </h2>
-
-        <div className="text-gray-600 mb-6 space-y-0.2">
-          <p className="text-base">
-            Tem certeza de que deseja excluir esse campeonato?
-          </p>
-
-          <p className="text-base whitespace-nowrap overflow-hidden text-ellipsis">
-            Esta ação não pode ser desfeita e todos os dados serão perdidos.
-          </p>
+        <div className="flex items-start gap-4 mb-5">
+          <div className="p-2.5 bg-red-50 rounded-xl shrink-0">
+            <AlertTriangle size={22} className="text-red-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Excluir Campeonato</h2>
+            <p className="text-sm text-gray-500 font-medium mt-0.5">Esta ação não pode ser desfeita</p>
+          </div>
         </div>
+
+        <p className="text-sm text-gray-600 font-medium mb-6 leading-relaxed">
+          Tem certeza de que deseja excluir esse campeonato? Todos os dados e confrontos vinculados serão permanentemente removidos.
+        </p>
 
         <div className="flex justify-end gap-3">
           <button
@@ -45,7 +46,6 @@ export default function ModalExcluirCampeonato({
           >
             Cancelar
           </button>
-
           <button
             data-testid="btn-confirmar-exclusao"
             onClick={onConfirm}

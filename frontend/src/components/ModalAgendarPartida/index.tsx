@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { X, ChevronDown } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import toast from "react-hot-toast";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
 
@@ -10,8 +10,8 @@ interface MatchToEdit {
   id: number;
   date: string;
   locationId: number;
-  homeTeam: { id: number; name: string };
-  awayTeam: { id: number; name: string };
+  homeTeam: { id: number; name: string; club?: { id: number; name: string } };
+  awayTeam: { id: number; name: string; club?: { id: number; name: string } };
   delegate?: { id: number; name: string };
 }
 
@@ -19,7 +19,7 @@ interface ModalAgendarPartidaProps {
   isOpen: boolean;
   onClose: () => void;
   nomeCampeonato: string;
-  matchToEdit?: MatchToEdit | null; // se fornecido → modo edição
+  matchToEdit?: MatchToEdit | null;
 }
 
 interface Team     { id: number; name: string; club?: { id: number; name: string }; }
@@ -29,7 +29,6 @@ interface Location { id: number; name: string; }
 export default function ModalAgendarPartida({
   isOpen, onClose, nomeCampeonato, matchToEdit,
 }: ModalAgendarPartidaProps) {
-  const router    = useRouter();
   const { token } = useAuth();
   const isEditing = !!matchToEdit;
 
@@ -46,16 +45,17 @@ export default function ModalAgendarPartida({
   const [teams,     setTeams]     = useState<Team[]>([]);
   const [delegados, setDelegados] = useState<User[]>([]);
   const [loading,   setLoading]   = useState(false);
+  const [tournamentId, setTournamentId] = useState<number | null>(null);
 
   // Pré-preenche campos no modo edição
   useEffect(() => {
     if (!matchToEdit) return;
-    const d = new Date(matchToEdit.date);
-    const dd   = String(d.getDate()).padStart(2, "0");
-    const mm   = String(d.getMonth() + 1).padStart(2, "0");
+    const d   = new Date(matchToEdit.date);
+    const dd  = String(d.getDate()).padStart(2, "0");
+    const mm  = String(d.getMonth() + 1).padStart(2, "0");
     const yyyy = d.getFullYear();
-    const hh   = String(d.getHours()).padStart(2, "0");
-    const min  = String(d.getMinutes()).padStart(2, "0");
+    const hh  = String(d.getHours()).padStart(2, "0");
+    const min = String(d.getMinutes()).padStart(2, "0");
     setData(`${dd}/${mm}/${yyyy}`);
     setHora(`${hh}:${min}`);
     setLocationId(matchToEdit.locationId);
@@ -64,70 +64,65 @@ export default function ModalAgendarPartida({
     setDelegateId(matchToEdit.delegate?.id ?? null);
   }, [matchToEdit]);
 
+  // Carrega locais, times e delegados
   useEffect(() => {
     if (!isOpen) return;
 
-    const headers: Record<string, string> = {
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    };
+    const headers: Record<string, string> = token
+      ? { Authorization: `Bearer ${token}` } : {};
 
-    // Busca simples — suporta array e resposta paginada { data, meta }
     const safeFetch = async (url: string): Promise<any[]> => {
       try {
-        const res = await fetch(url, { headers });
-        if (!res.ok) { console.error(`Erro ${res.status} em GET ${url}`); return []; }
+        const res  = await fetch(url, { headers });
+        if (!res.ok) return [];
         const json = await res.json();
         if (Array.isArray(json)) return json;
         if (json?.data && Array.isArray(json.data)) return json.data;
         return [];
-      } catch (err) {
-        console.error(`Falha ao buscar ${url}:`, err);
-        return [];
-      }
+      } catch { return []; }
     };
 
-    // Busca todas as páginas de endpoints paginados
     const fetchAllPages = async (url: string): Promise<any[]> => {
       try {
         const first = await fetch(`${url}?page=1&size=100`, { headers });
         if (!first.ok) return [];
-        const json = await first.json();
+        const json  = await first.json();
         if (Array.isArray(json)) return json;
         const { data = [], meta } = json;
         if (!meta || meta.lastPage <= 1) return data;
-        // Busca páginas restantes em paralelo
         const pages = Array.from({ length: meta.lastPage - 1 }, (_, i) =>
           fetch(`${url}?page=${i + 2}&size=100`, { headers })
-            .then(r => r.json())
-            .then(j => j?.data ?? [])
-            .catch(() => [])
+            .then(r => r.json()).then(j => j?.data ?? []).catch(() => [])
         );
         const rest = await Promise.all(pages);
         return [...data, ...rest.flat()];
-      } catch (err) {
-        console.error(`Falha ao buscar ${url}:`, err);
-        return [];
-      }
+      } catch { return []; }
     };
 
     const load = async () => {
       setLoading(true);
       try {
-        const [locationsData, teamsData, usersData] = await Promise.all([
+        const [locationsData, teamsData, usersData, tourData] = await Promise.all([
           safeFetch(`${API_URL}/location`),
           safeFetch(`${API_URL}/team`),
-          fetchAllPages(`${API_URL}/user`),  // paginado — busca tudo
+          fetchAllPages(`${API_URL}/user`),
+          safeFetch(`${API_URL}/tournament`),
         ]);
         setLocations(locationsData);
         setTeams(teamsData);
         setDelegados(usersData.filter((u: User) => u.type === "delegado"));
+        // Resolve o id do torneio pelo nome recebido como prop
+        const found = tourData.find((t: any) =>
+          t.name?.toLowerCase() === nomeCampeonato.toLowerCase()
+        );
+        setTournamentId(found?.id ?? null);
       } finally {
         setLoading(false);
       }
     };
 
     load();
-  }, [isOpen, token]);
+  }, [isOpen, token, nomeCampeonato]);
 
   const handleClose = () => {
     setData(""); setHora("");
@@ -155,16 +150,34 @@ export default function ModalAgendarPartida({
     setError(null);
 
     if (!data || !hora || !locationId || !homeTeamId || !awayTeamId || !delegateId) {
-      setError("Preencha todos os campos obrigatórios.");
+      const msg = "Preencha todos os campos obrigatórios.";
+      setError(msg);
+      toast.error(msg, { position: "bottom-right", style: { borderRadius: "8px", fontFamily: "Roboto, sans-serif" } });
       return;
     }
     if (homeTeamId === awayTeamId) {
-      setError("O time mandante e visitante não podem ser o mesmo.");
+      const msg = "O time mandante e visitante não podem ser o mesmo.";
+      setError(msg);
+      toast.error(msg, { position: "bottom-right", style: { borderRadius: "8px", fontFamily: "Roboto, sans-serif" } });
       return;
     }
 
     const [dia, mes, ano] = data.split("/");
-    const isoDate = new Date(`${ano}-${mes}-${dia}T${hora}:00`).toISOString();
+    // Monta a data em UTC explícito para evitar offset de timezone
+    const [hh, min]  = hora.split(":").map(Number);
+    const utcDate    = new Date(Date.UTC(Number(ano), Number(mes) - 1, Number(dia), hh, min, 0));
+    const isoDate    = utcDate.toISOString();
+
+    // Payload conforme estrutura da API
+    const payload: Record<string, any> = {
+      date:       isoDate,
+      locationId,
+      homeTeamId,
+      awayTeamId,
+      delegateId,
+    };
+    // status é gerenciado pelo backend automaticamente na criação
+    // if (!isEditing) payload.status = "scheduled";
 
     setSubmitting(true);
     try {
@@ -177,28 +190,65 @@ export default function ModalAgendarPartida({
           "Content-Type": "application/json",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({
-          date: isoDate, locationId, homeTeamId,
-          awayTeamId, delegateId,
-          ...(!isEditing && { status: "scheduled" }),
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.message ?? `Erro ${res.status}`);
+        const body = await res.json().catch(() => ({}));
+        console.error("POST /match bad request:", JSON.stringify(body, null, 2));
+        console.error("Payload enviado:", JSON.stringify(payload, null, 2));
+        const msg  = Array.isArray(body?.message)
+          ? body.message.join(", ")
+          : (body?.message ?? `Erro ${res.status}`);
+        throw new Error(msg);
       }
 
+      // Vincula a partida ao torneio via tournament-knockout (apenas na criação)
+      if (!isEditing && tournamentId) {
+        const match = await res.json();
+
+        // Busca knockouts existentes para calcular o próximo slot disponível
+        const koRes      = await fetch(`${API_URL}/tournament-knockout`, {
+          headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        });
+        const koData     = koRes.ok ? await koRes.json() : [];
+        const existing   = (Array.isArray(koData) ? koData : [])
+          .filter((e: any) => e.tournamentId === tournamentId);
+        const nextSlot   = existing.length + 1;
+        const nextRound  = Math.ceil(nextSlot / 8); // agrupa de 8 em 8 por rodada
+
+        await fetch(`${API_URL}/tournament-knockout`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            tournamentId,
+            matchId:    match.id,
+            stage:      "GROUP",
+            roundOrder: nextRound,
+            slot:       nextSlot,
+          }),
+        });
+      }
+
+      toast.success(isEditing ? "Partida atualizada com sucesso!" : "Partida agendada com sucesso!", {
+        position: "bottom-right",
+        style: { borderRadius: "8px", background: "#004a1b", color: "#fff", fontFamily: "Roboto, sans-serif" },
+      });
+
       handleClose();
-      router.refresh();
     } catch (err: any) {
-      setError(err.message ?? "Erro ao salvar partida. Tente novamente.");
+      const msg = err.message ?? "Erro ao salvar partida. Tente novamente.";
+      setError(msg);
+      toast.error(msg, { position: "bottom-right", style: { borderRadius: "8px", fontFamily: "Roboto, sans-serif" } });
     } finally {
       setSubmitting(false);
     }
   };
 
-  const teamLabel = (t: Team) => t.club?.name ?? t.name;
+  const teamLabel = (t: Team) => t.club ? `${t.club.name} — ${t.name}` : t.name;
 
   if (!isOpen) return null;
 
@@ -236,6 +286,7 @@ export default function ModalAgendarPartida({
         )}
 
         <form className="p-6 pt-0 py-8 space-y-5 text-sm" onSubmit={handleSubmit}>
+          {/* Data e Hora */}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-bold text-gray-900">Data *</label>
@@ -249,6 +300,7 @@ export default function ModalAgendarPartida({
             </div>
           </div>
 
+          {/* Local */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-bold text-gray-900">Local *</label>
             <div className="relative">
@@ -260,6 +312,7 @@ export default function ModalAgendarPartida({
             </div>
           </div>
 
+          {/* Times */}
           <div className="grid grid-cols-2 gap-4">
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-bold text-gray-900">Mandante *</label>
@@ -285,6 +338,7 @@ export default function ModalAgendarPartida({
             </div>
           </div>
 
+          {/* Delegado */}
           <div className="flex flex-col gap-1.5 pb-2">
             <label className="text-sm font-bold text-gray-900 flex items-center gap-2">
               Delegado *
@@ -304,6 +358,7 @@ export default function ModalAgendarPartida({
             </div>
           </div>
 
+          {/* Ações */}
           <div className="pt-6 flex justify-end gap-3">
             <button type="button" onClick={handleClose}
               className="px-6 py-2 border border-gray-300 rounded-md font-bold text-gray-700 hover:bg-gray-100 transition-colors text-sm cursor-pointer">

@@ -1,208 +1,289 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { CalendarPlus, Users, Clock, Loader2, Trophy } from 'lucide-react';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import ModalAgendarPartida from '@/components/ModalAgendarPartida';
-import { useAuth } from '@/context/AuthContext';
+import React, { useEffect, useState, useCallback } from "react";
+import { Trophy, Trash2, Pencil, Loader2 } from "lucide-react";
+import ModalExcluirPartida from "@/components/ModalExcluirPartida";
+import ModalAgendarPartida from "@/components/ModalAgendarPartida";
+import { useAuth } from "@/context/AuthContext";
+import { useParams, useSearchParams } from "next/navigation";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+
+interface MatchReport {
+  id: number;
+  status: string;
+  homeScore: number;
+  awayScore: number;
+}
+
+interface Team {
+  id: number;
+  name: string;
+  club?: { id: number; name: string };
+}
+
+interface MatchNested {
+  id: number;
+  date: string;
+  status: "scheduled" | "finished" | "cancelled" | string;
+  locationId: number;
+  homeTeam: Team;
+  awayTeam: Team;
+  location?: { id: number; name: string };
+  delegate?: { id: number; name: string };
+  report?: MatchReport;
+}
 
 interface KnockoutEntry {
   id: number;
   tournamentId: number;
   stage: string;
+  roundOrder: number;
+  slot: number;
+  matchId: number;
+  winnerTeamId: number | null;
   isDecided: boolean;
+  notes: string | null;
   createdAt: string;
+  match: MatchNested;
+  winnerTeam: Team | null;
 }
 
-interface TournamentInfo {
+interface Match {
   id: number;
-  nome: string;
-  totalPartidas: number;
-  partidasFinalizadas: number;
+  date: string;
   status: string;
-  ano: string;
+  locationId: number;
+  homeTeam: Team;
+  awayTeam: Team;
+  location?: { id: number; name: string };
+  delegate?: { id: number; name: string };
+  report?: MatchReport;
 }
 
-export default function GerenciarCampeonatoPage() {
-  const params  = useParams();
-  const router  = useRouter();
-  const { token } = useAuth();
+const STAGE_LABELS: Record<string, string> = {
+  GROUP:         "Fase de Grupos",
+  QUARTER_FINAL: "Quartas de Final",
+  SEMI_FINAL:    "Semifinal",
+  FINAL:         "Final",
+};
 
-  const [isAgendarModalOpen, setIsAgendarModalOpen] = useState(false);
-  const [tournament, setTournament] = useState<TournamentInfo | null>(null);
-  const [loading,    setLoading]    = useState(true);
-  const [notFound,   setNotFound]   = useState(false);
+function teamDisplay(team: Team): string {
+  return team.club ? `${team.club.name}` : team.name;
+}
 
-  const searchParams  = useSearchParams();
-  const tournamentId  = searchParams.get("id") ? Number(searchParams.get("id")) : null;
+function teamLabel(team: Team): string {
+  return team.club ? `${team.club.name} — ${team.name}` : team.name;
+}
 
-  const nomeParam = params.nome
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString("pt-BR");
+}
+function formatHour(iso: string) {
+  return new Date(iso).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+}
+
+function ScoreBadge({ match }: { match: MatchNested }) {
+  if (match.report && match.status === "finished") {
+    return (
+      <span className="bg-[#dcfce7] text-[#166534] border border-[#bbf7d0] font-bold px-4 py-1.5 rounded-full text-base whitespace-nowrap">
+        {match.report.homeScore} - {match.report.awayScore}
+      </span>
+    );
+  }
+  return (
+    <span className="bg-gray-100 text-gray-500 border border-gray-200 font-bold px-4 py-1.5 rounded-full text-sm whitespace-nowrap">
+      Em breve
+    </span>
+  );
+}
+
+export default function VerPartidasPage() {
+  const { token, user } = useAuth();
+  const isAdmin         = user?.type === "admin";
+  const params         = useParams();
+  const searchParams   = useSearchParams();
+
+  // ID vem da query string — ?id=1
+  const tournamentId   = searchParams.get("id") ? Number(searchParams.get("id")) : null;
+  const nomeCampeonato = params?.nome
     ? decodeURIComponent(params.nome as string)
-    : null;
+    : "Campeonato";
 
-  useEffect(() => {
-    if (!nomeParam) { setNotFound(true); setLoading(false); return; }
+  const [entries,            setEntries]            = useState<KnockoutEntry[]>([]);
+  const [loading,            setLoading]            = useState(true);
+  const [notFound,           setNotFound]           = useState(false);
+  const [isExcluirOpen,      setIsExcluirOpen]      = useState(false);
+  const [isEditarOpen,       setIsEditarOpen]       = useState(false);
+  const [partidaParaExcluir, setPartidaParaExcluir] = useState<number | null>(null);
+  const [partidaParaEditar,  setPartidaParaEditar]  = useState<Match | null>(null);
 
-    const load = async () => {
-      setLoading(true);
-      try {
-        const headers: Record<string, string> = token
-          ? { Authorization: `Bearer ${token}` } : {};
+  const fetchMatches = useCallback(async () => {
+    setLoading(true);
+    setNotFound(false);
+    try {
+      const headers: Record<string, string> = token
+        ? { Authorization: `Bearer ${token}` } : {};
 
-        // 1. Usa o id da query string se disponível; senão busca pelo nome
-        let found: any = null;
-        if (tournamentId) {
-          const res = await fetch(`${API_URL}/tournament/${tournamentId}`, { headers });
-          if (!res.ok) { setNotFound(true); return; }
-          found = await res.json();
-        } else {
-          const tourRes  = await fetch(`${API_URL}/tournament`, { headers });
-          const tourData = await tourRes.json();
-          found = (Array.isArray(tourData) ? tourData : [])
-            .find((t: any) => t.name?.toLowerCase() === (nomeParam ?? "").toLowerCase());
-        }
+      let resolvedId = tournamentId;
 
-        if (!found) { setNotFound(true); return; }
-
-        // 2. Busca confrontos pelo tournamentId
-        const koRes  = await fetch(`${API_URL}/tournament-knockout`, { headers });
-        const koData: KnockoutEntry[] = await koRes.json();
-        const entries = (Array.isArray(koData) ? koData : [])
-          .filter((e: any) => e.tournamentId === found.id);
-
-        const finalizadas = entries.filter((e) => e.isDecided).length;
-
-        setTournament({
-          id:                  found.id,
-          nome:                found.name,
-          totalPartidas:       entries.length,
-          partidasFinalizadas: finalizadas,
-          status:              entries.length > 0 && finalizadas === entries.length
-            ? "Finalizado" : "Em Andamento",
-          ano: new Date(found.createdAt).getFullYear().toString(),
-        });
-      } catch {
-        setNotFound(true);
-      } finally {
-        setLoading(false);
+      // Se não veio ID na URL, busca pelo nome como fallback
+      if (!resolvedId) {
+        const tourRes  = await fetch(`${API_URL}/tournament`, { headers });
+        const tourData = await tourRes.json();
+        const found    = (Array.isArray(tourData) ? tourData : [])
+          .find((t: any) => t.name?.toLowerCase() === nomeCampeonato.toLowerCase());
+        resolvedId = found?.id ?? null;
       }
-    };
 
-    load();
-  }, [nomeParam, token]);
+      if (!resolvedId) { setNotFound(true); return; }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[40vh]">
-        <Loader2 size={32} className="animate-spin text-[#007a33]" />
-      </div>
-    );
-  }
+      // GET /tournament/{id} — valida que o torneio existe
+      const tourRes = await fetch(`${API_URL}/tournament/${resolvedId}`, { headers });
+      if (!tourRes.ok) { setNotFound(true); return; }
 
-  if (notFound || !tournament) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[40vh] gap-3 text-gray-400">
-        <Trophy size={40} className="opacity-30" />
-        <p className="font-bold text-lg text-gray-600">Campeonato não encontrado</p>
-        <button
-          onClick={() => router.push("/campeonatos")}
-          className="text-sm text-[#007a33] font-bold hover:underline cursor-pointer"
-        >
-          Voltar para campeonatos
-        </button>
-      </div>
-    );
-  }
+      // GET /tournament-knockout — filtra pelo tournamentId
+      const koRes  = await fetch(`${API_URL}/tournament-knockout`, { headers });
+      const koData = await koRes.json();
+      const filtered: KnockoutEntry[] = (Array.isArray(koData) ? koData : [])
+        .filter((e: any) => e.tournamentId === resolvedId);
 
-  const isFinished = tournament.status === "Finalizado";
+      setEntries(filtered);
+    } catch (err) {
+      console.error("Erro ao buscar partidas:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [token, tournamentId, nomeCampeonato]);
+
+  useEffect(() => { fetchMatches(); }, [fetchMatches]);
+
+  const handleConfirmExcluir = async () => {
+    if (!partidaParaExcluir) return;
+    try {
+      await fetch(`${API_URL}/match/${partidaParaExcluir}`, {
+        method: "DELETE",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      await fetchMatches();
+    } catch (err) {
+      console.error("Erro ao excluir partida:", err);
+    } finally {
+      setIsExcluirOpen(false);
+      setPartidaParaExcluir(null);
+    }
+  };
 
   return (
-    <div className="flex flex-col font-bold" data-testid="page-gerenciar-campeonato">
-      <div className="w-full max-w-6xl mx-auto px-6 pt-10 pb-20 text-gray-900">
-
-        {/* Cabeçalho */}
-        <div className="mb-10 text-left">
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-              {tournament.nome}
-            </h1>
-            <span className={`px-3 py-1 rounded-full text-xs font-bold border ${
-              isFinished
-                ? "bg-gray-100 text-gray-500 border-gray-200"
-                : "bg-[#dcfce7] text-[#166534] border-[#bbf7d0]"
-            }`}>
-              {tournament.status}
-            </span>
-          </div>
-          <p className="text-base text-gray-500 font-medium">
-            {tournament.ano} • Mata-Mata •{" "}
-            {tournament.partidasFinalizadas}/{tournament.totalPartidas} partidas finalizadas
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Agendar nova partida */}
-          <button
-            onClick={() => !isFinished && setIsAgendarModalOpen(true)}
-            disabled={isFinished}
-            className={`flex items-center gap-5 p-6 bg-white border-2 rounded-xl shadow-md text-left group transition-all ${
-              isFinished
-                ? "border-gray-100 opacity-50 cursor-not-allowed"
-                : "border-gray-100 hover:border-emerald-200 hover:shadow-md cursor-pointer"
-            }`}
-          >
-            <div className={`p-4 rounded-xl transition-colors ${isFinished ? "bg-gray-100" : "bg-gray-100 group-hover:bg-green-50"}`}>
-              <CalendarPlus size={36} className={isFinished ? "text-gray-300" : "text-gray-700 group-hover:text-[#007a33]"} />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-900 leading-tight">Agendar nova partida</h3>
-              <p className="text-sm text-gray-500 font-medium">
-                {isFinished ? "Campeonato encerrado" : "Agende uma partida no campeonato"}
-              </p>
-            </div>
-          </button>
-
-          {/* Importar Times — em breve */}
-          <button disabled className="flex items-center gap-5 p-6 bg-white border-2 border-gray-100 rounded-xl text-left opacity-50 cursor-not-allowed">
-            <div className="p-4 bg-gray-100 rounded-xl">
-              <Users size={36} className="text-gray-300" />
-            </div>
-            <div>
-              <h3 className="text-xl font-bold text-gray-400 leading-tight">Importar Times</h3>
-              <p className="text-sm text-gray-300 font-medium">Em breve</p>
-            </div>
-          </button>
-        </div>
-
-        {/* Ver Partidas */}
-        <button
-          onClick={() => router.push(`/${encodeURIComponent(tournament.nome)}/ver-partidas?id=${tournament.id}`)}
-          className="w-full mb-12 flex items-center gap-5 p-6 bg-white border-2 border-gray-100 rounded-xl shadow-md hover:border-emerald-200 hover:shadow-md transition-all text-left group cursor-pointer"
-        >
-          <div className="p-4 bg-gray-100 rounded-xl group-hover:bg-green-50 transition-colors">
-            <Clock size={36} className="text-gray-700 group-hover:text-[#007a33]" />
-          </div>
-          <div>
-            <h3 className="text-xl font-bold text-gray-900 leading-tight">Ver Partidas do Campeonato</h3>
-            <p className="text-sm text-gray-500 font-medium">Visualize a agenda de jogos</p>
-          </div>
-        </button>
-
-        <div className="flex justify-center">
-          <button
-            onClick={() => router.push("/campeonatos")}
-            className="bg-[#007a33] hover:bg-[#005f27] text-white px-12 py-2.5 rounded-lg font-bold shadow-md transition-all active:scale-95 cursor-pointer text-base"
-          >
-            Voltar
-          </button>
-        </div>
+    <div className="max-w-6xl mx-auto p-4 md:p-6">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Lista de Partidas</h1>
+        <p className="text-sm text-gray-500 font-medium mt-1">
+          {loading
+            ? "Carregando..."
+            : `${entries.length} partida${entries.length !== 1 ? "s" : ""} encontrada${entries.length !== 1 ? "s" : ""}`}
+        </p>
       </div>
 
+      {loading ? (
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={32} className="animate-spin text-[#007a33]" />
+        </div>
+      ) : notFound ? (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+          <Trophy size={40} className="mb-3 opacity-30" />
+          <p className="font-bold text-lg">Campeonato não encontrado</p>
+        </div>
+      ) : entries.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-20 text-gray-400">
+          <Trophy size={40} className="mb-3 opacity-30" />
+          <p className="font-bold text-lg">Nenhuma partida cadastrada</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {entries.map((entry) => {
+            const { match } = entry;
+            const isFinished = match.status === "finished";
+            return (
+              <div
+                key={entry.id}
+                className="bg-white rounded-xl border border-gray-200 shadow-sm px-5 py-5 flex flex-col sm:flex-row items-center gap-4 hover:shadow-md hover:border-gray-300 transition-all"
+              >
+                <div className="flex flex-col items-center shrink-0">
+                  <div className="text-[#007a33] bg-[#f0fdf4] p-2.5 rounded-xl border border-[#bbf7d0]">
+                    <Trophy size={22} />
+                  </div>
+                  <span className="text-[10px] text-gray-400 font-bold mt-1 whitespace-nowrap">
+                    {STAGE_LABELS[entry.stage] ?? entry.stage}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-4 flex-1 min-w-0 justify-center sm:justify-start">
+                  <div className="flex flex-col items-end min-w-0">
+                    <span className="font-bold text-gray-900 truncate max-w-[100px] sm:max-w-[160px]">
+                      {teamDisplay(match.homeTeam)}
+                    </span>
+                    {match.homeTeam.club && (
+                      <span className="text-[10px] text-gray-400 font-medium truncate max-w-[100px] sm:max-w-[160px]">
+                        {match.homeTeam.name}
+                      </span>
+                    )}
+                  </div>
+                  <ScoreBadge match={match} />
+                  <div className="flex flex-col items-start min-w-0">
+                    <span className="font-bold text-gray-900 truncate max-w-[100px] sm:max-w-[160px]">
+                      {teamDisplay(match.awayTeam)}
+                    </span>
+                    {match.awayTeam.club && (
+                      <span className="text-[10px] text-gray-400 font-medium truncate max-w-[100px] sm:max-w-[160px]">
+                        {match.awayTeam.name}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="text-sm text-gray-500 font-medium text-center sm:text-right whitespace-nowrap">
+                  {match.location && <p className="font-semibold text-gray-700">{match.location.name}</p>}
+                  {match.date && <p>{formatDate(match.date)} • {formatHour(match.date)}</p>}
+                  {match.delegate && <p className="text-xs text-gray-400 mt-0.5">Delegado: {match.delegate.name}</p>}
+                  {entry.winnerTeam && (
+                    <p className="text-xs text-[#007a33] font-bold mt-0.5">✓ {entry.winnerTeam.name}</p>
+                  )}
+                </div>
+
+                {/* Editar e excluir — apenas admin, apenas partidas scheduled sem resultado */}
+                {isAdmin && match.status === "scheduled" && !match.report && (
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => { setPartidaParaEditar(match as Match); setIsEditarOpen(true); }}
+                      className="bg-[#007a33] hover:bg-[#005f27] text-white px-5 py-2 rounded-xl text-sm font-bold transition-all active:scale-95 cursor-pointer flex items-center gap-1.5"
+                    >
+                      <Pencil size={14} /> Editar
+                    </button>
+                    <button
+                      onClick={() => { setPartidaParaExcluir(match.id); setIsExcluirOpen(true); }}
+                      className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all cursor-pointer"
+                      title="Excluir partida"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      <ModalExcluirPartida
+        isOpen={isExcluirOpen}
+        onClose={() => setIsExcluirOpen(false)}
+        onConfirm={handleConfirmExcluir}
+      />
       <ModalAgendarPartida
-        isOpen={isAgendarModalOpen}
-        onClose={() => setIsAgendarModalOpen(false)}
-        nomeCampeonato={tournament.nome}
+        isOpen={isEditarOpen}
+        onClose={() => { setIsEditarOpen(false); setPartidaParaEditar(null); fetchMatches(); }}
+        nomeCampeonato={nomeCampeonato}
+        matchToEdit={partidaParaEditar}
       />
     </div>
   );
